@@ -1,7 +1,10 @@
 # bitGenerator module
 # this module's purpose is to generate random bits to be used as instructions
 # random byte outputs need to be of the byte datatype
-from random import randint
+from random import randint, seed
+
+def setRandomSeed(random_seed):
+    seed(random_seed)
 
 def generateRandomBytes(numBytes, byteorder='big'):
     maxInt = (2 ** (numBytes * 8)) - 1
