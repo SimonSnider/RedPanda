@@ -3,12 +3,13 @@
 from capstone import *
 from capstone.mips import *
 
-def filterInstruction(instruction):
-    md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32)
+def filterInstruction(instruction, verbose=False):
+    md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32 + CS_MODE_BIG_ENDIAN)
     md.detail = True
 
     for insn in md.disasm(instruction, 0x1000):
-        print("%s\t%s" % (insn.mnemonic, insn.op_str))
+        if(verbose):
+            print("%s\t%s" % (insn.mnemonic, insn.op_str))
 
         if len(insn.operands) > 0:
             for i in insn.operands:
@@ -17,6 +18,7 @@ def filterInstruction(instruction):
                 if i.type == MIPS_OP_IMM:
                     continue;
                 if i.type == MIPS_OP_MEM:
-                    print("Error: Instruction Contains Memory Acess")
+                    if(verbose):
+                        print("Error: Instruction Contains Memory Acess")
                     return False;
     return True

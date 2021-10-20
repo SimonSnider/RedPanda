@@ -1,4 +1,4 @@
-import verifierAdapter
+from modules.generateInstruction import verifierAdapter
 
 def test_setISA():
     verifierAdapter.setISA("mips32")
