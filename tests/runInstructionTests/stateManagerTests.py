@@ -31,6 +31,8 @@ def setup(cpu):
     panda.arch.dump_regs(cpu)
     global regState2
     regState2 = getRegisterState(panda, cpu)
+    print(regState2)
+    # print(regState2)
     # Set starting_pc
     cpu.env_ptr.active_tc.PC = ADDRESS
     panda.end_analysis()
@@ -40,15 +42,24 @@ def setup(cpu):
 #    panda.end_analysis()
     
 
+panda.run()
 
 class TestScript(unittest.TestCase):
-    def test(self):
-        print("before test run")
-        panda.run()
-        print("after test run")
-        # assert False
+    def testRandomizeRegisterState(self):
+        """
+        Check that the randomized register state is different from the original register state.
+        """
         global regState1, regState2
-        assert compareRegStates(regState1, regState2)
+        self.assertTrue(compareRegStates(regState1, regState2))
+
+    def testOffLimitsRegs(self):
+        """
+        check that the skipped registers in mips are still 0 after randomization
+        """
+        global regState2
+        for key in skippedMipsRegs:
+            self.assertEqual(regState2.get(key), 0, msg='key: {0}'.format(key))
+
 
 if __name__ == '__main__':
     unittest.main()

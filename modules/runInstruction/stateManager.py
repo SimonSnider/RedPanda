@@ -6,7 +6,10 @@ from random import randint, seed
 from pandare.arch import PandaArch
 from pandare.panda import Panda
 
+skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
+
 def setRandomSeed(random_seed):
+    """Sets the random seed used in this module"""
     seed(random_seed)
 
 def randomizeRegisters(panda: Panda, cpu, regKeys=[]):
@@ -18,11 +21,11 @@ def randomizeRegisters(panda: Panda, cpu, regKeys=[]):
     random_seed will set the seed of the random number generator. if left as -1 it will use the default
     """
     if (panda.arch_name == "mips"):
-        skippedRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
+        # skippedRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
         keys = regKeys
         if (len(keys) == 0): keys = panda.arch.registers.keys()
         for key in keys:
-            if key in skippedRegs: continue
+            if key in skippedMipsRegs: continue
             num = randint(0, 2**(32) - 1)
             panda.arch.set_reg(cpu, key, num)
     return

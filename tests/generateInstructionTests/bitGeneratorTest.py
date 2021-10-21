@@ -7,8 +7,8 @@ import pytest
 
 def testGenerateRandomBytes(bytes):
     """
-    call generateRandomBytes 100 times with x bytes and check that
-    it is in the correct range
+    call generateRandomBytes 100 times with 1, 2, and 4 bytes and check that
+    it is between 0 and 2^(8*x) - 1
     """
     for i in range(100):
         byteData = generateRandomBytes(bytes)
@@ -21,8 +21,8 @@ def testGenerateRandomBytes(bytes):
 
 def testByteBinaryString(bytes):
     """
-    call generateRandomBytes 100 times with x bytes 
-    and convert it to a binary string. check that
+    calls generateRandomBytes 100 times with 1, 2, and 4 bytes 
+    and converts it to a binary string, then checks that
     the string only contains 1's and 0's
     """
     for i in range(100):
