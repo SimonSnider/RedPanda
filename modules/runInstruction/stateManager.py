@@ -8,9 +8,18 @@ from pandare.panda import Panda
 
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
 
+def initializePanda(architecture="mips"):
+    panda = Panda("mips",
+        extra_args=["-M", "configurable", "-nographic"],
+        raw_monitor=True)
+    return panda
+
 def setRandomSeed(random_seed):
     """Sets the random seed used in this module"""
     seed(random_seed)
+
+def initializeMemory(panda: Panda, memName, memSize=2 * 1024 * 1024, address=0):
+    panda.map_memory(memName, memSize, address)
 
 def randomizeRegisters(panda: Panda, cpu, regKeys=[]):
     """
