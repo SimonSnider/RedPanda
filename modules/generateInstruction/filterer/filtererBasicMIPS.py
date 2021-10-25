@@ -14,11 +14,17 @@ def filterInstruction(instruction, verbose=False):
         if len(insn.operands) > 0:
             for i in insn.operands:
                 if i.type == MIPS_OP_REG:
+                    if len(insn.operands) == 1:
+                        return False;
                     continue;
                 if i.type == MIPS_OP_IMM:
+                    if len(insn.operands) == 1:
+                        return False;
                     continue;
                 if i.type == MIPS_OP_MEM:
                     if(verbose):
                         print("Error: Instruction Contains Memory Acess")
                     return False;
+        else:
+            return False;
     return True

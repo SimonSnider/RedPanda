@@ -2,7 +2,7 @@ import pytest
 from modules.generateInstruction.filterer.filtererBasicMIPS import filterInstruction
 
 def test_filterValidRTypeInstructions():
-    """Test that valid R-Type instructions are not filtered out.
+    """Test that valid R-Type instructions are not filtered out. On inputs of register to register R-Type instructions in MIPS32, the filtererBasicMIPS.py module should not filter any instructions.
     The following instructions are tested in the order given:
         add
         sub
@@ -43,7 +43,7 @@ def test_filterInvalidRTypeInstructions():
     """
     # Filter the syscall instruction
     instruction = b"\x00\x00\x00\x0c"
-    assert filterInstruction(instruction) == False
+    assert filterInstruction(instruction, verbose=True) == False
 
     # Filter the jr instruction
     instruction = b"\x01\x60\x00\x08"
