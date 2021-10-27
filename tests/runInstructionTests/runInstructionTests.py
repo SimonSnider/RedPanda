@@ -12,10 +12,9 @@ class TestScript(unittest.TestCase):
 
         ADDRESS = 0x0000
         encoding, count = ks.asm(CODE, ADDRESS)
-        data = runInstructionLoop(encoding, 1)
+        data = runInstructionLoop(encoding, 10)
         for regStates in data:
             self.assertEqual(regStates[1].get("T0"), 0)
-        self.assertEqual(len(regStates), 1, msg="more than one reg state")
     
     # def testRunInstructionLoop(self):
     #     instruction = "" #call generateInstruction Module
