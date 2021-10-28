@@ -4,6 +4,18 @@ from capstone import *
 from capstone.mips import *
 
 def filterInstruction(instruction, verbose=False):
+    """
+
+    Arguments:
+        instruction -- takes a 32 bit instruction specified in byte format
+
+        verbose -- turns on printing of generated instruction bytes (default = False)
+
+    Output:
+        Returns true if the instruction is not filtered out in the current model
+        Returns false otherwise
+    """
+
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32 + CS_MODE_BIG_ENDIAN)
     md.detail = True
 
