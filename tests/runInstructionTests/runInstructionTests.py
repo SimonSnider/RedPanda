@@ -1,6 +1,10 @@
 import unittest
 from modules.runInstruction.runInstruction import *
+from modules.runInstruction.stateManager import *
 from keystone import *
+from modules.generateInstruction import instructionGenerator
+
+panda = initializePanda()
 
 class TestScript(unittest.TestCase):
     def testRunInstructionOnce(self):
@@ -12,19 +16,29 @@ class TestScript(unittest.TestCase):
 
         ADDRESS = 0x0000
         encoding, count = ks.asm(CODE, ADDRESS)
-        data = runInstructionLoop(encoding, 1, verbose=True)
+        data = runInstructionLoop(panda, encoding, 1, verbose=True)
         for regStates in data:
             self.assertEqual(regStates[1].get("T0"), 0)
     
-    # def testRunInstructionLoop(self):
-    #     instruction = "" #call generateInstruction Module
+    def testRunInstructionLoop(self):
+        instructionGenerator.initialize()
+        instruction =  instructionGenerator.generateInstruction()
+        n = 100
+        data = runInstructionLoop(panda, instruction, n)
+        self.assertEqual(len(data.keys()), n)
 
+    def testRunInstructions(self):
+        instructions = []
+        instructionGenerator.initialize()
+        inst = 10
+        n = 100
+        for i in range(inst):
+            instructions.append(instructionGenerator.generateInstruction(True))
 
-    #     data = runInstructionLoop(instruction, 100)
-    #     for regStates in data:
-    #         self.assertTrue(compareRegStates(regStates[0], regStates[1]))
-
-    # def testRunInstructions(self):
+        stateData: dict = runInstructions(panda, instructions, n, True)
+        self.assertEqual(len(stateData.keys()), inst)
+        for key in stateData.keys():
+            self.assertEqual(len(stateData.get(key)), n)
 
 
 
