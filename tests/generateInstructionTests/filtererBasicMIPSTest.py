@@ -74,6 +74,8 @@ def test_filterInvalidITypeInstructions():
         lw
         sw
         sb
+        beq
+        bne
     """
     # Filter the lw instruction
     instruction = b"\x8d\x28\x00\x00"
@@ -85,6 +87,14 @@ def test_filterInvalidITypeInstructions():
 
     # Filter the sb instruction
     instruction = b"\xa1\x28\x00\x00"
+    assert filterInstruction(instruction) == False
+
+    # Filter the beq instruction
+    instruction = b"\x11\x09\xff\xfe"
+    assert filterInstruction(instruction) == False
+
+    # Filter the bne instruction
+    instruction = b"\x15\x09\xff\xfe"
     assert filterInstruction(instruction) == False
 
 def test_filterAnyJTypeInstructions():

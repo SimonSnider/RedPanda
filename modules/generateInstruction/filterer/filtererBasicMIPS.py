@@ -23,6 +23,11 @@ def filterInstruction(instruction, verbose=False):
         if(verbose):
             print("%s\t%s" % (insn.mnemonic, insn.op_str))
 
+        mnemonic = insn.mnemonic
+
+        if(mnemonic in ["beq", "bne", "bgtz", "bltz", "bgez", "blez"]):
+            return False
+
         if len(insn.operands) > 0:
             for i in insn.operands:
                 if i.type == MIPS_OP_REG:
