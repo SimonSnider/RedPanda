@@ -43,10 +43,10 @@ def generateInstruction(verbose=False):
         if(verbose):
             print(bitGen.byteBinaryString(randomInstructionBytes))
 
-        if(verAdapt.isValidInstruction(randomInstructionBytes)):
+        if(not verAdapt.isValidInstruction(randomInstructionBytes)):
             continue
 
-        if(fBMIPS.filterInstruction(randomInstructionBytes)):
+        if(not fBMIPS.filterInstruction(randomInstructionBytes)):
             continue
 
         break;
