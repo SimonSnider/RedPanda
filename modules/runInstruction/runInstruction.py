@@ -17,13 +17,12 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0):
     return
 
 
-def runInstructionLoop(instruction, n, verbose=False):
+def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     """
     runs the instruction n times and returns the register states
     [[before, after], [before, after], ...]
     """
     print("initializing panda")
-    panda = initializePanda()
     ADDRESS = 0
     stateData = []
     index = -1
@@ -33,13 +32,12 @@ def runInstructionLoop(instruction, n, verbose=False):
     def setup(cpu):
         initializeMemory(panda, "mymem", address=ADDRESS)
         loadInstruction(panda, cpu, instruction, ADDRESS)
-        panda.enable_precise_pc()
-        print("setup done")
+        if (verbose): print("setup done")
 
     @panda.cb_insn_exec
     def randomRegState(cpu, pc):
         if (pc == ADDRESS):
-            print("randomizing registers")
+            if (verbose): print("randomizing registers")
             randomizeRegisters(panda, cpu)
             stateData.append([getRegisterState(panda, cpu)])
             nonlocal index
@@ -58,10 +56,10 @@ def runInstructionLoop(instruction, n, verbose=False):
     @panda.cb_after_insn_exec
     def getInstValues(cpu, pc):
         if (pc == 4):
-            print("saving after reg state")
+            if (verbose): print("saving after reg state")
             stateData[index].append(getRegisterState(panda, cpu))
         if (index >= n-1):
-            print("end analysis")
+            if (verbose): print("end analysis")
             panda.end_analysis()
         return 0
 
@@ -69,3 +67,60 @@ def runInstructionLoop(instruction, n, verbose=False):
 
     panda.run()
     return stateData
+
+def runInstructions(panda: Panda, instructions, n, verbose=False):
+    """
+    runs each instruction n times and returns the instructions and register states
+    [[instruction1, [[before, after], [before, after], ...]], [instruction2, [[before, after]...]], ...]
+    """
+    print("initializing panda")
+    ADDRESS = 0
+    stateData = {}
+    regStateIndex = 0
+    instIndex = 0
+    md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
+
+
+    @panda.cb_after_machine_init
+    def setup(cpu):
+        initializeMemory(panda, "mymem", address=ADDRESS)
+        nonlocal instIndex
+        loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
+        stateData[instructions[instIndex]] = []
+        print("setup done")
+
+    @panda.cb_insn_exec
+    def randomRegState(cpu, pc):
+        if (pc == ADDRESS):
+            if (verbose): print("randomizing registers")
+            randomizeRegisters(panda, cpu)
+            stateData[instructions[instIndex]].append([getRegisterState(panda, cpu)])
+        code = panda.virtual_memory_read(cpu, pc, 4)
+        if (verbose):
+            for i in md.disasm(code, pc):
+                print("0x%x:\t%s\t%s" % (i.address, i.mnemonic, i.op_str))
+                break
+        return 0
+
+    @panda.cb_after_insn_translate
+    def translateAll(env, pc):
+        return True
+
+    @panda.cb_after_insn_exec
+    def getInstValues(cpu, pc):
+        nonlocal regStateIndex, instIndex
+        if (pc == 4):
+            if (verbose): print("saving after reg state")
+            stateData[instructions[instIndex]][regStateIndex].append(getRegisterState(panda, cpu))
+            regStateIndex += 1
+        if (regStateIndex >= n):
+            if (instIndex < len(instructions)-1):
+                instIndex += 1
+                loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
+                stateData[instructions[instIndex]] = []
+            else:
+                if (verbose): print("end analysis")
+                panda.end_analysis()
+                
+            
+        return 0

@@ -12,7 +12,7 @@ class TestScript(unittest.TestCase):
 
         ADDRESS = 0x0000
         encoding, count = ks.asm(CODE, ADDRESS)
-        data = runInstructionLoop(encoding, 10)
+        data = runInstructionLoop(encoding, 1, verbose=True)
         for regStates in data:
             self.assertEqual(regStates[1].get("T0"), 0)
     
@@ -23,6 +23,8 @@ class TestScript(unittest.TestCase):
     #     data = runInstructionLoop(instruction, 100)
     #     for regStates in data:
     #         self.assertTrue(compareRegStates(regStates[0], regStates[1]))
+
+    # def testRunInstructions(self):
 
 
 
