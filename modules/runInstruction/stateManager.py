@@ -21,7 +21,7 @@ def setRandomSeed(random_seed):
 def initializeMemory(panda: Panda, memName, memSize=2 * 1024 * 1024, address=0):
     panda.map_memory(memName, memSize, address)
 
-def randomizeRegisters(panda: Panda, cpu, regKeys=[]):
+def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes):
     """
     randomize the registers of the panda instance
     panda is the instance of panda to randomize the registers in
@@ -31,12 +31,10 @@ def randomizeRegisters(panda: Panda, cpu, regKeys=[]):
     """
     if (panda.arch_name == "mips"):
         # skippedRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
-        keys = regKeys
-        if (len(keys) == 0): keys = panda.arch.registers.keys()
-        for key in keys:
-            if key in skippedMipsRegs: continue
+        for (regname, reg) in panda.arch.registers.items():
+            if (regname in skippedMipsRegs or not getBit(regBitMask, reg)): continue
             num = randint(0, 2**(32) - 1)
-            panda.arch.set_reg(cpu, key, num)
+            panda.arch.set_reg(cpu, regname, num)
     return
 
 def randomizeMemory(panda):
@@ -62,3 +60,11 @@ def compareRegStates(state1, state2):
     for key in state1:
         if (state1[key] != state2[key]): return True
     return False
+
+def getBit(byteData, bit):
+    """
+    returns true if the <bit> bit of <byteData> is set to 1
+    """
+    if (bit < 0): return False
+    
+    return int.from_bytes(byteData, 'big')&(1<<(bit-1)) != 0

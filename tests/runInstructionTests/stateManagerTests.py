@@ -60,6 +60,36 @@ class TestScript(unittest.TestCase):
         for key in skippedMipsRegs:
             self.assertEqual(regState2.get(key), 0, msg='key: {0}'.format(key))
 
+    def testGetBitTrue(self):
+        n = b'\x01'
+        self.assertTrue(getBit(n, 1))
+        n = b'\x03'
+        self.assertTrue(getBit(n, 1))
+        n = b'\x02'
+        self.assertTrue(getBit(n, 2))
+        n = b'\x80'
+        self.assertTrue(getBit(n, 8))
+        n = b'\x80\x00\x00'
+        self.assertTrue(getBit(n, 24))
+        n = b'\x00\x40\x00'
+        self.assertTrue(getBit(n, 15))
+
+    def testGetBitFalse(self):
+        n = b'\x01'
+        self.assertFalse(getBit(n, 2))
+        n = b'\x03'
+        self.assertFalse(getBit(n, 4))
+        n = b'\x02'
+        self.assertFalse(getBit(n, 1))
+        n = b'\x80'
+        self.assertFalse(getBit(n, 3))
+        n = b'\x80\x00\x00'
+        self.assertFalse(getBit(n, 23))
+        n = b'\x00\x40\x00'
+        self.assertFalse(getBit(n, 16))
+        
+
+
 
 if __name__ == '__main__':
     unittest.main()
