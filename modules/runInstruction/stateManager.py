@@ -21,7 +21,7 @@ def setRandomSeed(random_seed):
 def initializeMemory(panda: Panda, memName, memSize=2 * 1024 * 1024, address=0):
     panda.map_memory(memName, memSize, address)
 
-def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes):
+def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff'):
     """
     randomize the registers of the panda instance
     panda is the instance of panda to randomize the registers in
@@ -63,8 +63,8 @@ def compareRegStates(state1, state2):
 
 def getBit(byteData, bit):
     """
-    returns true if the <bit> bit of <byteData> is set to 1
+    returns true if the <bit> bit of <byteData> is set to 1, 0 indexed
     """
     if (bit < 0): return False
     
-    return int.from_bytes(byteData, 'big')&(1<<(bit-1)) != 0
+    return int.from_bytes(byteData, 'big')&(1<<(bit)) != 0
