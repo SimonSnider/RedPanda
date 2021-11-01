@@ -8,7 +8,6 @@ panda = initializePanda()
 
 class TestScript(unittest.TestCase):
     # def testRunInstructionOnce(self):
-    #     # panda.reset()
     #     print("test1")
     #     instruction = "andi $t0, $t1, 0"
     #     print(instruction)
@@ -18,9 +17,14 @@ class TestScript(unittest.TestCase):
 
     #     ADDRESS = 0x0000
     #     encoding, count = ks.asm(CODE, ADDRESS)
-    #     data = runInstructionLoop(panda, encoding, 1)
+    #     data, initialState = runInstructionLoop(panda, encoding, 1)
+    #     self.assertIsInstance(initialState, dict)
     #     for regStates in data:
-    #         self.assertEqual(regStates[1].get("T0"), 0)
+    #         self.assertNotEqual(regStates[1].get("T0"), 0)
+    #         self.assertEqual(regStates[2].get("T0"), 0)
+    #         self.assertIsInstance(regStates[0], bytes)
+    #         self.assertIsInstance(regStates[1], dict)
+    #         self.assertIsInstance(regStates[2], dict)
     
     # def testRunInstructionLoop(self):
     #     # panda.reset()
@@ -28,8 +32,13 @@ class TestScript(unittest.TestCase):
     #     instructionGenerator.initialize()
     #     instruction =  instructionGenerator.generateInstruction()
     #     n = 100
-    #     data = runInstructionLoop(panda, instruction, n)
+    #     data, initialState = runInstructionLoop(panda, instruction, n)
     #     self.assertEqual(len(data), n)
+    #     self.assertIsInstance(initialState, dict)
+    #     for regState in data:
+    #         self.assertIsInstance(regState[0], bytes)
+    #         self.assertIsInstance(regState[1], dict)
+    #         self.assertIsInstance(regState[2], dict)
 
     def testRunInstructions(self):
         # panda.reset()
@@ -42,10 +51,15 @@ class TestScript(unittest.TestCase):
             instructions.append(instructionGenerator.generateInstruction())
             print(instructions[i])
 
-        stateData: dict = runInstructions(panda, instructions, n)
+        stateData, initialState = runInstructions(panda, instructions, n)
         self.assertEqual(len(stateData.keys()), inst)
+        self.assertIsInstance(initialState, dict)
         for key in stateData.keys():
             self.assertEqual(len(stateData.get(key)), n)
+            for regState in stateData.get(key):
+                self.assertIsInstance(regState[0], bytes)
+                self.assertIsInstance(regState[1], dict)
+                self.assertIsInstance(regState[2], dict)
 
 
 

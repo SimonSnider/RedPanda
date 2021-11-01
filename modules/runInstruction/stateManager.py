@@ -53,6 +53,19 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
             panda.arch.set_reg(cpu, regname, num)
     return
 
+def setRegisters(panda: Panda, cpu, registerSate: dict):
+    """
+    Arguments:
+        panda -- the instance of panda that will have its register set
+        cpu -- an instance of the cpu given by a panda callback
+        registerState -- a dictionary of register names to register values
+    Outputs:
+        for every item in registerState, set the corresponding panda register to that item's value
+    """
+    for (regname, reg) in registerSate.items():
+        panda.arch.set_reg(cpu, regname, registerSate[regname])
+    return
+
 def randomizeMemory(panda):
     """
     Arguments:

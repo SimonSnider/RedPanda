@@ -2,6 +2,7 @@ from pandare import Panda
 from modules.runInstruction.stateManager import *
 from capstone import *
 from capstone.mips import *
+from modules.generateInstruction.bitGenerator import *
 
 
 def loadInstruction(panda: Panda, cpu, instruction, address=0):
@@ -32,29 +33,34 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
         n -- how many times you want to run the instruction
         verbose -- turns on printing of step completions and instructions being run
     Outputs:
-        returns an n by 2 array containing the before and after register state dictionaries of running the instruction with a
-        randomized register state.
-        output format: [[beforeState0, afterState0], [beforeState1, afterState1], ...]
+        returns an n x 2 array of bitmasks, before, and after register states states and the initial register state
+        output format: [[bitmask0: bytes, beforeState0: dict, afterState0: dict], [bitmask1, beforeState1, afterState1], ...], initialState
     """
     print("initializing panda")
     ADDRESS = 0
     stateData = []
     index = -1
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
+    initialState = {}
 
     @panda.cb_after_machine_init
     def setup(cpu):
         initializeMemory(panda, "mymem", address=ADDRESS)
         loadInstruction(panda, cpu, instruction, ADDRESS)
+        randomizeRegisters(panda, cpu)
+        nonlocal initialState
+        initialState = getRegisterState(panda, cpu)
         if (verbose): print("setup done")
-        
+
 
     @panda.cb_insn_exec
     def randomRegState(cpu, pc):
         if (pc == ADDRESS):
             if (verbose): print("randomizing registers")
-            randomizeRegisters(panda, cpu)
-            stateData.append([getRegisterState(panda, cpu)])
+            bitmask = generateRandomBits(32)
+            setRegisters(panda, cpu, initialState)
+            randomizeRegisters(panda, cpu, bitmask)
+            stateData.append([bitmask, getRegisterState(panda, cpu)])
             nonlocal index
             index += 1
         code = panda.virtual_memory_read(cpu, pc, 4)
@@ -81,34 +87,35 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     panda.cb_insn_translate(lambda x, y: True)
 
     panda.run()
-    return stateData
+    return stateData, initialState
 
 def runInstructions(panda: Panda, instructions, n, verbose=False):
     """
-    runs each instruction n times and returns the instructions and register states
-    [[instruction1, [[before, after], [before, after], ...]], [instruction2, [[before, after]...]], ...]
     Arguments:
         panda -- The instance of panda the instructions will be run on
         instructions -- the list of instructions in byte form that will be run on the panda instance
         n -- the number of times each instruction will be run
         verbose -- enables printing of step completions and instructions being run
     Outputs:
-        returns a dictionary of instruction byte to an n by 2 array containing the 
-        before and after register state dictionaries of running that instruction.
-        Output format: {inst1: [[beforeState0, afterState0], [beforeState1, afterState1], ...], inst2: [[beforeState0, afterState0]...], ...}
+        returns a dictionary of instruction byte to an n by 3 array containing the 
+        bitmask, before register state, and after register state of running that instruction and te inital register state
+        Output format: {inst1: [[beforeState0, afterState0], [beforeState1, afterState1], ...], inst2: [[beforeState0, afterState0]...], ...}, initialState
     """
     ADDRESS = 0
     stateData = dict()
     regStateIndex = 0
     instIndex = 0
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
+    initialState = {}
 
 
     @panda.cb_after_machine_init
     def setup(cpu):
         initializeMemory(panda, "mymem", address=ADDRESS)
-        nonlocal instIndex
+        nonlocal instIndex, initialState
         loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
+        randomizeRegisters(panda, cpu)
+        initialState = getRegisterState(panda, cpu)
         stateData[instructions[instIndex]] = []
         print("setup done")
 
@@ -116,8 +123,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     def randomRegState(cpu, pc):
         if (pc == ADDRESS):
             if (verbose): print("randomizing registers")
-            randomizeRegisters(panda, cpu)
-            stateData[instructions[instIndex]].append([getRegisterState(panda, cpu)])
+            bitmask = generateRandomBits(32)
+            randomizeRegisters(panda, cpu, bitmask)
+            stateData[instructions[instIndex]].append([bitmask, getRegisterState(panda, cpu)])
         code = panda.virtual_memory_read(cpu, pc, 4)
         if (verbose):
             for i in md.disasm(code, pc):
@@ -150,5 +158,5 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
 
-    return stateData
+    return stateData, initialState
     

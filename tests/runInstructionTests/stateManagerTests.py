@@ -16,6 +16,7 @@ panda = Panda("mips",
 regState1 = {}
 regState2 = {}
 regState3 = {}
+regState4 = {}
 
 
 # @pytest.mark.skip(reason="do not run this, let panda do it")
@@ -26,7 +27,7 @@ def setup(cpu):
     '''
     # map 2MB memory for this emulation
     panda.map_memory("mymem", 2 * 1024 * 1024, ADDRESS)
-    global regState1, regState2, regState3
+    global regState1, regState2, regState3, regState4
     regState1 = getRegisterState(panda, cpu)
     print("randomizing register state")
     randomizeRegisters(panda, cpu)
@@ -36,6 +37,8 @@ def setup(cpu):
     bitmask = b'\x00\x00\x05\x00'
     randomizeRegisters(panda, cpu, bitmask)
     regState3 = getRegisterState(panda, cpu)
+    setRegisters(panda, cpu, regState2)
+    regState4 = getRegisterState(panda, cpu)
     print(regState3)
     # Set starting_pc
     cpu.env_ptr.active_tc.PC = ADDRESS
@@ -102,6 +105,12 @@ class TestScript(unittest.TestCase):
         self.assertEqual(regState2['T1'], regState3['T1'])
         self.assertNotEqual(regState2['T2'], regState3['T2'])
         self.assertEqual(regState2['T3'], regState3['T3'])
+
+    def testSetRegisters(self):
+        """
+        after testing randomize registers with bitmask, set the registers back to regState2 and check if regState4 and regState2 are the same
+        """
+        self.assertFalse(compareRegStates(regState2, regState4))
         
 
 
