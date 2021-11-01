@@ -6,8 +6,15 @@ from capstone.mips import *
 
 def loadInstruction(panda: Panda, cpu, instruction, address=0):
     """
-    Takes an instance of panda, a cpu from the setup callback, an instruction, and an address.
-    loads the instruction into phyiscal memory at the address and sets the program counter to the address
+    Arguments:
+        panda -- the instance of panda the instruction will be loaded into
+        cpu -- the cpu instance obtained from a panda callback
+        instruction -- the instruction in byte form
+        address -- the address location to load the instruction into
+    Output:
+        loads the instruction into panda's memory at the specified address,
+        then loads a jump instruction immediately after it to loop through that instruction.
+        Sets the program counter to address
     """
     panda.physical_memory_write(address, bytes(instruction))
     # create a jump instruction
@@ -19,8 +26,15 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0):
 
 def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     """
-    runs the instruction n times and returns the register states
-    [[before, after], [before, after], ...]
+    Arguments:
+        panda -- the istance of panda that will be executed
+        instruction -- the instruction you want to run in byte form
+        n -- how many times you want to run the instruction
+        verbose -- turns on printing of step completions and instructions being run
+    Outputs:
+        returns an n by 2 array containing the before and after register state dictionaries of running the instruction with a
+        randomized register state.
+        output format: [[beforeState0, afterState0], [beforeState1, afterState1], ...]
     """
     print("initializing panda")
     ADDRESS = 0
@@ -73,6 +87,15 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     """
     runs each instruction n times and returns the instructions and register states
     [[instruction1, [[before, after], [before, after], ...]], [instruction2, [[before, after]...]], ...]
+    Arguments:
+        panda -- The instance of panda the instructions will be run on
+        instructions -- the list of instructions in byte form that will be run on the panda instance
+        n -- the number of times each instruction will be run
+        verbose -- enables printing of step completions and instructions being run
+    Outputs:
+        returns a dictionary of instruction byte to an n by 2 array containing the 
+        before and after register state dictionaries of running that instruction.
+        Output format: {inst1: [[beforeState0, afterState0], [beforeState1, afterState1], ...], inst2: [[beforeState0, afterState0]...], ...}
     """
     ADDRESS = 0
     stateData = dict()
