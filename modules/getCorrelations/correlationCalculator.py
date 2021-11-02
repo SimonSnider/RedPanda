@@ -73,3 +73,5 @@ def computeCorrelations():
             
             M[i][j] = num/denom
 
+    return M
+
