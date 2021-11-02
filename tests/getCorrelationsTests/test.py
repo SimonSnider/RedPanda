@@ -1,5 +1,4 @@
-from modules.getCorrelations import correlationCalculator as CC
-#import pytest
+from modules.getCorrelations.correlationCalculator import *
 
 def test_noCorrelations():
     RNaught = {
@@ -54,12 +53,12 @@ def test_noCorrelations():
         "r2": 0,
         "r3": 1 
     }]]
-    CC.setArch("test", 3)
-    CC.initialize(dataList, RNaught, RNaught, 1)
-    M = CC.computeCorrelations()
+    setArch("test", 3)
+    initialize(dataList, RNaught, RNaught, 1)
+    M = computeCorrelations()
 
-    print(M)
-    #assert M == [[1,0,0], [0,1,0], [0,0,1]]
+    #print(M)
+    assert M == [[1,0,0], [0,1,0], [0,0,1]]
 
 def test_allCorrelated():
     RNaught = {
@@ -120,12 +119,12 @@ def test_allCorrelated():
         "r2": 0,
         "r3": 1 
     }]]
-    CC.setArch("test", 3)
-    CC.initialize(dataList, RNaught, RNaughtFinal, 1)
-    M = CC.computeCorrelations()
+    setArch("test", 3)
+    initialize(dataList, RNaught, RNaughtFinal, 1)
+    M = computeCorrelations()
 
-    print(M)
-    #assert M == [[1,1,1], [1,1,1], [1,1,1]]
+    #print(M)
+    assert M == [[1,1,1], [1,1,1], [1,1,1]]
 
 def test_addCorrelated():
     RNaught = {
@@ -186,13 +185,13 @@ def test_addCorrelated():
         "r2": 0,
         "r3": 1 
     }]]
-    CC.setArch("test", 3)
-    CC.initialize(dataList, RNaught, RNaughtFinal, 1)
-    M = CC.computeCorrelations()
+    setArch("test", 3)
+    initialize(dataList, RNaught, RNaughtFinal, 1)
+    M = computeCorrelations()
 
-    print(M)
-    #assert M == [[0,0,0], [1,1,0], [1,0,1]]
+    #print(M)
+    assert M == [[0,0,0], [1,1,0], [1,0,1]]
     
-test_noCorrelations()
-test_allCorrelated()
-test_addCorrelated()
+#test_noCorrelations()
+#test_allCorrelated()
+#test_addCorrelated()
