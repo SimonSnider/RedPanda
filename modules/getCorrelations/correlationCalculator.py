@@ -24,8 +24,8 @@ def setArch(archType):
         n = 24
 
 # list has initial register values, 
-def initialize(list: list, RNaught: dict, iterPerReg: int = 100):
-    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I
+def initialize(dataList: list, RNaught: dict, iterPerReg: int = 100):
+    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
     iterPerRegister = iterPerReg
     I = n*iterPerRegister
     RegisterInitial = RNaught
@@ -36,15 +36,40 @@ def initialize(list: list, RNaught: dict, iterPerReg: int = 100):
 
     i=0
     # guessed indices
-    for item in list:
-        RegisterInitials[i] = initialR = item[0]
-        RegisterFinals[i] = finalR = item[1]
+    for item in dataList:
+        RegisterInitials[i] = item[0]
+        RegisterFinals[i] = item[1]
         Bs[i] = item[2]
-        Ps[i]=1
-        # iterate through initial and final registers to get b, p values
-        if(initialR==finalR):
-            Ps[i]=0
 
+    regList = RegisterInitials[0].keys()
 
 
 def computePs():
+    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I
+    for iter in range(I):
+        newDict = {}
+        Ri0 = RegisterInitials[iter]
+        Rif = RegisterFinals[iter]
+        for reg in Ri0.keys():
+            if (Ri0.get(reg) != Rif.get(reg)):
+                newDict[reg] = 1
+            else:
+                newDict[reg] = 0
+        Ps[iter] = newDict
+
+def computeCorrelations():
+    computePs()
+    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
+
+    M = [[] for _ in range(n)]*n
+    
+    for i in range(n):
+        for j in range(n):
+            denom = 0
+            num = 0
+            for k in range(I):
+                demon += Bs[k].get(regList[i])
+                num += Bs[k].get(regList[i])*Ps[k].get(regList[j])
+            
+            M[i][j] = num/denom
+
