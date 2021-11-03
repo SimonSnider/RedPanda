@@ -5,6 +5,7 @@
 from random import randint, seed
 from pandare.arch import PandaArch
 from pandare.panda import Panda
+import math
 
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
 
@@ -49,7 +50,7 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
         # skippedRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
         for (regname, reg) in panda.arch.registers.items():
             if (regname in skippedMipsRegs or not getBit(regBitMask, reg)): continue
-            num = randint(0, 2**(32) - 1)
+            num = randint(0, math.floor((2**(32) - 1)/4))
             panda.arch.set_reg(cpu, regname, num)
     return
 
