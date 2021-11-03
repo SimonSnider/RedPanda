@@ -52,7 +52,7 @@ def runProgram():
     analyzedData = []
     
     instructionKeys = instructionData.keys()
-    for i in range(numInstructions):
+    for i in range(1):
         dat = instructionData[instructionKeys[i]]
         CC.initialize(dat, 1)
         analyzedData.append(CC.computeCorrelations())
@@ -61,7 +61,7 @@ def runProgram():
         
     with open(outputFileName, 'w') as csvfile: 
         writer = csv.writer(csvfile) 
-        writer.writerow(fields)
+        # writer.writerow(fields)
         writer.writerows(analyzedData)
 
 runProgram()
