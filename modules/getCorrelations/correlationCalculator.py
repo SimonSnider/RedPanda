@@ -31,8 +31,8 @@ def initialize(dataList: list, iterPerReg: int = 100):
     global iterPerRegister, RegisterInitial, RegisterInitialOutput, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
     iterPerRegister = iterPerReg
     I = n*iterPerRegister
-    if(I != len(dataList)):
-        I = len(dataList)
+    if(I != len(dataList)-1):
+        I = len(dataList)-1
     RegisterInitial = dataList[0][1]
     RegisterInitialOutput = dataList[0][2]
     RegisterInitials = [0]*I
@@ -42,7 +42,8 @@ def initialize(dataList: list, iterPerReg: int = 100):
 
     i=0
     # guessed indices
-    for item in dataList:
+    for r in range(len(dataList)-1):
+        item = dataList[r+1]
         RegisterInitials[i] = item[1]
         RegisterFinals[i] = item[2]
         Bs[i] = item[0]
@@ -67,7 +68,8 @@ def computePs():
 def computeCorrelations():
     computePs()
     global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
-
+    print(Ps)
+    
     M = [[0]*n for _ in range(n)]
     
     for i in range(n):
@@ -75,8 +77,9 @@ def computeCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                denom += Bs[k].get(regList[i])
-                num += Bs[k].get(regList[i])*Ps[k].get(regList[j])
+                bitMaskV = int.from_bytes(Bs[k], 'big')&(1<<(i))
+                denom += bitMaskV
+                num += bitMaskV*Ps[k].get(regList[j])
 
             M[i][j] = num/denom
 
