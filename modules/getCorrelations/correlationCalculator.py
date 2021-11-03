@@ -94,8 +94,12 @@ def computeCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                denom += Bs[k][i]
-                num += Bs[k][i]*Ps[k].get(regList[j])
+                if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
+                    bitMaskV = 0
+                else:
+                    bitMaskV = 1
+                denom += bitMaskV
+                num += bitMaskV*Ps[k].get(regList[j])
 
             M[i][j] = num/denom
 
