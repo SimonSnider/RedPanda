@@ -41,9 +41,9 @@ def initialize(dataList: list, RNaught: dict, RNaughtFinal: dict, iterPerReg: in
     i=0
     # guessed indices
     for item in dataList:
-        RegisterInitials[i] = item[0]
-        RegisterFinals[i] = item[1]
-        Bs[i] = item[2]
+        RegisterInitials[i] = item[1]
+        RegisterFinals[i] = item[2]
+        Bs[i] = item[0]
         i += 1
 
     regList = list(RegisterInitials[0])
