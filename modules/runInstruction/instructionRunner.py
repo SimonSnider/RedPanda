@@ -27,4 +27,4 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
     # for _ in range(instructionTotal):
     #     instructionList.append(instructionGen.generateInstruction())
 
-    return runInstructions(pandaInstance, instructionList, instructionIterations, verbose)
+    return runInstructions(pandaInstance, instructionList, instructionIterations, verbose) 

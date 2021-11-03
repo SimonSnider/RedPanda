@@ -18,7 +18,7 @@ Arguments:
 """
 
 from modules.runInstruction.instructionRunner import generateInstructionData
-from modules.getCorrelations import correlationCalculator as CC
+from modules.getCorrelations import correlationCalculator as CC 
 import sys
 import csv
 
