@@ -18,6 +18,7 @@ Arguments:
 """
 
 from modules.runInstruction.instructionRunner import generateInstructionData
+from modules.getCorrelations import correlationCalculator as CC
 import sys
 import csv
 
@@ -46,9 +47,17 @@ def runProgram():
     verbose = int(input() or 0)
 
     instructionData = generateInstructionData(arch, numInstructions, instructionIterations, verbose)
-    analyzedData = analyzeData(model, instructionData, verbose)
 
-    fields = ['InstructionName', 'Coorelation'] 
+    CC.setArch("mips32")
+    analyzedData = []
+    
+    instructionKeys = instructionData.keys()
+    for i in range(numInstructions):
+        dat = instructionData[instructionKeys[i]]
+        CC.initialize(dat, 1)
+        analyzedData.append(CC.computeCorrelations())
+
+    # fields = ['InstructionName', 'Coorelation'] 
         
     with open(outputFileName, 'w') as csvfile: 
         writer = csv.writer(csvfile) 
