@@ -15,6 +15,9 @@ panda = Panda("mips",
 
 regState1 = {}
 regState2 = {}
+regState3 = {}
+regState4 = {}
+
 
 # @pytest.mark.skip(reason="do not run this, let panda do it")
 @panda.cb_after_machine_init
@@ -24,15 +27,19 @@ def setup(cpu):
     '''
     # map 2MB memory for this emulation
     panda.map_memory("mymem", 2 * 1024 * 1024, ADDRESS)
-    global regState1
+    global regState1, regState2, regState3, regState4
     regState1 = getRegisterState(panda, cpu)
     print("randomizing register state")
     randomizeRegisters(panda, cpu)
     panda.arch.dump_regs(cpu)
-    global regState2
     regState2 = getRegisterState(panda, cpu)
     print(regState2)
-    # print(regState2)
+    bitmask = b'\x00\x00\x05\x00'
+    randomizeRegisters(panda, cpu, bitmask)
+    regState3 = getRegisterState(panda, cpu)
+    setRegisters(panda, cpu, regState2)
+    regState4 = getRegisterState(panda, cpu)
+    print(regState3)
     # Set starting_pc
     cpu.env_ptr.active_tc.PC = ADDRESS
     panda.end_analysis()
@@ -59,6 +66,53 @@ class TestScript(unittest.TestCase):
         global regState2
         for key in skippedMipsRegs:
             self.assertEqual(regState2.get(key), 0, msg='key: {0}'.format(key))
+
+    def testGetBitTrue(self):
+        n = b'\x01'
+        self.assertTrue(getBit(n, 0))
+        n = b'\x03'
+        self.assertTrue(getBit(n, 0))
+        n = b'\x02'
+        self.assertTrue(getBit(n, 1))
+        n = b'\x80'
+        self.assertTrue(getBit(n, 7))
+        n = b'\x80\x00\x00'
+        self.assertTrue(getBit(n, 23))
+        n = b'\x00\x40\x00'
+        self.assertTrue(getBit(n, 14))
+
+    def testGetBitFalse(self):
+        n = b'\x01'
+        self.assertFalse(getBit(n, 1))
+        n = b'\x03'
+        self.assertFalse(getBit(n, 3))
+        n = b'\x02'
+        self.assertFalse(getBit(n, 0))
+        n = b'\x80'
+        self.assertFalse(getBit(n, 2))
+        n = b'\x80\x00\x00'
+        self.assertFalse(getBit(n, 22))
+        n = b'\x00\x40\x00'
+        self.assertFalse(getBit(n, 15))
+
+    def testRandomizeRegisterWithBitmask(self):
+        """
+        during the execution randomizeRegisterState was called with a bitmask indicating the 9th and 11th register,
+        T0 and T2, should be randomized. Check that T0 and T2 changed but T1 and T3 remained the same
+        """
+        self.assertTrue(compareRegStates(regState2, regState3))
+        self.assertNotEqual(regState2['T0'], regState3['T0'])
+        self.assertEqual(regState2['T1'], regState3['T1'])
+        self.assertNotEqual(regState2['T2'], regState3['T2'])
+        self.assertEqual(regState2['T3'], regState3['T3'])
+
+    def testSetRegisters(self):
+        """
+        after testing randomize registers with bitmask, set the registers back to regState2 and check if regState4 and regState2 are the same
+        """
+        self.assertFalse(compareRegStates(regState2, regState4))
+        
+
 
 
 if __name__ == '__main__':

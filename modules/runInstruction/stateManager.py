@@ -8,37 +8,80 @@ from pandare.panda import Panda
 
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
 
+def initializePanda(architecture="mips"):
+    panda = Panda("mips",
+        extra_args=["-M", "configurable", "-nographic"],
+        raw_monitor=True)
+    return panda
+
 def setRandomSeed(random_seed):
-    """Sets the random seed used in this module"""
+    """
+    Arguments:
+        random_seed -- an int to set as the random seed
+    Outputs
+        sets the seed for randint calls
+    """
     seed(random_seed)
 
-def randomizeRegisters(panda: Panda, cpu, regKeys=[]):
+def initializeMemory(panda: Panda, memName, memSize=2 * 1024 * 1024, address=0):
     """
-    randomize the registers of the panda instance
-    panda is the instance of panda to randomize the registers in
-    cpu is the cpu from the callback function
-    regKeys is a list of register keys that are to be randomized. If left blank if will randomize all registers
-    random_seed will set the seed of the random number generator. if left as -1 it will use the default
+    Arguments:
+        panda -- the instance of panda that will have its memory initialized
+        memName -- the name of the memory region that will be mapped
+        memSize -- the size of the memory region
+        address -- the start address of the memory region
+    Ouputs:
+        maps a section of memory in panda
+    """
+    panda.map_memory(memName, memSize, address)
+
+def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff'):
+    """
+    Arguments:
+        panda -- the instance of panda that will have its registers randomized
+        cpu -- the cpu given by a panda callback
+        regBitMask -- a byte bitmask the length of the number of registers in the panda architecture that determines which registers are randomized
+    Outputs:
+        for registers 1 through n, if the nth bit in the regBitMask is 1, sets the nth register to a random value.
+        Will not randomize register necessary for hardware execution, such as ZERO, Stack Pointers, Kernel registers, Return Addresses, Etc.
     """
     if (panda.arch_name == "mips"):
         # skippedRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
-        keys = regKeys
-        if (len(keys) == 0): keys = panda.arch.registers.keys()
-        for key in keys:
-            if key in skippedMipsRegs: continue
+        for (regname, reg) in panda.arch.registers.items():
+            if (regname in skippedMipsRegs or not getBit(regBitMask, reg)): continue
             num = randint(0, 2**(32) - 1)
-            panda.arch.set_reg(cpu, key, num)
+            panda.arch.set_reg(cpu, regname, num)
+    return
+
+def setRegisters(panda: Panda, cpu, registerSate: dict):
+    """
+    Arguments:
+        panda -- the instance of panda that will have its register set
+        cpu -- an instance of the cpu given by a panda callback
+        registerState -- a dictionary of register names to register values
+    Outputs:
+        for every item in registerState, set the corresponding panda register to that item's value
+    """
+    for (regname, reg) in registerSate.items():
+        panda.arch.set_reg(cpu, regname, registerSate[regname])
     return
 
 def randomizeMemory(panda):
     """
-    randomize all of memory
+    Arguments:
+        panda -- the instance of panda that will have its register state randomized
+    Outputs:
+        randomizes the memory of panda
     """
     return
 
 def getRegisterState(panda: Panda, cpu):
     """
-    return a structure containing the registers and their values
+    Arguments:
+        panda -- the panda instance the register instance will be gotten from
+        cpu -- the cpu instance returned from a panda callback
+    Outputs:
+        a dictionary of register names to register values
     """
     regs = {}
     for (regname, reg) in panda.arch.registers.items():
@@ -48,8 +91,23 @@ def getRegisterState(panda: Panda, cpu):
 
 def compareRegStates(state1, state2):
     """
-    compare two states and return true if they are different
+    Arguments:
+        state1, state2 -- a dictionary of register names to values
+    Outputs:
+        returns true if the register states are different
     """
     for key in state1:
         if (state1[key] != state2[key]): return True
     return False
+
+def getBit(byteData, bit):
+    """
+    Arguments:
+        byteData -- a byte literal
+        bit -- which bit will be returned
+    Outputs:
+        Returns true if the <bit> bit of byteData is set to 1, false otherwise
+    """
+    if (bit < 0): return False
+    
+    return int.from_bytes(byteData, 'big')&(1<<(bit)) != 0
