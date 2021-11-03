@@ -40,18 +40,34 @@ class TestScript(unittest.TestCase):
     #         self.assertIsInstance(regState[1], dict)
     #         self.assertIsInstance(regState[2], dict)
 
-    def testRunInstructions(self):
-        # panda.reset()
-        print("test3")
-        instructions = []
-        instructionGenerator.initialize()
-        inst = 10
-        n = 100
-        for i in range(inst):
-            instructions.append(instructionGenerator.generateInstruction())
-            print(instructions[i])
+    # def testRunInstructions(self):
+    #     # panda.reset()
+    #     print("test3")
+    #     instructions = []
+    #     instructionGenerator.initialize()
+    #     inst = 10
+    #     n = 100
+    #     for i in range(inst):
+    #         instructions.append(instructionGenerator.generateInstruction())
+    #         print(instructions[i])
 
-        stateData = runInstructions(panda, instructions, n)
+    #     stateData = runInstructions(panda, instructions, n)
+    #     self.assertEqual(len(stateData.keys()), inst)
+    #     for key in stateData.keys():
+    #         self.assertEqual(len(stateData.get(key)), n)
+    #         self.assertEqual(stateData.get(key)[0][0], b'\x00\x00\x00\x00')
+    #         for regState in stateData.get(key):
+    #             self.assertIsInstance(regState[0], bytes)
+    #             self.assertIsInstance(regState[1], dict)
+    #             self.assertIsInstance(regState[2], dict)
+
+    def testRunAddInstruction(self):
+        print("test4")
+        instructions = [b"\x01\x4b\x48\x20"]
+        inst = 1
+        n = 100
+
+        stateData = runInstructions(panda, instructions, n,True)
         self.assertEqual(len(stateData.keys()), inst)
         for key in stateData.keys():
             self.assertEqual(len(stateData.get(key)), n)

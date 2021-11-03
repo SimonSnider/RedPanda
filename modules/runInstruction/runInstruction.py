@@ -122,16 +122,22 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         randomizeRegisters(panda, cpu)
         initialState = getRegisterState(panda, cpu)
         stateData[instructions[instIndex]] = []
-        print("setup done")
+        if (verbose): print("setup done")
 
     @panda.cb_insn_exec
     def randomRegState(cpu, pc):
+        if (verbose): print("randomRegState")
         if (pc == ADDRESS):
             if (verbose): print("randomizing registers")
             bitmask = b'\x00\x00\x00\x00'
             if (regStateIndex > 0):
                 bitmask = generateRandomBits(32)
             randomizeRegisters(panda, cpu, bitmask)
+            if (verbose): print("saving before reg state")
+            if (verbose):
+                print((2**(32)-1))
+                print(panda.arch.get_reg(cpu, "T2"))
+                print(panda.arch.get_reg(cpu, "T3"))
             stateData[instructions[instIndex]].append([bitmask, getRegisterState(panda, cpu)])
         code = panda.virtual_memory_read(cpu, pc, 4)
         if (verbose):
@@ -146,6 +152,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
     @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
+        if (verbose): print("getInstValues")
         nonlocal regStateIndex, instIndex
         if (pc == 4):
             if (verbose): print("saving reg state after run", regStateIndex)
@@ -153,6 +160,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             regStateIndex += 1
         if (regStateIndex >= n):
             if (instIndex < len(instructions)-1):
+                if (verbose): print("switching instructions")
                 instIndex += 1
                 loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
                 stateData[instructions[instIndex]] = []

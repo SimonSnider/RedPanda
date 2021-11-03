@@ -1,5 +1,6 @@
 from modules.generateInstruction import instructionGenerator as instructionGen
 from modules.runInstruction.stateManager import initializePanda
+from modules.runInstruction.runInstruction import *
 
 def generateInstructionData(arch="mips", instructionTotal=1, instructionIterations=10, verbose=False):
     """Generates a structure of data pertaining to randomly generated instructions in a set ISA.
@@ -20,7 +21,7 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
         Register state is stored as a dictionary of <register name> -> <register value> pairings. 
     """
     pandaInstance = initializePanda(arch)
-    instructionGen.initialize(arch)
+    # instructionGen.initialize(arch)
 
     instructionList = [b"\x01\x4b\x48\x20"]
 
