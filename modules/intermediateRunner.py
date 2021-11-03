@@ -51,7 +51,7 @@ def runProgram():
     CC.setArch("mips32")
     analyzedData = []
     
-    instructionKeys = instructionData.keys()
+    instructionKeys = list(instructionData.keys())
     for i in range(1):
         dat = instructionData[instructionKeys[i]]
         CC.initialize(dat, 1)
