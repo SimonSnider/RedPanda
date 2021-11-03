@@ -27,12 +27,14 @@ def setArch(archType, testV=0):
         n = testV
 
 # list has initial register values, 
-def initialize(dataList: list, RNaught: dict, RNaughtFinal: dict, iterPerReg: int = 100):
+def initialize(dataList: list, iterPerReg: int = 100):
     global iterPerRegister, RegisterInitial, RegisterInitialOutput, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
     iterPerRegister = iterPerReg
     I = n*iterPerRegister
-    RegisterInitial = RNaught
-    RegisterInitialOutput = RNaughtFinal
+    if(I != len(dataList)):
+        I = len(dataList)
+    RegisterInitial = dataList[0][1]
+    RegisterInitialOutput = dataList[0][2]
     RegisterInitials = [0]*I
     RegisterFinals = [0]*I
     Bs = [0]*I
