@@ -68,7 +68,6 @@ def computePs():
 def computeCorrelations():
     computePs()
     global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
-    print(Ps)
     
     M = [[0]*n for _ in range(n)]
     
@@ -77,9 +76,8 @@ def computeCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = int.from_bytes(Bs[k], 'big')&(1<<(i))
-                denom += bitMaskV
-                num += bitMaskV*Ps[k].get(regList[j])
+                denom += Bs[k][i]
+                num += Bs[k][i]*Ps[k].get(regList[j])
 
             M[i][j] = num/denom
 

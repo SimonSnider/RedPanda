@@ -62,6 +62,7 @@ def runProgram():
     with open(outputFileName, 'w') as csvfile: 
         writer = csv.writer(csvfile) 
         # writer.writerow(fields)
-        writer.writerows(analyzedData)
+        for data in analyzedData:
+            writer.writerows(data)
 
 runProgram()
