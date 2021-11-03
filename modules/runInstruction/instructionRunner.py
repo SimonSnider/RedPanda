@@ -17,7 +17,7 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
         Returns a dictionary of <instruction bytecode> -> <result array> pairings where the result array is an <instructionIterations x 2> array 
         with the first column specifying the register state before instruction execution and the second column specifying the register state afterwards.
 
-        Register state is stored as a dictionary of <register name> -> <register value> pairings.
+        Register state is stored as a dictionary of <register name> -> <register value> pairings. 
     """
     pandaInstance = initializePanda(arch)
     instructionGen.initialize(arch)
