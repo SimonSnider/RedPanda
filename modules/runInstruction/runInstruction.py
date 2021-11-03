@@ -144,7 +144,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     def translateAll(env, pc):
         return True
 
-    @panda.cb_after_insn_exec
+    @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
         nonlocal regStateIndex, instIndex
         if (pc == 4):
