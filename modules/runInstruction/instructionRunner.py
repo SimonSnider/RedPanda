@@ -22,9 +22,9 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
     pandaInstance = initializePanda(arch)
     instructionGen.initialize(arch)
 
-    instructionList = []
+    instructionList = [b"\x01\x4b\x48\x20"]
 
-    for _ in range(instructionTotal):
-        instructionList.append(instructionGen.generateInstruction())
+    # for _ in range(instructionTotal):
+    #     instructionList.append(instructionGen.generateInstruction())
 
     return runInstructions(pandaInstance, instructionList, instructionIterations, verbose)
