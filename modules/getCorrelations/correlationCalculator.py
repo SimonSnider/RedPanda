@@ -26,7 +26,7 @@ def setArch(archType, testV=0):
 
     global n
     if(archType.lower()=="mips32"):
-        n = 24
+        n = 32
     elif(archType.lower()=="test"):
         n = testV
 
@@ -104,4 +104,21 @@ def computeCorrelations():
             M[i][j] = num/denom
 
     return M
+
+def computeTestCorrelation(i, j):
+    denom = 0
+    num = 0
+    computePs()
+    global Ps, regList, Bs, n, I
+    print(I, n)
+    for k in range(I):
+        print(Bs[k], hex(Ps[k].get(regList[j])))
+        if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
+            bitMaskV = 0
+        else:
+            bitMaskV = 1
+        denom += bitMaskV
+        num += bitMaskV*(Ps[k].get(regList[j]))
+
+    return num/denom
 

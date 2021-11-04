@@ -259,8 +259,109 @@ def test_addCorrelatedWithExtra():
 
     #print(M)
     assert M == [[0,0,0,0,0], [1,1,0,0,0], [1,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1]]
+
+def test_singleCorrelation():
+    """
+    Test for realistic correlations for an add instruction where not every register is part of the instruction. The output registers are given by: r1 = r2 + r3. This test is done with 5 registers.
+    """
+    RNaught = {
+        "r1": 1,
+        "r2": 2,
+        "r3": 3,
+        "r4": 4,
+        "r5": 5
+    }
+
+    RNaughtFinal = {
+        "r1": 5,
+        "r2": 2,
+        "r3": 3,
+        "r4": 4,
+        "r5": 5
+    }
+
+    dataList = [[RNaught, RNaughtFinal,b'\x00'],[
+    {
+        "r1": 0,
+        "r2": 2,
+        "r3": 3,
+        "r4": 4,
+        "r5": 5 
+    },
+    {
+        "r1": 5,
+        "r2": 2,
+        "r3": 3,
+        "r4": 4,
+        "r5": 5 
+    },b'\x10'],[
+    {
+        "r1": 1,
+        "r2": 0,
+        "r3": 3,
+        "r4": 4,
+        "r5": 5 
+    },
+    {
+        "r1": 3,
+        "r2": 0,
+        "r3": 3,
+        "r4": 4,
+        "r5": 5 
+    }, b'\x08'],[
+    {
+        "r1": 1,
+        "r2": 2,
+        "r3": 0,
+        "r4": 4,
+        "r5": 5 
+    },
+    {
+        "r1": 2,
+        "r2": 2,
+        "r3": 0,
+        "r4": 4,
+        "r5": 5 
+    },b'\x04'],[
+    {
+        "r1": 1,
+        "r2": 2,
+        "r3": 3,
+        "r4": 0,
+        "r5": 5 
+    },
+    {
+        "r1": 5,
+        "r2": 2,
+        "r3": 3,
+        "r4": 0,
+        "r5": 5 
+    },b'\x02'],[
+    {
+        "r1": 1,
+        "r2": 2,
+        "r3": 3,
+        "r4": 4,
+        "r5": 0 
+    },
+    {
+        "r1": 5,
+        "r2": 2,
+        "r3": 3,
+        "r4": 4,
+        "r5": 0 
+    }, b'\x01']]
+    setArch("test", 5)
+    dataListUp = [[item[2], item[0], item[1]] for item in dataList]
+    initialize(dataListUp, 1)
+    M = computeTestCorrelation(3, 4)
+
+    print(M)
+    # assert M == [[0,0,0,0,0], [1,1,0,0,0], [1,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1]]
     
+
 #test_noCorrelations()
 #test_allCorrelated()
 #test_addCorrelated()
 #test_addCorrelatedWithExtra()
+test_singleCorrelation()

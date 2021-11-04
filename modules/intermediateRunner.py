@@ -55,7 +55,8 @@ def runProgram():
     for i in range(1):
         dat = instructionData[instructionKeys[i]]
         CC.initialize(dat, 1)
-        analyzedData.append(CC.computeCorrelations())
+        print(CC.computeTestCorrelation(0,0))
+        # analyzedData.append(CC.computeCorrelations())
 
     # fields = ['InstructionName', 'Coorelation'] 
         
