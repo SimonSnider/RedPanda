@@ -41,7 +41,7 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     Arguments:
         panda -- the istance of panda that will be executed
         instruction -- the instruction you want to run in byte form
-        n -- how many times you want to run the instruction
+        n -- how many times you want the instruction to run for each bitmask
         verbose -- turns on printing of step completions and instructions being run
     Outputs:
         returns an n x 3 array of bitmasks, beforeregister states, and after register states.
@@ -117,7 +117,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     Arguments:
         panda -- The instance of panda the instructions will be run on
         instructions -- the list of instructions in byte form that will be run on the panda instance
-        n -- the number of times each instruction will be run
+        n -- the number of times each instruction will be run on each bitmask
         verbose -- enables printing of step completions and instructions being run
     Outputs:
         returns a dictionary of instruction byte to an n by 3 array containing the 
