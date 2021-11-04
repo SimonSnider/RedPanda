@@ -24,15 +24,13 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0):
     cpu.env_ptr.active_tc.PC = address
     return
 
-
 def getNextValidBit(panda: Panda, regNum):
     # 
-    regs = panda.arch.registers.keys()
+    regs = list(panda.arch.registers.keys())
     count = 0
     for i in range(len(regs)):
         if (regs[i] not in skippedMipsRegs):
             if (count >= regNum):
-                print(regs[i])
                 return i
             else:
                 count += 1
@@ -43,19 +41,23 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     Arguments:
         panda -- the istance of panda that will be executed
         instruction -- the instruction you want to run in byte form
-        n -- the number of times the instruction will be run with each register being randomized
+        n -- how many times you want to run the instruction
         verbose -- turns on printing of step completions and instructions being run
     Outputs:
-        returns an n x 2 array of bitmasks, before, and after register states states and the initial register state
-        output format: [[bitmask0: bytes, beforeState0: dict, afterState0: dict], [bitmask1, beforeState1, afterState1], ...], initialState
+        returns an n x 3 array of bitmasks, beforeregister states, and after register states.
+        bitmask0 is always all zeroes
+        output format: [[bitmask0: bytes, beforeState0: dict, afterState0: dict], [bitmask1, beforeState1, afterState1], ...]
     """
     print("initializing panda")
     ADDRESS = 0
     stateData = []
     index = 0
+    regCount = 0
+    loopCount = 0
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
     initialState = {}
-    bitmask = b'\x00\x00\x00\x01'
+    bitmask = b'\x00\x00\x00\x00'
+    
 
     @panda.cb_after_machine_init
     def setup(cpu):
@@ -71,7 +73,18 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     def randomRegState(cpu, pc):
         if (pc == ADDRESS):
             if (verbose): print("randomizing registers")
-            bitmask = generateRandomBits(32)
+            nonlocal index, bitmask, loopCount ,regCount
+            if (index > 0):
+                nextReg = getNextValidBit(panda, regCount)
+                if (nextReg == -1):
+                    if (verbose): print("end analysis")
+                    panda.end_analysis()
+                    return 0
+                bitmask = int.to_bytes(1<<(31-nextReg), 4, 'big')
+                loopCount += 1
+                if (loopCount >= n):
+                    loopCount = 0
+                    regCount += 1
             setRegisters(panda, cpu, initialState)
             randomizeRegisters(panda, cpu, bitmask)
             stateData.append([bitmask, getRegisterState(panda, cpu)])
@@ -88,20 +101,16 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
 
     @panda.cb_after_insn_exec
     def getInstValues(cpu, pc):
-        nonlocal index
         if (pc == 4):
             if (verbose): print("saving after reg state")
+            nonlocal index
             stateData[index].append(getRegisterState(panda, cpu))
             index += 1
-        if (index >= n-1):
-            if (verbose): print("end analysis")
-            panda.end_analysis()
         return 0
 
     panda.cb_insn_translate(lambda x, y: True)
-
     panda.run()
-    return stateData, initialState
+    return stateData
 
 def runInstructions(panda: Panda, instructions, n, verbose=False):
     """
@@ -112,13 +121,16 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         verbose -- enables printing of step completions and instructions being run
     Outputs:
         returns a dictionary of instruction byte to an n by 3 array containing the 
-        bitmask, before register state, and after register state of running that instruction and te inital register state
-        Output format: {inst1: [[beforeState0, afterState0], [beforeState1, afterState1], ...], inst2: [[beforeState0, afterState0]...], ...}, initialState
+        bitmask, before register state, and after register state of running that instruction. bitmask0 is always all zeroes
+        Output format: {inst1: [[bitmask0: bytes, beforeState0: dict, afterState0: dict], [bitmask1, beforeState1, afterState1], ...], inst2: [[bitmask0, beforeState0, afterState0]...], ...}
     """
     ADDRESS = 0
-    stateData = dict()
+    stateData = {}
     regStateIndex = 0
     instIndex = 0
+    regCount = 0
+    loopCount = 0
+    bitmask = b'\x00\x00\x00\x00'
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
     initialState = {}
 
@@ -126,19 +138,22 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_after_machine_init
     def setup(cpu):
         initializeMemory(panda, "mymem", address=ADDRESS)
-        nonlocal instIndex, initialState
+        nonlocal instIndex, initialState, stateData
         loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
         randomizeRegisters(panda, cpu)
         initialState = getRegisterState(panda, cpu)
         stateData[instructions[instIndex]] = []
-        print("setup done")
+        if (verbose): print("setup done")
 
     @panda.cb_insn_exec
     def randomRegState(cpu, pc):
+        nonlocal regCount, loopCount, bitmask, stateData
+        if (verbose): print("randomRegState")
         if (pc == ADDRESS):
             if (verbose): print("randomizing registers")
-            bitmask = generateRandomBits(32)
+            setRegisters(panda, cpu, initialState)
             randomizeRegisters(panda, cpu, bitmask)
+            if (verbose): print("saving before reg state")
             stateData[instructions[instIndex]].append([bitmask, getRegisterState(panda, cpu)])
         code = panda.virtual_memory_read(cpu, pc, 4)
         if (verbose):
@@ -151,26 +166,39 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     def translateAll(env, pc):
         return True
 
-    @panda.cb_after_insn_exec
+    @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
-        nonlocal regStateIndex, instIndex
+        if (verbose): print("getInstValues")
+        nonlocal regStateIndex, instIndex, regCount, loopCount, bitmask
         if (pc == 4):
             if (verbose): print("saving reg state after run", regStateIndex)
             stateData[instructions[instIndex]][regStateIndex].append(getRegisterState(panda, cpu))
             regStateIndex += 1
-        if (regStateIndex >= n):
-            if (instIndex < len(instructions)-1):
-                instIndex += 1
-                loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
-                stateData[instructions[instIndex]] = []
-                regStateIndex = 0
-            else:
-                if (verbose): print("end analysis")
-                panda.end_analysis()
+            nextReg = getNextValidBit(panda, regCount)
+            if (nextReg == -1):
+                if (instIndex < len(instructions)-1):
+                    if (verbose): print("switching instructions")
+                    instIndex += 1
+                    loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
+                    stateData[instructions[instIndex]] = []
+                    regStateIndex = 0
+                    loopCount = 0
+                    regCount = 0
+                    bitmask = b'\x00\x00\x00\x00'
+                    return 0
+                else:
+                    if (verbose): print("end analysis")
+                    panda.end_analysis()
+                    return 0
+            bitmask = int.to_bytes(1<<(31-nextReg), 4, 'big')
+            loopCount += 1
+            if (loopCount >= n):
+                loopCount = 0
+                regCount += 1
+            
         return 0
 
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
 
-    return stateData, initialState
-    
+    return stateData
