@@ -25,12 +25,25 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0):
     return
 
 
+def getNextValidBit(panda: Panda, regNum):
+    # 
+    regs = panda.arch.registers.keys()
+    count = 0
+    for i in range(len(regs)):
+        if (regs[i] not in skippedMipsRegs):
+            if (count >= regNum):
+                print(regs[i])
+                return i
+            else:
+                count += 1
+    return -1
+
 def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     """
     Arguments:
         panda -- the istance of panda that will be executed
         instruction -- the instruction you want to run in byte form
-        n -- how many times you want to run the instruction
+        n -- the number of times the instruction will be run with each register being randomized
         verbose -- turns on printing of step completions and instructions being run
     Outputs:
         returns an n x 2 array of bitmasks, before, and after register states states and the initial register state
@@ -39,9 +52,10 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     print("initializing panda")
     ADDRESS = 0
     stateData = []
-    index = -1
+    index = 0
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
     initialState = {}
+    bitmask = b'\x00\x00\x00\x01'
 
     @panda.cb_after_machine_init
     def setup(cpu):
@@ -61,8 +75,6 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
             setRegisters(panda, cpu, initialState)
             randomizeRegisters(panda, cpu, bitmask)
             stateData.append([bitmask, getRegisterState(panda, cpu)])
-            nonlocal index
-            index += 1
         code = panda.virtual_memory_read(cpu, pc, 4)
         if (verbose):
             for i in md.disasm(code, pc):
@@ -76,9 +88,11 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
 
     @panda.cb_after_insn_exec
     def getInstValues(cpu, pc):
+        nonlocal index
         if (pc == 4):
             if (verbose): print("saving after reg state")
             stateData[index].append(getRegisterState(panda, cpu))
+            index += 1
         if (index >= n-1):
             if (verbose): print("end analysis")
             panda.end_analysis()
