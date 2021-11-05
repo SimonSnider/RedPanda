@@ -1,6 +1,6 @@
 from modules.generateInstruction import instructionGenerator as instructionGen
 from modules.runInstruction.stateManager import initializePanda
-from modules.runInstruction.runInstruction import *
+from modules.runInstruction.runInstruction import runInstructionSingleRandomReg as S
 
 def generateInstructionData(arch="mips", instructionTotal=1, instructionIterations=10, verbose=False):
     """Generates a structure of data pertaining to randomly generated instructions in a set ISA.
@@ -28,4 +28,4 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
     # for _ in range(instructionTotal):
     #     instructionList.append(instructionGen.generateInstruction())
 
-    return runInstructions(pandaInstance, instructionList, instructionIterations, verbose) 
+    return S.runInstructions(pandaInstance, instructionList, instructionIterations, verbose) 
