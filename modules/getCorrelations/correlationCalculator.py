@@ -100,8 +100,12 @@ def computeCorrelations():
                     bitMaskV = 1
                 denom += bitMaskV
                 num += bitMaskV*Ps[k].get(regList[j])
-
-            M[i][j] = num/denom
+            if(num==0 and denom==0):
+                M[i][j] = 0
+                if(i==j):
+                    M[i][j]=5
+            else:
+                M[i][j] = num/denom
 
     return M
 
@@ -119,6 +123,7 @@ def computeTestCorrelation(i, j):
             bitMaskV = 1
         denom += bitMaskV
         num += bitMaskV*(Ps[k].get(regList[j]))
-
+    if num==0 and denom==0:
+        return 1
     return num/denom
 

@@ -24,6 +24,7 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
     # instructionGen.initialize(arch)
 
     instructionList = [b"\x01\x4b\x48\x20"]
+    # instructionList = [b"\x00\x00\x00\x00"]
 
     # for _ in range(instructionTotal):
     #     instructionList.append(instructionGen.generateInstruction())
