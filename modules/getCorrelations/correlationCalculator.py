@@ -103,7 +103,7 @@ def computeCorrelations():
             if(num==0 and denom==0):
                 M[i][j] = 0
                 if(i==j):
-                    M[i][j]=5
+                    M[i][j]=1
             else:
                 M[i][j] = num/denom
 
