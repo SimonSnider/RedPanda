@@ -360,8 +360,8 @@ def test_singleCorrelation():
     # assert M == [[0,0,0,0,0], [1,1,0,0,0], [1,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1]]
     
 
-#test_noCorrelations()
-#test_allCorrelated()
-#test_addCorrelated()
-#test_addCorrelatedWithExtra()
-test_singleCorrelation()
+test_noCorrelations()
+test_allCorrelated()
+test_addCorrelated()
+test_addCorrelatedWithExtra()
+# test_singleCorrelation()
