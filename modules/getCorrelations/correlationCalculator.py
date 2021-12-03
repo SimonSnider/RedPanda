@@ -8,6 +8,9 @@ RegisterFinals = -1   #R_i,f
 Bs = -1 #B_i
 Ps = -1
 
+xBar = []
+yBar = [[]]
+
 regList = ["ZERO", "AT", "V0", "V1", "A0", "A1", "A2", "A3", "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "T8", "T9", "K0", "K1", "GP", "SP", "FP", "RA"]
 # remove bad ones from list above
 
@@ -63,20 +66,33 @@ def initialize(dataList: list, iterPerReg: int = 100):
     regList = list(RegisterInitials[0])
 
 
-def computePs():
-    """Calculates the value for each P_i. Must call initialize before this.
-    """
-    global iterPerRegister, RegisterInitial, RegisterInitialOutput, RegisterInitials, RegisterFinals, Bs, Ps, I
+def computeBars():
+    global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
+    xBar = {}
+    yBar = {}
+    regs = RegisterInitials[0].keys()
+    for r in regs:
+        xBar[r] = 0
+        yBar[r] = {}
+        for r2 in regs:
+            yBar[r][r2] = 0
+    
     for iter in range(I):
-        newDict = {}
         Ri0 = RegisterInitials[iter]
         Rif = RegisterFinals[iter]
         for reg in Ri0.keys():
-            if (RegisterInitialOutput.get(reg) != Rif.get(reg)):
-                newDict[reg] = 1
-            else:
-                newDict[reg] = 0
-        Ps[iter] = newDict
+            if(int.from_bytes(Bs[iter], 'big')&(1<<(n-reg-1)) != 0):            
+                xBar[reg] += Ri0[reg]
+                for reg2 in Rif.keys():
+                    yBar[reg][reg2] += Rif[reg2]
+                    
+    for r in regs:
+        xBar[r] /= iterPerRegister
+        for r2 in regs:
+            yBar[r][r2] /= iterPerRegister
+            
+            
+
 
 def computeCorrelations():
     """Calculates the correlation value for each pair of registers. Must call initialize before this.
@@ -84,8 +100,9 @@ def computeCorrelations():
     Return Value:
     M -- n x n list where M[i][j] is the correlation of register i on register j
     """
-    computePs()
-    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
+    global n, iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, xBar, yBar
+
+    computeBars()
     
     M = [[0]*n for _ in range(n)]
     
@@ -109,21 +126,4 @@ def computeCorrelations():
 
     return M
 
-def computeTestCorrelation(i, j):
-    denom = 0
-    num = 0
-    computePs()
-    global Ps, regList, Bs, n, I
-    print(I, n)
-    for k in range(I):
-        print(Bs[k], hex(Ps[k].get(regList[j])))
-        if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
-            bitMaskV = 0
-        else:
-            bitMaskV = 1
-        denom += bitMaskV
-        num += bitMaskV*(Ps[k].get(regList[j]))
-    if num==0 and denom==0:
-        return 1
-    return num/denom
 
