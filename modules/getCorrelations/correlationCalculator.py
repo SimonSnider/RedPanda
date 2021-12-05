@@ -66,6 +66,7 @@ def initialize(dataList: list, iterPerReg: int = 100):
     regList = list(RegisterInitials[0])
 
 def pearsonCorrelations():
+    computeBars2()
     global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
     correlationNums = {}
     xDiffSquaress = {} # sums of (xi-xbar)^2
@@ -84,7 +85,6 @@ def pearsonCorrelations():
         Rif = RegisterFinals[iter]
         for r1 in regs:
             for r2 in regs:
-                toAdd = (Ri0[r1]-xBar[r1])*(Rif[r2]-yBar[r2])
                 correlationNums[r1][r2] += (Ri0[r1]-xBar[r1])*(Rif[r2]-yBar[r2])
                 xDiffSquaress[r1][r2] += (Ri0[r1]-xBar[r1])*(Ri0[r1]-xBar[r1])
                 yDiffSquaress[r1][r2] += (Rif[r2]-yBar[r2])*(Rif[r2]-yBar[r2])
@@ -93,7 +93,16 @@ def pearsonCorrelations():
     for reg in regs:
         correlations[reg] = {}
         for reg2 in regs:
-            correlations[reg][reg2] = correlationNums[reg][reg2] / ((xDiffSquaress[reg][reg2]*yDiffSquaress[reg][reg2]) ** 0.5)
+            denom = ((xDiffSquaress[reg][reg2]*yDiffSquaress[reg][reg2]) ** 0.5)
+            if denom == 0:
+                if reg == reg2:
+                    correlations[reg][reg2] = 1
+                else:
+                    correlations[reg][reg2] = 0
+            else:
+                correlations[reg][reg2] = correlationNums[reg][reg2] / denom
+            if correlationNums[reg][reg2] == -1/2:
+                print(((xDiffSquaress[reg][reg2]*yDiffSquaress[reg][reg2]) ** 0.5))
     return correlations
 
 
