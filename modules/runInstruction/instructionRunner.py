@@ -23,7 +23,15 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
     pandaInstance = initializePanda(arch)
     # instructionGen.initialize(arch)
 
-    instructionList = [b"\x01\x4b\x48\x20"]
+    #add t1 t2 t3
+    #instructionList = [b"\x01\x4b\x48\x20"]
+
+    #slt t1 t2 t3
+    #instructionList = [b"\x01\x4b\x48\x2a"]
+    
+    #sll t1 t2 3
+    instructionList = [b"\x00\x08\x48\xc2"]
+
     # instructionList = [b"\x00\x00\x00\x00"]
 
     # for _ in range(instructionTotal):
