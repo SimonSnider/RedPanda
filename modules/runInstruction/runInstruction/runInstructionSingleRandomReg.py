@@ -198,7 +198,14 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             
         return 0
 
+    @panda.cb_before_handle_exception
+    def bhe(cpu, index):
+        pc = cpu.panda_guest_pc
+        print(f"handled exception index {index:#x} at pc: {pc:#x}")
+        panda.arch.set_pc(cpu, pc+4)
+        return -1
+
+    panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
-
     return stateData
