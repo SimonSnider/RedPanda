@@ -1,3 +1,7 @@
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+
 n = 24 #number of registers about which we care
 iterPerRegister = 100 #CHANGE THIS NUMBER. STAT MATH HERE
 I = n*iterPerRegister
@@ -66,6 +70,8 @@ def initialize(dataList: list, iterPerReg: int = 100):
     regList = list(RegisterInitials[0])
 
 def pearsonCorrelations():
+    graph("T2", "T1")
+    plt.show()
     computeBars2()
     global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
     correlationNums = {}
@@ -85,9 +91,9 @@ def pearsonCorrelations():
         Rif = RegisterFinals[iter]
         for r1 in regs:
             for r2 in regs:
-                correlationNums[r1][r2] += (Ri0[r1]-xBar[r1])*(Rif[r2]-yBar[r2])
-                xDiffSquaress[r1][r2] += (Ri0[r1]-xBar[r1])*(Ri0[r1]-xBar[r1])
-                yDiffSquaress[r1][r2] += (Rif[r2]-yBar[r2])*(Rif[r2]-yBar[r2])
+                correlationNums[r1][r2] += (ap(Ri0[r1])-xBar[r1])*(ap(Rif[r2])-yBar[r2])
+                xDiffSquaress[r1][r2] += (ap(Ri0[r1])-xBar[r1])*(ap(Ri0[r1])-xBar[r1])
+                yDiffSquaress[r1][r2] += (ap(Rif[r2])-yBar[r2])*(ap(Rif[r2])-yBar[r2])
 
     correlations = {}
     for reg in regs:
@@ -106,6 +112,30 @@ def pearsonCorrelations():
     return correlations
 
 
+def apply2sComplement(number):
+    if number >= 2 ** 31:
+        return number - 2 ** 32
+    return number
+
+
+def ap(n):
+    return apply2sComplement(n)
+
+
+def graph(x, y):
+    fig, ax = plt.subplots()
+    global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
+    xData = [0]*I
+    yData = [0]*I
+    regs = RegisterInitials[0].keys()
+    for iter in range(I):
+        Ri0 = RegisterInitials[iter]
+        Rif = RegisterFinals[iter]
+        xData[iter] = ap(Ri0[x])
+        yData[iter] = ap(Rif[y])
+    ax.scatter(xData, yData)
+    print("correlation between "+x+" and "+y+": "+str(np.corrcoef(xData, yData)))
+
 def computeBars2():
     global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
     xBar = {}
@@ -119,12 +149,19 @@ def computeBars2():
         Ri0 = RegisterInitials[iter]
         Rif = RegisterFinals[iter]
         for reg in regs:
-            xBar[reg] += Ri0[reg]
-            yBar[reg] += Rif[reg]
+            if Ri0[reg]<0:
+                print("negative input: " + str(apply2sComplement(Ri0[reg])))
+            if Rif[reg]<0:
+                print("negative output: " + str(apply2sComplement(Rif[reg])))
+            xBar[reg] += apply2sComplement(Ri0[reg])
+            yBar[reg] += apply2sComplement(Rif[reg])
 
     for reg in regs:
         xBar[reg] /= I
         yBar[reg] /= I
+
+    print("input: " + str(Ri0["T2"]))
+    print("output: " + str(Rif["T1"]))
 
 def computeBars():
     global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
@@ -144,8 +181,13 @@ def computeBars():
             reg = list(Ri0.keys())[i]
             if(int.from_bytes(Bs[iter], 'big')&(1<<(4*(n-i-1))) != 0):
                 xBar[reg] += Ri0[reg]
+                print(reg)
+                if reg == "T2":
+                    print("input: " + Ri0[reg])
                 for reg2 in Rif.keys():
                     yBar[reg][reg2] += Rif[reg2]
+                    if reg == "T1":
+                        print("output: " + Rif[reg2])
                     
     for r in regs:
         xBar[r] /= I
@@ -155,8 +197,6 @@ def computeBars():
     print(xBar)
     print(yBar)
             
-            
-
 
 def computeCorrelations():
     """Calculates the correlation value for each pair of registers. Must call initialize before this.
@@ -165,7 +205,8 @@ def computeCorrelations():
     M -- n x n list where M[i][j] is the correlation of register i on register j
     """
     global n, iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, xBar, yBar
-
+    print("3")
+    print(2)
     computeBars2()
     correlations = pearsonCorrelations()
     print(correlations)

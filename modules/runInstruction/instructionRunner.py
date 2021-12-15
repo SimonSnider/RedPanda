@@ -30,7 +30,7 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
     #instructionList = [b"\x01\x4b\x48\x2a"]
     
     #sll t1 t2 3
-    instructionList = [b"\x00\x08\x48\xc2"]
+    instructionList = [b"\x00\x0a\x4a\xc0"]
 
     # instructionList = [b"\x00\x00\x00\x00"]
 

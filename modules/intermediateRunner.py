@@ -54,7 +54,7 @@ def runProgram():
     instructionKeys = list(instructionData.keys())
     for i in range(1):
         dat = instructionData[instructionKeys[i]]
-        CC.initialize(dat, 1)
+        CC.initialize(dat, instructionIterations)
         print(CC.pearsonCorrelations())
         analyzedData.append(CC.pearsonCorrelations())
 
