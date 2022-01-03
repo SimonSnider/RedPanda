@@ -23,12 +23,11 @@ class TestScript(unittest.TestCase):
     #     instruction = "andi $t0, $t1, 0"
     #     print(instruction)
     #     CODE = instruction.encode('UTF-8')
-    
-#         ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
+    #     ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
 
     #     ADDRESS = 0x0000
     #     encoding, count = ks.asm(CODE, ADDRESS)
-    #     data = runInstruction.runInstructionLoop(panda, encoding, 1)
+    #     data = runInstruction.runInstructionLoop(panda, encoding, 1, verbose = True)
     #     for regStates in data:
     #         self.assertNotEqual(regStates[1].get("T0"), 0)
     #         self.assertEqual(regStates[2].get("T0"), 0)
@@ -45,7 +44,7 @@ class TestScript(unittest.TestCase):
 
     #     ADDRESS = 0x0000
     #     encoding, count = ks.asm(CODE, ADDRESS)
-    #     data = runInstructionSingleRandomReg.runInstructionLoop(panda, encoding, 1)
+    #     data = runInstructionSingleRandomReg.runInstructionLoop(panda, encoding, 1, True)
         
     #     self.assertEqual(len(data), 25)
     #     for i in range (len(data)):
@@ -58,16 +57,22 @@ class TestScript(unittest.TestCase):
     #         if (i == 0): continue
     #         self.assertTrue(isPowerOfTwo(int.from_bytes(regStates[0], 'big')))
     
-    # def testRunInstructionLoop(self):
-    #     instructionGenerator.initialize()
-    #     instruction =  instructionGenerator.generateInstruction()
-    #     n = 100
-    #     data = runInstruction.runInstructionLoop(panda, instruction, n)
-    #     self.assertEqual(len(data), n)
-    #     for regState in data:
-    #         self.assertIsInstance(regState[0], bytes)
-    #         self.assertIsInstance(regState[1], dict)
-    #         self.assertIsInstance(regState[2], dict)
+    def testRunInstructionLoop(self):
+        instruction = "add $t0, $t1, $t2"
+        print(instruction)
+        CODE = instruction.encode('UTF-8')
+
+        ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
+
+        ADDRESS = 0x0000
+        encoding, count = ks.asm(CODE, ADDRESS)
+        n = 10
+        data = runInstructionSingleRandomReg.runInstructionLoop(panda, encoding, n, True)
+        self.assertEqual(len(data), n*24 + 1)
+        for regState in data:
+            self.assertIsInstance(regState[0], bytes)
+            self.assertIsInstance(regState[1], dict)
+            self.assertIsInstance(regState[2], dict)
 
     # def testRunInstructions(self):
     #     instructions = []
@@ -87,23 +92,23 @@ class TestScript(unittest.TestCase):
     #             self.assertIsInstance(regState[1], dict)
     #             self.assertIsInstance(regState[2], dict)
 
-    def testRunInstructions(self):
-        instructions = []
-        instructionGenerator.initialize()
-        inst = 10
-        n = 5
-        for i in range(inst):
-            instructions.append(instructionGenerator.generateInstruction())
+    # def testRunInstructions(self):
+    #     instructions = []
+    #     instructionGenerator.initialize()
+    #     inst = 10
+    #     n = 5
+    #     for i in range(inst):
+    #         instructions.append(instructionGenerator.generateInstruction())
 
-        stateData = runInstructionSingleRandomReg.runInstructions(panda, instructions, n, True)
-        self.assertEqual(len(stateData.keys()), inst)
-        for key in stateData.keys():
-            self.assertEqual(stateData.get(key)[0][0], b'\x00\x00\x00\x00')
-            for regState in stateData.get(key):
-                self.assertIsInstance(regState[0], bytes)
-                self.assertIsInstance(regState[1], dict)
-                self.assertIsInstance(regState[2], dict)
-                self.assertTrue(isPowerOfTwo(int.from_bytes(regState[0], 'big', signed=False)))
+    #     stateData = runInstructionSingleRandomReg.runInstructions(panda, instructions, n, True)
+    #     self.assertEqual(len(stateData.keys()), inst)
+    #     for key in stateData.keys():
+    #         self.assertEqual(stateData.get(key)[0][0], b'\x00\x00\x00\x00')
+    #         for regState in stateData.get(key):
+    #             self.assertIsInstance(regState[0], bytes)
+    #             self.assertIsInstance(regState[1], dict)
+    #             self.assertIsInstance(regState[2], dict)
+    #             self.assertTrue(isPowerOfTwo(int.from_bytes(regState[0], 'big', signed=False)))
 
 
 if __name__ == '__main__':
