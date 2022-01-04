@@ -57,8 +57,8 @@ class TestScript(unittest.TestCase):
     #         if (i == 0): continue
     #         self.assertTrue(isPowerOfTwo(int.from_bytes(regStates[0], 'big')))
     
-    def testRunInstructionLoop(self):
-        instruction = "add $t0, $t1, $t2"
+    def testRunInstructionLoopSingleRandomReg(self):
+        instruction = "ori $t0, $t1, 0x0001"
         print(instruction)
         CODE = instruction.encode('UTF-8')
 
@@ -66,7 +66,7 @@ class TestScript(unittest.TestCase):
 
         ADDRESS = 0x0000
         encoding, count = ks.asm(CODE, ADDRESS)
-        n = 10
+        n = 100
         data = runInstructionSingleRandomReg.runInstructionLoop(panda, encoding, n, True)
         self.assertEqual(len(data), n*24 + 1)
         for regState in data:
@@ -92,7 +92,7 @@ class TestScript(unittest.TestCase):
     #             self.assertIsInstance(regState[1], dict)
     #             self.assertIsInstance(regState[2], dict)
 
-    # def testRunInstructions(self):
+    # def testRunInstructionsSingleRandomReg(self):
     #     instructions = []
     #     instructionGenerator.initialize()
     #     inst = 10
