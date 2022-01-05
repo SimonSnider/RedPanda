@@ -19,9 +19,11 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0):
         Sets the program counter to address
     """
     panda.physical_memory_write(address, bytes(instruction))
+    panda.physical_memory_write(address + len(instruction), bytes(b"\x00\x00\x00\x00"))
     # create a jump instruction
     jump = b"\x08\x00\x00\x00"
-    panda.physical_memory_write(address + len(instruction), bytes(jump))
+    panda.physical_memory_write(address + 2*len(instruction), bytes(jump))
+    
     cpu.env_ptr.active_tc.PC = address
     return
 
@@ -58,6 +60,7 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     lowerBound = -(2**31)
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
     initialState = {}
+    latch = 1
     bitmask = b'\x00\x00\x00\x00'
     
 
@@ -73,17 +76,17 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
 
     @panda.cb_insn_exec
     def randomRegState(cpu, pc):
+        nonlocal latch
         if (pc == ADDRESS):
             if (verbose): print("randomizing registers")
             nonlocal index, bitmask, regBoundsCount
-                
             setRegisters(panda, cpu, initialState)
             randomizeRegisters(panda, cpu, bitmask, lowerBound, upperBound)
             stateData.append([bitmask, getRegisterState(panda, cpu)])
         if (verbose):
             code = panda.virtual_memory_read(cpu, pc, 4)
             for i in md.disasm(code, pc):
-                print("0x%x:\t%s\t%s" % (i.address, i.mnemonic, i.op_str))
+                print("0x%x:\t%s\t%s" % (pc, i.mnemonic, i.op_str))
                 break
         return 0
 
@@ -93,8 +96,9 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
 
     @panda.cb_after_insn_exec
     def getInstValues(cpu, pc):
+        nonlocal latch
         if (pc == 4):
-            # if (verbose): print("saving after reg state")
+            if (verbose): print("saving after reg state")
             nonlocal index, bitmask, regBoundsCount
             stateData[index].append(getRegisterState(panda, cpu))
             
@@ -133,6 +137,7 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
         lowerBound = -(2**(31 - regBoundsCount))
         stateData.pop()
         return -1
+
 
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
@@ -245,6 +250,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         lowerBound = -(2**(31 - regBoundsCount))
         stateData[instructions[instIndex]].pop()
         return -1
+
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()

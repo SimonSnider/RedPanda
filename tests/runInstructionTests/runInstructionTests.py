@@ -57,22 +57,22 @@ class TestScript(unittest.TestCase):
     #         if (i == 0): continue
     #         self.assertTrue(isPowerOfTwo(int.from_bytes(regStates[0], 'big')))
     
-    def testRunInstructionLoopSingleRandomReg(self):
-        instruction = "ori $t0, $t1, 0x0001"
-        print(instruction)
-        CODE = instruction.encode('UTF-8')
+    # def testRunInstructionLoopSingleRandomReg(self):
+    #     instruction = "add $t0, $t1, $t2"
+    #     print(instruction)
+    #     CODE = instruction.encode('UTF-8')
 
-        ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
+    #     ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
 
-        ADDRESS = 0x0000
-        encoding, count = ks.asm(CODE, ADDRESS)
-        n = 100
-        data = runInstructionSingleRandomReg.runInstructionLoop(panda, encoding, n, True)
-        self.assertEqual(len(data), n*24 + 1)
-        for regState in data:
-            self.assertIsInstance(regState[0], bytes)
-            self.assertIsInstance(regState[1], dict)
-            self.assertIsInstance(regState[2], dict)
+    #     ADDRESS = 0x0000
+    #     encoding, count = ks.asm(CODE, ADDRESS)
+    #     n = 100
+    #     data = runInstructionSingleRandomReg.runInstructionLoop(panda, encoding, n, False)
+    #     self.assertEqual(len(data), n*24 + 1)
+    #     for regState in data:
+    #         self.assertIsInstance(regState[0], bytes)
+    #         self.assertIsInstance(regState[1], dict)
+    #         self.assertIsInstance(regState[2], dict)
 
     # def testRunInstructions(self):
     #     instructions = []
@@ -92,23 +92,23 @@ class TestScript(unittest.TestCase):
     #             self.assertIsInstance(regState[1], dict)
     #             self.assertIsInstance(regState[2], dict)
 
-    # def testRunInstructionsSingleRandomReg(self):
-    #     instructions = []
-    #     instructionGenerator.initialize()
-    #     inst = 10
-    #     n = 5
-    #     for i in range(inst):
-    #         instructions.append(instructionGenerator.generateInstruction())
+    def testRunInstructionsSingleRandomReg(self):
+        instructions = []
+        instructionGenerator.initialize()
+        inst = 10
+        n = 5
+        for i in range(inst):
+            instructions.append(instructionGenerator.generateInstruction())
 
-    #     stateData = runInstructionSingleRandomReg.runInstructions(panda, instructions, n, True)
-    #     self.assertEqual(len(stateData.keys()), inst)
-    #     for key in stateData.keys():
-    #         self.assertEqual(stateData.get(key)[0][0], b'\x00\x00\x00\x00')
-    #         for regState in stateData.get(key):
-    #             self.assertIsInstance(regState[0], bytes)
-    #             self.assertIsInstance(regState[1], dict)
-    #             self.assertIsInstance(regState[2], dict)
-    #             self.assertTrue(isPowerOfTwo(int.from_bytes(regState[0], 'big', signed=False)))
+        stateData = runInstructionSingleRandomReg.runInstructions(panda, instructions, n, True)
+        self.assertEqual(len(stateData.keys()), inst)
+        for key in stateData.keys():
+            self.assertEqual(stateData.get(key)[0][0], b'\x00\x00\x00\x00')
+            for regState in stateData.get(key):
+                self.assertIsInstance(regState[0], bytes)
+                self.assertIsInstance(regState[1], dict)
+                self.assertIsInstance(regState[2], dict)
+                self.assertTrue(isPowerOfTwo(int.from_bytes(regState[0], 'big', signed=False)))
 
 
 if __name__ == '__main__':
