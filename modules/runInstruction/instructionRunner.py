@@ -1,6 +1,7 @@
 from modules.generateInstruction import instructionGenerator as instructionGen
 from modules.runInstruction.stateManager import initializePanda
 from modules.runInstruction.runInstruction import runInstructionSingleRandomReg as S
+from keystone import *
 
 def generateInstructionData(arch="mips", instructionTotal=1, instructionIterations=10, verbose=False):
     """Generates a structure of data pertaining to randomly generated instructions in a set ISA.
@@ -29,8 +30,15 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
     #slt t1 t2 t3
     #instructionList = [b"\x01\x4b\x48\x2a"]
     
-    #sll t1 t2 3
-    instructionList = [b"\x00\x0a\x4a\xc0"]
+    # sll t1 t2 3
+    instructionList = [b"\x00\x0a\x48\xc0"]
+    # ks = Ks(KS_ARCH_MIPS, KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN) 
+    # ADDRESS = 0x0000
+    # instruction = "sll $t1, $t2, 3"
+    # encoding, count = ks.asm(instruction.encode('UTF-8'), ADDRESS)
+
+    # instructionList = []
+    # instructionList.append(encoding)
 
     # instructionList = [b"\x00\x00\x00\x00"]
 

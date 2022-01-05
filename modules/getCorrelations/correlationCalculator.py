@@ -70,6 +70,7 @@ def initialize(dataList: list, iterPerReg: int = 100):
     regList = list(RegisterInitials[0])
 
 def pearsonCorrelations():
+    plt.close('all')
     graph("T2", "T1")
     plt.show()
     computeBars2()
@@ -125,14 +126,20 @@ def ap(n):
 def graph(x, y):
     fig, ax = plt.subplots()
     global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
-    xData = [0]*I
-    yData = [0]*I
-    regs = RegisterInitials[0].keys()
+    xData = []
+    yData = []
+    x0 = RegisterInitials[0][y]
+
     for iter in range(I):
         Ri0 = RegisterInitials[iter]
         Rif = RegisterFinals[iter]
-        xData[iter] = ap(Ri0[x])
-        yData[iter] = ap(Rif[y])
+        if Ri0[x] == x0:
+            continue
+        xData.append(ap(Ri0[x]))
+        yData.append(ap(Rif[y]))
+        # if iter<300:
+        #     print("x: "+str(xData[iter])+"; y: "+str(yData[iter]))
+    # print(xData)
     ax.scatter(xData, yData)
     print("correlation between "+x+" and "+y+": "+str(np.corrcoef(xData, yData)))
 
