@@ -25,7 +25,7 @@ def filterInstruction(instruction, verbose=False):
 
         mnemonic = insn.mnemonic
 
-        if(mnemonic in ["beq", "bne", "bgtz", "bltz", "bgez", "blez"]):
+        if(mnemonic in ["beq", "bne", "bgtz", "bltz", "bgez", "blez", "addi"]):
             return False
 
         if len(insn.operands) > 0:

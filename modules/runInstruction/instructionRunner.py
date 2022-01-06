@@ -1,16 +1,13 @@
-from modules.generateInstruction import instructionGenerator as instructionGen
 from modules.runInstruction.stateManager import initializePanda
 from modules.runInstruction.runInstruction import runInstructionSingleRandomReg as S
 
-def generateInstructionData(arch="mips", instructionTotal=1, instructionIterations=10, verbose=False):
+def generateInstructionData(arch, instructionList, instructionIterations=10, verbose=False):
     """Generates a structure of data pertaining to randomly generated instructions in a set ISA.
 
     Arguments:
         arch -- specifies the architecture to generate instruction data for (default = mips32)
         Valid Arguments:
             mips32 -- Use the MIPS architecture
-
-        instructionTotal -- specifies the total number of random instructions to generate data for (default = 1)
 
         instructionIterations -- specifies the number times an instruction is run and data is generated (default = 10)
 
@@ -21,12 +18,5 @@ def generateInstructionData(arch="mips", instructionTotal=1, instructionIteratio
         Register state is stored as a dictionary of <register name> -> <register value> pairings. 
     """
     pandaInstance = initializePanda(arch)
-    # instructionGen.initialize(arch)
-
-    instructionList = [b"\x01\x4b\x48\x20"]
-    # instructionList = [b"\x00\x00\x00\x00"]
-
-    # for _ in range(instructionTotal):
-    #     instructionList.append(instructionGen.generateInstruction())
 
     return S.runInstructions(pandaInstance, instructionList, instructionIterations, verbose) 
