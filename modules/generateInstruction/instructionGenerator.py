@@ -2,30 +2,19 @@ from modules.generateInstruction import verifierAdapter as verAdapt
 from modules.generateInstruction import bitGenerator as bitGen
 from modules.generateInstruction.filterer import filtererBasicMIPS as fBMIPS
 
-def initialize(arch="mips32"):
+def initialize(arch="mips32", littleEndian=False):
     """Initializes an architecture to generate instructions
 
     Arguments:
         arch -- specifies the architecture for which instructions are generated (default = mips32)
+        littleEndian -- specifies the instructions to be verified in little endian mode (default = False)
 
     Valid Arguments:
         mips32 -- Use the MIPS architecture
     """
-    verAdapt.setISA(arch)
-    verAdapt.initialize()
+    return verAdapt.initialize(arch, littleEndian)
 
-def setISA(arch):
-    """Changes the current architecture to a newly specified one
-    
-    Arguments:
-        arch -- specifies the architecture for which instructions are generated
-
-    Valid Arguments:
-        mips32 -- Use the MIPS architecture
-    """
-    verAdapt.setISA(arch)
-
-def generateInstruction(verbose=False):
+def generateInstruction(instructionGenerator, verbose=False):
     """Generates a single instruction in the currently selected ISA
     Instructions generated in this way are valid instructions for the current ISA 
     and are runnable on the currently tested Taint-Tracker system.
@@ -43,9 +32,11 @@ def generateInstruction(verbose=False):
         if(verbose):
             print(bitGen.byteBinaryString(randomInstructionBytes))
 
-        if(not verAdapt.isValidInstruction(randomInstructionBytes)):
+        # Check if the instruction is a valid instruction in the ISA
+        if(not instructionGenerator.isValidInstruction(randomInstructionBytes)):
             continue
 
+        # Check if the instruction should be filtered out for the current implementation selection
         if(not fBMIPS.filterInstruction(randomInstructionBytes)):
             continue
 
