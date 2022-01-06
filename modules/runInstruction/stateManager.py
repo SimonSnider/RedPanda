@@ -1,10 +1,10 @@
 # State Manager Module. Handles randomizing register and memory state and viewing them
 # Since there can only be one instance of panda, procedures will have to take in an instance of panda to manipulate
 # This means that these procedures will likely need to be called in @panda.cb_after_machine_init or the like
-
 from random import randint, seed
 from pandare.arch import PandaArch
 from pandare.panda import Panda
+from modules.generateInstruction.bitGenerator import *
 import math
 
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
@@ -36,7 +36,7 @@ def initializeMemory(panda: Panda, memName, memSize=2 * 1024 * 1024, address=0):
     """
     panda.map_memory(memName, memSize, address)
 
-def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff'):
+def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff', minValue = -(2**(31)), maxValue = (2**31) - 1):
     """
     Arguments:
         panda -- the instance of panda that will have its registers randomized
@@ -50,8 +50,8 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
         # skippedRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
         for (regname, reg) in panda.arch.registers.items():
             if (regname in skippedMipsRegs or not getBit(regBitMask, reg)): continue
-            num = randint(0, math.floor((2**(32) - 1)/4))
-            panda.arch.set_reg(cpu, regname, num)
+            num = generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
+            panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
     return
 
 def setRegisters(panda: Panda, cpu, registerSate: dict):
