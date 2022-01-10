@@ -17,6 +17,7 @@ Arguments:
             reg-coorelational -- calculate coorelation between register values before and after an instruction is run
 """
 
+import os
 from modules.runInstruction.instructionRunner import generateInstructionData
 from modules.getCorrelations import correlationCalculator as CC 
 from modules.generateInstruction import instructionGenerator as instructionGen
@@ -205,25 +206,30 @@ if len(sys.argv) > 1:
         arguments = []
 
         # Read file
-        with open("debug.cfg") as f:
+        fname = "debug.cfg"
+        this_file = os.path.abspath(__file__)
+        this_dir = os.path.dirname(this_file)
+        wanted_file = os.path.join(this_dir, fname)
+        with open(wanted_file) as f:
             lines = f.readlines()
 
         # Parse file
         for line in lines:
             # Ignore comments and blank lines
-            if (line[0] == '#') or (len(line) < 2):
+            if (line[0] == '#') or (len(line.rstrip('\n')) < 1):
                 continue;
 
-            arguments.append(line)
-
+            arguments.append(line.rstrip('\n'))
+        print(len(arguments))
         print("Read instruction arguments: \nArchitecture:", arguments[0], 
             "\nInstruction Mode:", arguments[1], 
             "\nInstruction Iterations:", arguments[2], 
             "\nOutput File Name:", arguments[3], 
             "\nInstructions File:", arguments[4], 
-            "\nNumber of Instructions to Generate:", arguments[5], 
-            "\nVerbose:", arguments[6])
+            "\nNumber of Instructions to Generate:", arguments[5],
+            "\nVerbose:", arguments[6]
+            )
 
-        runModel(int(arguments[0]), int(arguments[1]), int(arguments[2]), arguments[3], arguments[4], int(arguments[5]), int(arguments[6]))
+        runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], arguments[4], int(arguments[5]), int(arguments[6]))
     else:
         runInputAndModel()
