@@ -19,10 +19,10 @@ def initialize(arch, littleEndian=False):
 
     # Set architecture and mode relative to the selected architecture implementation
     if(arch == "mips32"):
-	    verifier.arch = CS_ARCH_MIPS
-	    verifier.mode = CS_MODE_MIPS32
+        verifier.arch = CS_ARCH_MIPS
+        verifier.mode = CS_MODE_MIPS32
     else:
-        raise ValueError("Verifier architecture selection invalid. Maybe it is not implemented?")
+        raise ValueError("Verifier architecture selection invalid. Maybe it is not implemented?", arch)
 
     # Instantiate Dissassembler in either little endian or big endian mode
     verifier.disassembler = Cs(verifier.arch, 
@@ -36,12 +36,12 @@ def initialize(arch, littleEndian=False):
 
 # given binary code, decide whether it is a valid instruction
 def isValidInstruction(verifier, instruction, verbose=False):
-	if(verbose):
-		print("archType: %i; mode: %i" %(verifier.arch, verifier.mode))
+    if(verbose):
+        print("archType: %i; mode: %i" %(verifier.arch, verifier.mode))
 
-    # Attempt to disassemble the instruction. If it succeeds return true.
-	for insn in verifier.disassembler.disasm(instruction, 0x1000):
-		if(verbose):
-			print("%s\t%s\t%x" %(insn.mnemonic, insn.op_str, insn.address))
+    # attempt to disassemble whether it is a valid instruction
+    for insn in verifier.disassembler.disasm(instruction, 0x1000):
+        if (verbose): 
+            print("%s\t%s\t%x" %(insn.mnemonic, insn.op_str, insn.address))
         return True
-	return False
+    return False
