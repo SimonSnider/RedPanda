@@ -25,6 +25,10 @@ import keystone as k
 import sys
 import csv
 
+
+module_location = os.path.abspath(__file__)
+module_dir = os.path.dirname(module_location)
+
 def runInputAndModel():
     #
     # Take user input and specify run modes.
@@ -75,10 +79,10 @@ def runInputAndModel():
             return
     elif mode == 1:
         print("Specify the file containing the instructions (default = byte_specifications.txt)")
-        instructionsFile = input() or "byte_specifications.txt"
+        instructionsFile = input() or os.path.join(module_dir, "byte_specifications.txt")
     elif mode == 2:
         print("Specify the file containing the instructions (default = instruction_specifications.txt)")
-        instructionsFile = input() or "instruction_specifications.txt"
+        instructionsFile = input() or os.path.join(module_dir, "instruction_specifications.txt")
     else:
         print("Mode not within supported range. Please enter a supported mode value.")
         return
@@ -207,10 +211,8 @@ if len(sys.argv) > 1:
 
         # Read file
         fname = "debug.cfg"
-        this_file = os.path.abspath(__file__)
-        this_dir = os.path.dirname(this_file)
-        wanted_file = os.path.join(this_dir, fname)
-        with open(wanted_file) as f:
+        debug_file = os.path.join(module_dir, fname)
+        with open(debug_file) as f:
             lines = f.readlines()
 
         # Parse file
