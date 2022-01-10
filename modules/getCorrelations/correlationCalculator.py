@@ -1,3 +1,5 @@
+import pearson
+
 n = 24 #number of registers about which we care
 iterPerRegister = 100 #CHANGE THIS NUMBER. STAT MATH HERE
 I = n*iterPerRegister
@@ -8,8 +10,8 @@ RegisterFinals = -1   #R_i,f
 Bs = -1 #B_i
 Ps = -1
 
-xBar = []
-yBar = [[]]
+xBar = {}
+yBar = {}
 
 regList = ["ZERO", "AT", "V0", "V1", "A0", "A1", "A2", "A3", "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "T8", "T9", "K0", "K1", "GP", "SP", "FP", "RA"]
 # remove bad ones from list above
@@ -65,98 +67,58 @@ def initialize(dataList: list, iterPerReg: int = 100):
 
     regList = list(RegisterInitials[0])
 
-def pearsonCorrelations():
-    computeBars2()
-    global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
-    correlationNums = {}
-    xDiffSquaress = {} # sums of (xi-xbar)^2
-    yDiffSquaress = {} # sums of (yi-ybar)^2
-    regs = RegisterInitials[0].keys()
-    for r1 in regs:
-        correlationNums[r1] = {}
-        xDiffSquaress[r1] = {}
-        yDiffSquaress[r1] = {}
-        for r2 in regs:
-            correlationNums[r1][r2] = 0
-            xDiffSquaress[r1][r2] = 0
-            yDiffSquaress[r1][r2] = 0
-    for iter in range(I):
-        Ri0 = RegisterInitials[iter]
-        Rif = RegisterFinals[iter]
-        for r1 in regs:
-            for r2 in regs:
-                correlationNums[r1][r2] += (Ri0[r1]-xBar[r1])*(Rif[r2]-yBar[r2])
-                xDiffSquaress[r1][r2] += (Ri0[r1]-xBar[r1])*(Ri0[r1]-xBar[r1])
-                yDiffSquaress[r1][r2] += (Rif[r2]-yBar[r2])*(Rif[r2]-yBar[r2])
-
-    correlations = {}
-    for reg in regs:
-        correlations[reg] = {}
-        for reg2 in regs:
-            denom = ((xDiffSquaress[reg][reg2]*yDiffSquaress[reg][reg2]) ** 0.5)
-            if denom == 0:
-                if reg == reg2:
-                    correlations[reg][reg2] = 1
-                else:
-                    correlations[reg][reg2] = 0
-            else:
-                correlations[reg][reg2] = correlationNums[reg][reg2] / denom
-            if correlationNums[reg][reg2] == -1/2:
-                print(((xDiffSquaress[reg][reg2]*yDiffSquaress[reg][reg2]) ** 0.5))
-    return correlations
-
-
-def computeBars2():
-    global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
-    xBar = {}
-    yBar = {}
-    regs = RegisterInitials[0].keys()
-    for r in regs:
-        xBar[r] = 0
-        yBar[r] = 0
-
-    for iter in range(I):
-        Ri0 = RegisterInitials[iter]
-        Rif = RegisterFinals[iter]
-        for reg in regs:
-            xBar[reg] += Ri0[reg]
-            yBar[reg] += Rif[reg]
-
-    for reg in regs:
-        xBar[reg] /= I
-        yBar[reg] /= I
-
-def computeBars():
-    global n, xBar, yBar, Bs, RegisterInitials, RegisterFinals, I, iterPerRegister
-    xBar = {}
-    yBar = {}
-    regs = RegisterInitials[0].keys()
-    for r in regs:
-        xBar[r] = 0
-        yBar[r] = {}
-        for r2 in regs:
-            yBar[r][r2] = 0
+def getBsDict(bytesB):
+    global n, regList
+    newDict = {}
+    for i in range(n):
+        bitMaskV = 1
+        if(int.from_bytes(bytesB, 'big')&(1<<(n-i-1)) == 0):
+            bitMaskV = 0
+        newDict{reglist[i]} = bitMaskV
     
-    for iter in range(I):
-        Ri0 = RegisterInitials[iter]
-        Rif = RegisterFinals[iter]
-        for i in range(n):
-            reg = list(Ri0.keys())[i]
-            if(int.from_bytes(Bs[iter], 'big')&(1<<(4*(n-i-1))) != 0):
-                xBar[reg] += Ri0[reg]
-                for reg2 in Rif.keys():
-                    yBar[reg][reg2] += Rif[reg2]
-                    
-    for r in regs:
-        xBar[r] /= I
+    
+def computeAverages():
+    global n, iterPerRegister, RegisterInitial, RegisterInitials, RegisterInitialOutput, RegisterFinals, Bs, I, regList, xBar, yBar
+    
+    xBar = RegisterInitial.copy()
+    yBar = RegisterInitial.copy()
+    bSum = {}
+
+    regs = regList
+    
+    for reg in regs:
+        yBar{reg} = RegisterInitialOutput.copy()
+        bSum{reg} = 0
+
+    for i in range(len(RegisterInitials)):
+        ri = RegisterInitials[i]
+        rf = RegisterFinals[i]
+        b = getBsDict(Bs[i])
+
+        for r1 in regs:
+            
+            xBar{r1} += ri{r1}*b{r1}
+            bSum{r1} += b{r1}
+
+            for r2 in regs:
+                yBar{r1}{r2} += rf{r2}*b{r1}
+
+
+    for r1 in regs:
+        xBar{r1} /= bSum{r1}
         for r2 in regs:
-            yBar[r][r2] /= I
+            yBar{r1}{r2} /= bSum{r1}
+    
+    
+def pearsonCorrelations(): 
+    global n, iterPerRegister, RegisterInitial, RegisterInitials, RegisterInitialOutput, RegisterFinals, Bs, I, regList, xBar, yBar
+    
+    computeAverages()
 
-    print(xBar)
-    print(yBar)
+    for x in regList:
+        for i in range(len(RegisterInitials)):
             
             
-
 
 def computeCorrelations():
     """Calculates the correlation value for each pair of registers. Must call initialize before this.
@@ -166,9 +128,9 @@ def computeCorrelations():
     """
     global n, iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, xBar, yBar
 
-    computeBars2()
     correlations = pearsonCorrelations()
     print(correlations)
+
     M = [[0]*n for _ in range(n)]
     
     for i in range(n):
