@@ -33,7 +33,7 @@ def generateInstruction(instructionGenerator, verbose=False):
             print(bitGen.byteBinaryString(randomInstructionBytes))
 
         # Check if the instruction is a valid instruction in the ISA
-        if(not instructionGenerator.isValidInstruction(randomInstructionBytes)):
+        if(not verAdapt.isValidInstruction(instructionGenerator, randomInstructionBytes)):
             continue
 
         # Check if the instruction should be filtered out for the current implementation selection
