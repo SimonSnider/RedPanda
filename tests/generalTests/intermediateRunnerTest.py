@@ -1,3 +1,4 @@
+from os import error
 import pytest
 from modules import intermediateRunner as intRun
 from tests.utilities import setConsoleInputs
@@ -5,17 +6,10 @@ from tests.utilities import setConsoleInputs
 def test_enterValidSettings(monkeypatch):
     """
     """
-    
-    intRun.runProgram();
+    setConsoleInputs(monkeypatch, ['data', '0', '0', '1', '10', '0', '0'])
 
-def test_enterInvalidSettings(monkeypatch):
-    """
-    """
-
-def test_runMIPSInstructionSet(monkeypatch):
-    """
-    """
-
-def test_fileCreated(monkeypatch):
-    """
-    """
+    try:
+        intRun.runProgram();
+        assert True
+    except:
+        assert False

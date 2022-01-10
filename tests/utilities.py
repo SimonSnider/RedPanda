@@ -1,5 +1,5 @@
 def generateConsoleInputGenerator(inputs):
-    for in in inputs:
+    for in_ in inputs:
         yield in_
 
 def setConsoleInputs(monkeypatch, inputs):
