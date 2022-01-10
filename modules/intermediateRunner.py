@@ -216,6 +216,14 @@ if len(sys.argv) > 1:
 
             arguments.append(line)
 
-        runModel(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6])
+        print("Read instruction arguments: \nArchitecture:", arguments[0], 
+            "\nInstruction Mode:", arguments[1], 
+            "\nInstruction Iterations:", arguments[2], 
+            "\nOutput File Name:", arguments[3], 
+            "\nInstructions File:", arguments[4], 
+            "\nNumber of Instructions to Generate:", arguments[5], 
+            "\nVerbose:", arguments[6])
+
+        runModel(int(arguments[0]), int(arguments[1]), int(arguments[2]), arguments[3], arguments[4], int(arguments[5]), int(arguments[6]))
     else:
         runInputAndModel()
