@@ -81,7 +81,7 @@ def computeCorrelations():
     M -- n x n list where M[i][j] is the correlation of register i on register j
     """
     computePs()
-    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
+    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, n
     
     M = [[0]*n for _ in range(n)]
     

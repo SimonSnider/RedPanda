@@ -105,7 +105,7 @@ def computeCorrelations():
     M -- n x m list where M[i][j] is the correlation of register i on register/memory access j
     """
     computePs()
-    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs
+    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs, n
     
     M = [[0]*(n + len(memReadsInitial) + len(memWritesInitial)) for _ in range(n)]
     
