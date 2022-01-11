@@ -32,9 +32,9 @@ def setArch(archType, testV=0):
     """
 
     global n
-    if(archType.lower()=="mips32"):
+    if archType.lower() == "mips32":
         n = 32
-    elif(archType.lower()=="test"):
+    elif archType.lower() == "test":
         n = testV
 
 def initialize(data: RegisterStates, iterPerReg: int = 100):
@@ -65,6 +65,30 @@ def initialize(data: RegisterStates, iterPerReg: int = 100):
     memWritesInitial = data.memoryWrites[0]
     memReads = data.memoryReads[1:]
     memWrites = data.memoryWrites[1:]
+    maxLengthReads = 0
+    # replace with math.max function python equivalent
+    for ls in memReads:
+        if len(ls) > maxLengthReads:
+            maxLengthReads = len(ls)
+    maxLengthWrites = 0
+    for ls in memWrites:
+        if len(ls) > maxLengthWrites:
+            maxLengthWrites = len(ls)
+
+    lengthen(memReadsInitial, maxLengthReads)
+    lengthen(memWritesInitial, maxLengthWrites)
+    for ls in memReads:
+        lengthen(ls, maxLengthReads)
+    for ls in memWrites:
+        lengthen(ls, maxLengthWrites)
+
+
+def lengthen(ls, length):
+    remaining = length - len(ls)
+    while remaining > 0:
+        ls.append(-1)
+        remaining -= 1
+
 
 def computePs():
     """Calculates the value for each P_i. Must call initialize before this.
