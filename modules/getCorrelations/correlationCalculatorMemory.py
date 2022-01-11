@@ -127,8 +127,8 @@ def computeCorrelations():
             else:
                 M[i][j] = num/denom
         for j in range(len(memReadsInitial)):
-            denom = 0;
-            num = 0;
+            denom = 0
+            num = 0
             for k in range(I):
                 if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
                     bitMaskV = 0
@@ -141,8 +141,8 @@ def computeCorrelations():
             else:
                 M[i][j+n] = num/denom
         for j in range(len(memWritesInitial)):
-            denom = 0;
-            num = 0;
+            denom = 0
+            num = 0
             for k in range(I):
                 if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
                     bitMaskV = 0
