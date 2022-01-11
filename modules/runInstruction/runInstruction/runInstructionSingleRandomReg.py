@@ -4,6 +4,8 @@ from capstone import *
 from capstone.mips import *
 import math
 from modules.generateInstruction.bitGenerator import *
+from modules.models.stateData import *
+import copy
 
 
 def loadInstruction(panda: Panda, cpu, instruction, address=0):
@@ -157,7 +159,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         Output format: {inst1: [[bitmask0: bytes, beforeState0: dict, afterState0: dict], [bitmask1, beforeState1, afterState1], ...], inst2: [[bitmask0, beforeState0, afterState0]...], ...}
     """
     ADDRESS = 0
-    stateData = {}
+    stateData = StateData()
+    registerStates = RegisterStates()
     regStateIndex = 0
     instIndex = 0
     regBoundsCount = 0
@@ -173,21 +176,22 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         initializeMemory(panda, "mymem", address=ADDRESS)
         nonlocal instIndex, initialState, stateData
         loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
+        stateData.instructions.append(instructions[instIndex])
         randomizeRegisters(panda, cpu)
         initialState = getRegisterState(panda, cpu)
-        stateData[instructions[instIndex]] = []
         if (verbose): print("setup done")
 
     @panda.cb_insn_exec
     def randomRegState(cpu, pc):
-        nonlocal bitmask, stateData
+        nonlocal bitmask, stateData, registerStates
         if (verbose): print("randomRegState")
         if (pc == ADDRESS):
             if (verbose): print("randomizing registers")
             setRegisters(panda, cpu, initialState)
             randomizeRegisters(panda, cpu, bitmask)
             if (verbose): print("saving before reg state")
-            stateData[instructions[instIndex]].append([bitmask, getRegisterState(panda, cpu)])
+            registerStates.bitmasks.append(bitmask)
+            registerStates.beforeStates.append(getRegisterState(panda, cpu))
         if (verbose):
             code = panda.virtual_memory_read(cpu, pc, 4)
             for i in md.disasm(code, pc):
@@ -202,10 +206,10 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
         if (verbose): print("getInstValues")
-        nonlocal regStateIndex, instIndex, bitmask
+        nonlocal regStateIndex, instIndex, bitmask, registerStates
         if (pc == 4):
             if (verbose): print("saving reg state after run", regStateIndex)
-            stateData[instructions[instIndex]][regStateIndex].append(getRegisterState(panda, cpu))
+            registerStates.afterStates.append(getRegisterState(panda, cpu))
             
             if (regStateIndex % n == 0):
                 nextReg = getNextValidBit(panda, math.floor(regStateIndex / n))
@@ -213,13 +217,16 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     if (instIndex < len(instructions)-1):
                         if (verbose): print("switching instructions")
                         instIndex += 1
+                        stateData.registerStates.append(copy.copy(registerStates))
                         loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
-                        stateData[instructions[instIndex]] = []
+                        stateData.instructions.append(instructions[instIndex])
+                        registerStates = RegisterStates()
                         regStateIndex = 0
                         bitmask = b'\x00\x00\x00\x00'
                         return 0
                     else:
                         if (verbose): print("end analysis")
+                        stateData.registerStates.append(copy.copy(registerStates))
                         panda.end_analysis()
                         return 0
             
@@ -229,7 +236,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
     @panda.cb_before_handle_exception
     def bhe(cpu, index):
-        nonlocal regBoundsCount, bitmask, stateData, regStateIndex, initialState
+        nonlocal regBoundsCount, bitmask, stateData, regStateIndex, initialState, registerStates
         pc = cpu.panda_guest_pc
         if (verbose): print(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
@@ -243,12 +250,16 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             lowerBound = -(2**(31 - math.floor(regBoundsCount/6)))
             randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound)
             initialState = getRegisterState(panda, cpu)
-            stateData[instructions[instIndex]] = []
+            # stateData[instructions[instIndex]] = []
+            registerStates.beforeStates = []
+            registerStates.bitmasks = []
+            registerStates.afterStates = []
             return -1
         if (verbose): print(f"re-randomizing register with reduced range")
         upperBound = 2**(31 - regBoundsCount) - 1
         lowerBound = -(2**(31 - regBoundsCount))
-        stateData[instructions[instIndex]].pop()
+        registerStates.beforeStates.pop()
+        registerStates.bitmasks.pop()
         return -1
 
     panda.enable_precise_pc()
