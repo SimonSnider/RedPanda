@@ -98,3 +98,62 @@ def computePs():
                 newList2[i] = 0
                 
         writePs[iter] = newList2
+
+def computeCorrelations():
+    """Calculates the correlation value for each pair of registers. Must call initialize before this.
+    Return Value:
+    M -- n x m list where M[i][j] is the correlation of register i on register/memory access j
+    """
+    computePs()
+    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs
+    
+    M = [[0]*(n + len(memReadsInitial) + len(memWritesInitial)) for _ in range(n)]
+    
+    for i in range(n):
+        for j in range(n):
+            denom = 0
+            num = 0
+            for k in range(I):
+                if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
+                    bitMaskV = 0
+                else:
+                    bitMaskV = 1
+                denom += bitMaskV
+                num += bitMaskV*Ps[k].get(regList[j])
+            if(num==0 and denom==0):
+                M[i][j] = 0
+                if(i==j):
+                    M[i][j]=1
+            else:
+                M[i][j] = num/denom
+        for j in range(len(memReadsInitial)):
+            denom = 0;
+            num = 0;
+            for k in range(I):
+                if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
+                    bitMaskV = 0
+                else:
+                    bitMaskV = 1
+                denom += bitMaskV
+                num += bitMaskV*readPs[j]
+            if(num==0 and denom==0):
+                M[i][j+n] = 0
+            else:
+                M[i][j+n] = num/denom
+        for j in range(len(memWritesInitial)):
+            denom = 0;
+            num = 0;
+            for k in range(I):
+                if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
+                    bitMaskV = 0
+                else:
+                    bitMaskV = 1
+                denom += bitMaskV
+                num += bitMaskV*writePs[j]
+            if(num==0 and denom==0):
+                M[i][j+n+len(memReadsInitial)] = 0
+            else:
+                M[i][j+n+len(memReadsInitial)] = num/denom
+                
+
+    return M
