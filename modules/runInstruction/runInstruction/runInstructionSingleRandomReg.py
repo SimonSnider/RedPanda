@@ -167,7 +167,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
     initialState = {}
 
-
     @panda.cb_after_machine_init
     def setup(cpu):
         initializeMemory(panda, "mymem", address=ADDRESS)
@@ -181,18 +180,22 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_insn_exec
     def randomRegState(cpu, pc):
         nonlocal bitmask, stateData
+
         if (verbose): print("randomRegState")
+
         if (pc == ADDRESS):
             if (verbose): print("randomizing registers")
             setRegisters(panda, cpu, initialState)
             randomizeRegisters(panda, cpu, bitmask)
             if (verbose): print("saving before reg state")
             stateData[instructions[instIndex]].append([bitmask, getRegisterState(panda, cpu)])
+
         if (verbose):
             code = panda.virtual_memory_read(cpu, pc, 4)
             for i in md.disasm(code, pc):
                 print("0x%x:\t%s\t%s" % (i.address, i.mnemonic, i.op_str))
                 break
+
         return 0
 
     @panda.cb_after_insn_translate
@@ -201,8 +204,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
     @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
-        if (verbose): print("getInstValues")
         nonlocal regStateIndex, instIndex, bitmask
+        if (verbose): print("getInstValues")
+
         if (pc == 4):
             if (verbose): print("saving reg state after run", regStateIndex)
             stateData[instructions[instIndex]][regStateIndex].append(getRegisterState(panda, cpu))
@@ -230,13 +234,16 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_before_handle_exception
     def bhe(cpu, index):
         nonlocal regBoundsCount, bitmask, stateData, regStateIndex, initialState
+
         pc = cpu.panda_guest_pc
         if (verbose): print(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
+
         if (regBoundsCount >= 31):
             print("Cannot run instruction")
             panda.end_analysis()
             return 0
+
         if (regStateIndex == 0):
             if (verbose): print(f"re-randomizing initial state")
             upperBound = 2**(31 - math.floor(regBoundsCount / 6)) - 1
@@ -245,11 +252,24 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             initialState = getRegisterState(panda, cpu)
             stateData[instructions[instIndex]] = []
             return -1
+
         if (verbose): print(f"re-randomizing register with reduced range")
         upperBound = 2**(31 - regBoundsCount) - 1
         lowerBound = -(2**(31 - regBoundsCount))
         stateData[instructions[instIndex]].pop()
         return -1
+
+    
+
+    panda.panda_enable_memcb()
+
+    @panda.cb_virt_mem_before_read
+    def manageread(cpu, pc, addr, size):
+        print("Hello")
+
+    @panda.cb_virt_mem_before_write
+    def managewrite(cpu, pc, addr, size, data):
+        print("Hello")
 
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
