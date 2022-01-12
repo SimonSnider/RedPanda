@@ -116,7 +116,7 @@ def computePs():
 
         newList2 = [0]*len(memWritesInitial)
         for i in range(len(memWritesInitial)):
-            if(memWriteInitial[i] != memWrites[iter][i]):
+            if(memWritesInitial[i] != memWrites[iter][i]):
                 newList2[i] = 1
             else:
                 newList2[i] = 0
@@ -130,7 +130,6 @@ def computeCorrelations():
     """
     computePs()
     global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs, n
-    
     M = [[0]*(n + len(memReadsInitial) + len(memWritesInitial)) for _ in range(n)]
     
     for i in range(n):
@@ -138,7 +137,7 @@ def computeCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
+                if(int.from_bytes(Bs[k], 'big')&(1<<(8*(n-i-1))) == 0):
                     bitMaskV = 0
                 else:
                     bitMaskV = 1
@@ -147,19 +146,19 @@ def computeCorrelations():
             if(num==0 and denom==0):
                 M[i][j] = 0
                 if(i==j):
-                    M[i][j]=1
+                    M[i][j]="incorrect"
             else:
                 M[i][j] = num/denom
         for j in range(len(memReadsInitial)):
             denom = 0
             num = 0
             for k in range(I):
-                if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
+                if(int.from_bytes(Bs[k], 'big')&(1<<(8*(n-i-1))) == 0):
                     bitMaskV = 0
                 else:
                     bitMaskV = 1
                 denom += bitMaskV
-                num += bitMaskV*readPs[j]
+                num += bitMaskV*readPs[k][j]
             if(num==0 and denom==0):
                 M[i][j+n] = 0
             else:
@@ -168,16 +167,15 @@ def computeCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
+                if(int.from_bytes(Bs[k], 'big')&(1<<(8*(n-i-1))) == 0):
                     bitMaskV = 0
                 else:
                     bitMaskV = 1
                 denom += bitMaskV
-                num += bitMaskV*writePs[j]
+                num += bitMaskV*writePs[k][j]
             if(num==0 and denom==0):
                 M[i][j+n+len(memReadsInitial)] = 0
             else:
-                M[i][j+n+len(memReadsInitial)] = num/denom
-                
+                M[i][j+n+len(memReadsInitial)] = num/denom       
 
     return M
