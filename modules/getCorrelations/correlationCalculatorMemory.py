@@ -14,8 +14,9 @@ memReads = []
 memWrites = []
 memReadsInitial = []
 memWritesInitial = []
-readsPs = -1;
-writePs = -1;
+readsPs = -1
+writePs = -1
+writeValPs = -1
 
 regList = ["ZERO", "AT", "V0", "V1", "A0", "A1", "A2", "A3", "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "T8", "T9", "K0", "K1", "GP", "SP", "FP", "RA"]
 
@@ -45,7 +46,7 @@ def initialize(data: RegisterStates, iterPerReg: int = 100):
     iterPerReg -- number of times each combination of changed registers is ran (default = 100)
 
     """
-    global iterPerRegister, RegisterInitial, RegisterInitialOutput, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs
+    global iterPerRegister, RegisterInitial, RegisterInitialOutput, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs, writeValPs, memWriteVals, memWriteValsInitial
     iterPerRegister = iterPerReg
 #    I = n*iterPerRegister
     I = len(data.bitmasks)-1
@@ -58,13 +59,16 @@ def initialize(data: RegisterStates, iterPerReg: int = 100):
     Ps = [0]*I
     readPs = [0]*I
     writePs = [0]*I
+    writeValPs = [0]*I
 
     regList = list(RegisterInitials[0])
 
     memReadsInitial = data.memoryReads[0]
     memWritesInitial = data.memoryWrites[0]
+    memWriteValsInitial = data.memoryWriteValues[0]
     memReads = data.memoryReads[1:]
     memWrites = data.memoryWrites[1:]
+    memWriteVals = data.memoryWriteValues[1:]
     maxLengthReads = 0
     # replace with math.max function python equivalent
     for ls in memReads:
@@ -77,9 +81,12 @@ def initialize(data: RegisterStates, iterPerReg: int = 100):
 
     lengthen(memReadsInitial, maxLengthReads)
     lengthen(memWritesInitial, maxLengthWrites)
+    lengthen(memWriteValsInitial, maxLengthWrites)
     for ls in memReads:
         lengthen(ls, maxLengthReads)
     for ls in memWrites:
+        lengthen(ls, maxLengthWrites)
+    for ls in memWriteVals:
         lengthen(ls, maxLengthWrites)
 
 
@@ -93,13 +100,13 @@ def lengthen(ls, length):
 def computePs():
     """Calculates the value for each P_i. Must call initialize before this.
     """
-    global iterPerRegister, RegisterInitial, RegisterInitialOutput, RegisterInitials, RegisterFinals, Bs, Ps, I, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs
+    global iterPerRegister, RegisterInitial, RegisterInitialOutput, RegisterInitials, RegisterFinals, Bs, Ps, I, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs, memWriteValsInitial, memWriteVals, writeValPs
     for iter in range(I):
         newDict = {}
         Ri0 = RegisterInitials[iter]
         Rif = RegisterFinals[iter]
         for reg in Ri0.keys():
-            if (RegisterInitialOutput.get(reg) != Rif.get(reg)):
+            if RegisterInitialOutput.get(reg) != Rif.get(reg):
                 newDict[reg] = 1
             else:
                 newDict[reg] = 0
@@ -107,7 +114,7 @@ def computePs():
 
         newList = [0]*len(memReadsInitial)
         for i in range(len(memReadsInitial)):
-            if(memReadsInitial[i] != memReads[iter][i]):
+            if memReadsInitial[i] != memReads[iter][i]:
                 newList[i] = 1
             else:
                 newList[i] = 0
@@ -116,12 +123,20 @@ def computePs():
 
         newList2 = [0]*len(memWritesInitial)
         for i in range(len(memWritesInitial)):
-            if(memWritesInitial[i] != memWrites[iter][i]):
+            if memWritesInitial[i] != memWrites[iter][i]:
                 newList2[i] = 1
             else:
                 newList2[i] = 0
                 
         writePs[iter] = newList2
+
+        newList3 = [0]*len(memWriteValsInitial)
+        for i in range(len(memWritesInitial)):
+            if memWriteValsInitial[i] != memWriteVals[iter][i]:
+                newList3[i] = 1
+            else:
+                newList3[i] = 0
+        writeValPs[iter] = newList3
 
 def computeCorrelations():
     """Calculates the correlation value for each pair of registers. Must call initialize before this.
@@ -129,53 +144,63 @@ def computeCorrelations():
     M -- n x m list where M[i][j] is the correlation of register i on register/memory access j
     """
     computePs()
-    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs, n
-    M = [[0]*(n + len(memReadsInitial) + len(memWritesInitial)) for _ in range(n)]
+    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs, n, writeValPs
+    M = [[0]*(n + len(memReadsInitial) + 2*len(memWritesInitial)) for _ in range(n)]
     
     for i in range(n):
         for j in range(n):
             denom = 0
             num = 0
             for k in range(I):
-                if(int.from_bytes(Bs[k], 'big')&(1<<(8*(n-i-1))) == 0):
+                if int.from_bytes(Bs[k], 'big') & (1 << (8*(n-i-1))) == 0:
                     bitMaskV = 0
                 else:
                     bitMaskV = 1
                 denom += bitMaskV
                 num += bitMaskV*Ps[k].get(regList[j])
-            if(num==0 and denom==0):
+            if num == 0 and denom == 0:
                 M[i][j] = 0
-                if(i==j):
-                    M[i][j]="incorrect"
+                if i == j:
+                    M[i][j] = {regList[j]: "reflexive"}
             else:
-                M[i][j] = num/denom
+                M[i][j] = {regList[j]: num/denom}
         for j in range(len(memReadsInitial)):
             denom = 0
             num = 0
             for k in range(I):
-                if(int.from_bytes(Bs[k], 'big')&(1<<(8*(n-i-1))) == 0):
+                if int.from_bytes(Bs[k], 'big') & (1 << (8*(n-i-1))) == 0:
                     bitMaskV = 0
                 else:
                     bitMaskV = 1
                 denom += bitMaskV
                 num += bitMaskV*readPs[k][j]
-            if(num==0 and denom==0):
-                M[i][j+n] = 0
+            if num == 0 and denom == 0:
+                M[i][j+n] = {"memRAddr": 0}
             else:
-                M[i][j+n] = num/denom
+                M[i][j+n] = {"memRAddr": num/denom}
+
         for j in range(len(memWritesInitial)):
             denom = 0
             num = 0
+            valueNum = 0
             for k in range(I):
-                if(int.from_bytes(Bs[k], 'big')&(1<<(8*(n-i-1))) == 0):
+                if int.from_bytes(Bs[k], 'big') & (1 << (8*(n-i-1))) == 0:
                     bitMaskV = 0
                 else:
                     bitMaskV = 1
                 denom += bitMaskV
                 num += bitMaskV*writePs[k][j]
-            if(num==0 and denom==0):
-                M[i][j+n+len(memReadsInitial)] = 0
+                valueNum += bitMaskV*writeValPs[k][j]
+            if num == 0 and denom == 0:
+                M[i][j+n+len(memReadsInitial)] = {"memWAddr": 0}
             else:
-                M[i][j+n+len(memReadsInitial)] = num/denom       
+                M[i][j+n+len(memReadsInitial)] = num/denom
+            if valueNum == 0 and denom == 0:
+                M[i][j+n+len(memReadsInitial)+len(memWritesInitial)] = {"memWVal": 0}
+            else:
+                dictionary = {"memWVal": valueNum/denom}
+                M[i][j+n+len(memReadsInitial)+len(memWritesInitial)] = dictionary
+    for it in range(n):
+        M[it] = {regList[it]: M[it]}
 
     return M

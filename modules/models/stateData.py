@@ -12,3 +12,4 @@ class RegisterStates:
     afterStates: "list[dict[str,int]]" = field(default_factory=list)
     memoryReads: "list[list[int]]" = field(default_factory=list)
     memoryWrites: "list[list[int]]" = field(default_factory=list)
+    memoryWriteValues: "list[list[int]]" = field(default_factory=list)
