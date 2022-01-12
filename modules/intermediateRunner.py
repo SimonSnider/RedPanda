@@ -17,12 +17,17 @@ Arguments:
             reg-coorelational -- calculate coorelation between register values before and after an instruction is run
 """
 
+import os
 from modules.runInstruction.instructionRunner import generateInstructionData
 from modules.getCorrelations import correlationCalculator as CC 
 from modules.generateInstruction import instructionGenerator as instructionGen
 import keystone as k
 import sys
 import csv
+
+
+module_location = os.path.abspath(__file__)
+module_dir = os.path.dirname(module_location)
 
 def runInputAndModel():
     #
@@ -74,10 +79,10 @@ def runInputAndModel():
             return
     elif mode == 1:
         print("Specify the file containing the instructions (default = byte_specifications.txt)")
-        instructionsFile = input() or "byte_specifications.txt"
+        instructionsFile = input() or os.path.join(module_dir, "byte_specifications.txt")
     elif mode == 2:
         print("Specify the file containing the instructions (default = instruction_specifications.txt)")
-        instructionsFile = input() or "instruction_specifications.txt"
+        instructionsFile = input() or os.path.join(module_dir, "instruction_specifications.txt")
     else:
         print("Mode not within supported range. Please enter a supported mode value.")
         return
@@ -205,17 +210,28 @@ if len(sys.argv) > 1:
         arguments = []
 
         # Read file
-        with open("debug.cfg") as f:
+        fname = "debug.cfg"
+        debug_file = os.path.join(module_dir, fname)
+        with open(debug_file) as f:
             lines = f.readlines()
 
         # Parse file
         for line in lines:
             # Ignore comments and blank lines
-            if (line[0] == '#') or (len(line) < 2):
+            if (line[0] == '#') or (len(line.rstrip('\n')) < 1):
                 continue;
 
-            arguments.append(line)
+            arguments.append(line.rstrip('\n'))
+        print(len(arguments))
+        print("Read instruction arguments: \nArchitecture:", arguments[0], 
+            "\nInstruction Mode:", arguments[1], 
+            "\nInstruction Iterations:", arguments[2], 
+            "\nOutput File Name:", arguments[3], 
+            "\nInstructions File:", arguments[4], 
+            "\nNumber of Instructions to Generate:", arguments[5],
+            "\nVerbose:", arguments[6]
+            )
 
-        runModel(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6])
+        runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], arguments[4], int(arguments[5]), int(arguments[6]))
     else:
         runInputAndModel()
