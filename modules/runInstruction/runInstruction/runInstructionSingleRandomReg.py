@@ -64,7 +64,6 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
     initialState = {}
     latch = 1
     bitmask = b'\x00\x00\x00\x00'
-    
 
     @panda.cb_after_machine_init
     def setup(cpu):
@@ -140,7 +139,6 @@ def runInstructionLoop(panda: Panda, instruction, n, verbose=False):
         stateData.pop()
         return -1
 
-
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
@@ -169,6 +167,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     bitmask = b'\x00\x00\x00\x00'
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
     initialState = {}
+    memoryStructure = dict()
 
 
     @panda.cb_after_machine_init
@@ -254,6 +253,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             registerStates.beforeStates = []
             registerStates.bitmasks = []
             registerStates.afterStates = []
+            registerStates.memoryWrites = []
+            registerStates.memoryReads = []
             return -1
         if (verbose): print(f"re-randomizing register with reduced range")
         upperBound = 2**(31 - regBoundsCount) - 1
@@ -262,6 +263,41 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         registerStates.bitmasks.pop()
         return -1
 
+    panda.enable_memcb()
+
+    @panda.cb_virt_mem_before_read
+    def manageread(cpu, pc, addr, size):
+        nonlocal memoryStructure, stateData, lowerBound, upperBound
+
+        if not (addr in memoryStructure):
+            memoryStructure[addr] = generateRandomMemoryValues(lowerBound, upperBound)
+
+        valueRead = memoryStructure[addr]
+
+        memoryTransaction = MemoryTransaction("read", valueRead, addr, size)
+        registerStates.memoryReads.append(memoryTransaction)
+
+        if(verbose):
+            print("pc of read:", pc)
+            print("value read:", valueRead)
+            print("addr of read:", addr)
+            print("size of read:", size)
+
+    @panda.cb_virt_mem_before_write
+    def managewrite(cpu, pc, addr, size, data):
+        nonlocal memoryStructure, stateData, registerStates
+
+        memoryStructure[addr] = data
+
+        memoryTransaction = MemoryTransaction("write", data, addr, size)
+        registerStates.memoryWrites.append(memoryTransaction)
+
+        if(verbose):        
+            print("pc of write:", pc)
+            print("addr of write:", addr)
+            print("size of write:", size)
+            print("data of write:", data)
+    
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()

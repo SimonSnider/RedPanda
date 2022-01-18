@@ -95,12 +95,20 @@ class TestScript(unittest.TestCase):
     #             self.assertIsInstance(regState[2], dict)
 
     def testRunInstructionsSingleRandomReg(self):
-        instructions = []
-        instructionGenerator.initialize()
-        inst = 10
+        instruction = "lw $t2, 4($t4)"
+        instruction2 = "sw $t2, 4($t4)"
+        CODE = instruction.encode('UTF-8')
+        CODE2 = instruction2.encode('UTF-8')
+        ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32R6 + KS_MODE_BIG_ENDIAN)
+
+        ADDRESS = 0x0000
+        encoding, count = ks.asm(CODE, ADDRESS)
+        encoding2, count = ks.asm(CODE2, ADDRESS)
+        instructions = [encoding, encoding2]
+        inst = 2
         n = 5
-        for i in range(inst):
-            instructions.append(instructionGenerator.generateInstruction(instGen))
+        # for i in range(inst):
+        #     instructions.append(instructionGenerator.generateInstruction(instGen))
 
         stateData = runInstructionSingleRandomReg.runInstructions(panda, instructions, n, True)
         self.assertIsInstance(stateData, StateData)

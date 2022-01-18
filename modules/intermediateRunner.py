@@ -233,5 +233,5 @@ if len(sys.argv) > 1:
             )
 
         runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], arguments[4], int(arguments[5]), int(arguments[6]))
-    else:
-        runInputAndModel()
+else:
+    runInputAndModel()
