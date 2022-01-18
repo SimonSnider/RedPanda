@@ -5,8 +5,10 @@ from modules.runInstruction.stateManager import *
 from keystone import *
 from modules.generateInstruction import instructionGenerator
 import math
+from modules.models.stateData import *
 
 panda = initializePanda()
+instGen = instructionGenerator.initialize()
 
 def Log2(x):
     if (x == 0): return True
@@ -98,17 +100,22 @@ class TestScript(unittest.TestCase):
         inst = 10
         n = 5
         for i in range(inst):
-            instructions.append(instructionGenerator.generateInstruction())
+            instructions.append(instructionGenerator.generateInstruction(instGen))
 
         stateData = runInstructionSingleRandomReg.runInstructions(panda, instructions, n, True)
-        self.assertEqual(len(stateData.keys()), inst)
-        for key in stateData.keys():
-            self.assertEqual(stateData.get(key)[0][0], b'\x00\x00\x00\x00')
-            for regState in stateData.get(key):
-                self.assertIsInstance(regState[0], bytes)
-                self.assertIsInstance(regState[1], dict)
-                self.assertIsInstance(regState[2], dict)
-                self.assertTrue(isPowerOfTwo(int.from_bytes(regState[0], 'big', signed=False)))
+        self.assertIsInstance(stateData, StateData)
+        self.assertEqual(len(stateData.instructions), inst)
+        self.assertEqual(len(stateData.registerStates), inst)
+        for states in stateData.registerStates:
+            self.assertIsInstance(states, RegisterStates)
+            self.assertEqual(states.bitmasks[0], b'\x00\x00\x00\x00')
+            self.assertEqual(len(states.bitmasks), len(states.beforeStates))
+            self.assertEqual(len(states.bitmasks), len(states.afterStates))
+            for i in range(len(states.bitmasks)):
+                self.assertIsInstance(states.bitmasks[i], bytes)
+                self.assertIsInstance(states.beforeStates[i], dict)
+                self.assertIsInstance(states.afterStates[i], dict)
+                self.assertTrue(isPowerOfTwo(int.from_bytes(states.bitmasks[i], 'big', signed=False)))
 
 
 if __name__ == '__main__':
