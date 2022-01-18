@@ -10,7 +10,7 @@ import math
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
 
 def initializePanda(architecture="mips"):
-    panda = Panda("mips",
+    panda = Panda(architecture,
         extra_args=["-M", "configurable", "-nographic"],
         raw_monitor=True)
     return panda
