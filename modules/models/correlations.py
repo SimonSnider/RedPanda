@@ -14,4 +14,4 @@ class IntermediateData:
 	initialOutput: "list[int]" = field(default_factory=list)
 	inputs: "list[int]" = field(default_factory=list)
 	outputs:"list[int]" = field(default_factory=list)
-	ps: "list[int]" = field(default_factory=list)
+	ps: "list[list[int]]" = field(default_factory=list)
