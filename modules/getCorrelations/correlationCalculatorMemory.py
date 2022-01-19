@@ -48,8 +48,8 @@ def initialize(data: RegisterStates, iterPerReg: int = 100):
     """
     global iterPerRegister, RegisterInitial, RegisterInitialOutput, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, memReads, memWrites, memReadsInitial, memWritesInitial, readPs, writePs, writeValPs, memWriteVals, memWriteValsInitial
     iterPerRegister = iterPerReg
-#    I = n*iterPerRegister
-    I = len(data.bitmasks)-1
+    I = n*iterPerRegister
+    # I = len(data.bitmasks)-1
 
     RegisterInitial = data.beforeStates[0]
     RegisterInitialOutput = data.afterStates[0]
@@ -86,12 +86,16 @@ def initialize(data: RegisterStates, iterPerReg: int = 100):
         memWrites.append(tempList)
         memWriteVals.append(tempValList)
        
-    memReadsInitial = memReads[0]
-    memWritesInitial = memWrites[0]
-    memWriteValsInitial = memWriteVals[0]
-    memReads = memReads[1:]
-    memWrites = memWrites[1:]
-    memWriteVals = memWriteVals[1:]
+    memReadsInitial = []
+    memWritesInitial = []
+    memWriteValsInitial = []
+
+    if(len(memReads) > 0): memReadsInitial = memReads[0]
+    if(len(memWrites) > 0): memWritesInitial = memWrites[0]
+    if(len(memWriteVals) > 0): memWriteValsInitial = memWriteVals[0]
+    if(len(memReads) > 1): memReads = memReads[1:]
+    if(len(memWrites) > 1): memWrites = memWrites[1:]
+    if(len(memWriteVals) > 1): memWriteVals = memWriteVals[1:]
 
 #################
 # END TEMP HACK #

@@ -177,7 +177,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile
 
             instructionList.append(encoding)
     elif mode == 3:
-        instructionList = [b"\x01\x4b\x48\x20"]
+        instructionList = [b"\xad\x49\x00\x03"]
     else:
         print("Mode supplied invalid. Must be 0, 1, or 2")
         return
@@ -190,20 +190,13 @@ def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile
     #
     # Generate coorelation data from the instruction results
     #
-    CC.setArch("mips32")
+    mem.setArch("mips32", 3)
     analyzedData = []
     
-    # instructionKeys = list(instructionData.keys())
-    # for i in range(1):
-    #     dat = instructionData[instructionKeys[i]]
-    #     CC.initialize(dat, 1)
-    #     print(CC.pearsonCorrelations())
-    #     analyzedData.append(CC.pearsonCorrelations())
-
-    mem.setArch("mips32", 3)
-    mem.initialize(instructionData, 3)
-    M = mem.computeCorrelations()
-    # fields = ['InstructionName', 'Coorelation'] 
+    for i in range(1):
+        dat = instructionData.registerStates[i]
+        mem.initialize(dat, instructionIterations)
+        analyzedData.append(mem.computeCorrelations())
         
     with open(outputFileName, 'w') as csvfile: 
         writer = csv.writer(csvfile) 
