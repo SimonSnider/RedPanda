@@ -95,11 +95,11 @@ class TestScript(unittest.TestCase):
     #             self.assertIsInstance(regState[2], dict)
 
     def testRunInstructionsSingleRandomReg(self):
-        instruction = "lw $t2, 4($t4)"
-        instruction2 = "sw $t2, 4($t4)"
+        instruction = "lw $t2, 0($t4)"
+        instruction2 = "sw $t2, 0($t4)"
         CODE = instruction.encode('UTF-8')
         CODE2 = instruction2.encode('UTF-8')
-        ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32R6 + KS_MODE_BIG_ENDIAN)
+        ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
 
         ADDRESS = 0x0000
         encoding, count = ks.asm(CODE, ADDRESS)

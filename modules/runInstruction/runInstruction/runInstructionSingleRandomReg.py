@@ -185,9 +185,11 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         nonlocal bitmask, stateData, registerStates
         if (verbose): print("randomRegState")
         if (pc == ADDRESS):
+            print("Lower bound: ", lowerBound)
+            print("upper bound: ", upperBound)
             if (verbose): print("randomizing registers")
             setRegisters(panda, cpu, initialState)
-            randomizeRegisters(panda, cpu, bitmask)
+            randomizeRegisters(panda, cpu, bitmask, lowerBound, upperBound)
             if (verbose): print("saving before reg state")
             registerStates.bitmasks.append(bitmask)
             registerStates.beforeStates.append(getRegisterState(panda, cpu))
@@ -205,8 +207,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
         if (verbose): print("getInstValues")
-        nonlocal regStateIndex, instIndex, bitmask, registerStates
+        nonlocal regStateIndex, instIndex, bitmask, registerStates, regBoundsCount
         if (pc == 4):
+            regBoundsCount = 0
             if (verbose): print("saving reg state after run", regStateIndex)
             registerStates.afterStates.append(getRegisterState(panda, cpu))
             
@@ -235,14 +238,10 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
     @panda.cb_before_handle_exception
     def bhe(cpu, index):
-        nonlocal regBoundsCount, bitmask, stateData, regStateIndex, initialState, registerStates
+        nonlocal regBoundsCount, bitmask, stateData, regStateIndex, initialState, registerStates, upperBound, lowerBound
         pc = cpu.panda_guest_pc
         if (verbose): print(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
-        if (regBoundsCount >= 31):
-            print("Cannot run instruction")
-            panda.end_analysis()
-            return 0
         if (regStateIndex == 0):
             if (verbose): print(f"re-randomizing initial state")
             upperBound = 2**(31 - math.floor(regBoundsCount / 6)) - 1
@@ -256,6 +255,10 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             registerStates.memoryWrites = []
             registerStates.memoryReads = []
             return -1
+        if (regBoundsCount >= 31):
+            print("Cannot run instruction")
+            panda.end_analysis()
+            return 0
         if (verbose): print(f"re-randomizing register with reduced range")
         upperBound = 2**(31 - regBoundsCount) - 1
         lowerBound = -(2**(31 - regBoundsCount))
