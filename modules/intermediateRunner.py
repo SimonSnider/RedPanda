@@ -21,6 +21,7 @@ import os
 from modules.runInstruction.instructionRunner import generateInstructionData
 from modules.getCorrelations import correlationCalculator as CC 
 from modules.generateInstruction import instructionGenerator as instructionGen
+from modules.getCorrelations import correlationCalculatorMemory as mem
 import keystone as k
 import sys
 import csv
@@ -151,6 +152,8 @@ def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile
                 continue;
 
             instructionList.append(bytes(line, encoding="raw_unicode_escape"))
+            print(instructionList)
+            print([b"\x01\x4b\x48\x20"])
     elif mode == 2:
         # Instructions are given in an unassembled format in a text file
         instructionList = []
@@ -173,6 +176,8 @@ def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile
             encoding, count = KS.asm(code, ADDRESS)
 
             instructionList.append(encoding)
+    elif mode == 3:
+        instructionList = [b"\x01\x4b\x48\x20"]
     else:
         print("Mode supplied invalid. Must be 0, 1, or 2")
         return
@@ -188,13 +193,16 @@ def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile
     CC.setArch("mips32")
     analyzedData = []
     
-    instructionKeys = list(instructionData.keys())
-    for i in range(1):
-        dat = instructionData[instructionKeys[i]]
-        CC.initialize(dat, 1)
-        print(CC.pearsonCorrelations())
-        analyzedData.append(CC.pearsonCorrelations())
+    # instructionKeys = list(instructionData.keys())
+    # for i in range(1):
+    #     dat = instructionData[instructionKeys[i]]
+    #     CC.initialize(dat, 1)
+    #     print(CC.pearsonCorrelations())
+    #     analyzedData.append(CC.pearsonCorrelations())
 
+    mem.setArch("mips32", 3)
+    mem.initialize(instructionData, 3)
+    M = mem.computeCorrelations()
     # fields = ['InstructionName', 'Coorelation'] 
         
     with open(outputFileName, 'w') as csvfile: 
@@ -233,5 +241,5 @@ if len(sys.argv) > 1:
             )
 
         runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], arguments[4], int(arguments[5]), int(arguments[6]))
-    else:
-        runInputAndModel()
+else:
+    runInputAndModel()

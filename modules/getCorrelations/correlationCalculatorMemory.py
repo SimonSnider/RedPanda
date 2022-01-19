@@ -63,12 +63,40 @@ def initialize(data: RegisterStates, iterPerReg: int = 100):
 
     regList = list(RegisterInitials[0])
 
-    memReadsInitial = data.memoryReads[0]
-    memWritesInitial = data.memoryWrites[0]
-    memWriteValsInitial = data.memoryWriteValues[0]
-    memReads = data.memoryReads[1:]
-    memWrites = data.memoryWrites[1:]
-    memWriteVals = data.memoryWriteValues[1:]
+#####################################
+# TEMP HACK TO FIX DATATYPE CHANGES #
+#####################################
+
+    memReads = []
+    memWrites = []
+    memWriteVals = []
+
+    for currentMemoryIteration in data.memoryReads:
+        tempList = []
+        for currentMemoryTransaction in currentMemoryIteration:
+            tempList.append(currentMemoryTransaction.address)
+        memReads.append(tempList)
+       
+    for currentMemoryIteration in data.memoryWrites:
+        tempList = []
+        tempValList = []
+        for currentMemoryTransaction in currentMemoryIteration:
+            tempList.append(currentMemoryTransaction.address)
+            tempValList.append(currentMemoryTransaction.value)
+        memWrites.append(tempList)
+        memWriteVals.append(tempValList)
+       
+    memReadsInitial = memReads[0]
+    memWritesInitial = memWrites[0]
+    memWriteValsInitial = memWriteVals[0]
+    memReads = memReads[1:]
+    memWrites = memWrites[1:]
+    memWriteVals = memWriteVals[1:]
+
+#################
+# END TEMP HACK #
+#################
+
     maxLengthReads = 0
     # replace with math.max function python equivalent
     for ls in memReads:
