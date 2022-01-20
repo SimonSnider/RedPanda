@@ -17,7 +17,7 @@ stop_addr = ADDRESS + len(encoding)
 print(encoding)
 
 # Create a machine of type 'configurable' but with just a CPU specified (no peripherals or memory maps)
-panda = Panda("x86_64", extra_args=["-M", "configurable", "-nographic", "-d", "in_asm"])
+panda = Panda("x86_64", extra_args=["-M", "configurable", "-nographic"])
 
 
 @panda.cb_after_machine_init
