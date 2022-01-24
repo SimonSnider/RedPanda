@@ -1,4 +1,4 @@
-<title> PANDA Taint Modeling </title>
+<t> PANDA Taint Modeling </t>
 
 # Quick Start Guide
 The PANDA Instruction Taint Analysis System (PANDA-ITAS) can be installed and run under default settings by following the instructions below.
