@@ -25,7 +25,6 @@ from modules.createOutput import matrixOutput as output
 import keystone as k
 import sys
 
-
 module_location = os.path.abspath(__file__)
 module_dir = os.path.dirname(module_location)
 
