@@ -1,1 +1,0 @@
-/snidersa/share/doc/python3.5/gdbinit.gz
