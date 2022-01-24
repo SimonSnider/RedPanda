@@ -21,9 +21,9 @@ import os
 from modules.runInstruction.instructionRunner import generateInstructionData
 from modules.getCorrelations import correlationCalculator as CC 
 from modules.generateInstruction import instructionGenerator as instructionGen
+from modules.createOutput import matrixOutput as output
 import keystone as k
 import sys
-import csv
 
 
 module_location = os.path.abspath(__file__)
@@ -37,7 +37,6 @@ def runInputAndModel():
     # File Name
     print("Specify an output file name (default = data)")
     outputFileName = input() or "data"
-    outputFileName = outputFileName + ".csv"
 
     # Architecture
     print("Specify an architecture (default = 0)")
@@ -211,16 +210,11 @@ def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile
         analyzedData.append(CC.computeCorrelations())
 
     # fields = ['InstructionName', 'Coorelation'] 
-        
-    with open(outputFileName, 'w') as csvfile: 
-        writer = csv.writer(csvfile) 
-        # writer.writerow(fields)
-        for data in analyzedData:
-            writer.writerows(data)
 
+    output.generateOutput(analyzedData, outputFileName)
 
 if len(sys.argv) > 1:
-    if sys.argv[1] == "-d":
+    if sys.argv[1] == "-c":
         # arguments list
         arguments = []
 
