@@ -35,6 +35,9 @@ def initializeMemory(panda: Panda, memName, memSize=2 * 1024 * 1024, address=0):
         maps a section of memory in panda
     """
     panda.map_memory(memName, memSize, address)
+    
+def generateRandomMemoryValues(minValue = -(2**(31)), maxValue = (2**31) - 1):
+    return generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
 
 def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff', minValue = -(2**(31)), maxValue = (2**31) - 1):
     """
