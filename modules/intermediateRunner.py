@@ -25,7 +25,6 @@ from modules.createOutput import matrixOutput as output
 import keystone as k
 import sys
 
-
 module_location = os.path.abspath(__file__)
 module_dir = os.path.dirname(module_location)
 
@@ -98,15 +97,30 @@ def runInputAndModel():
     print("Specify the analysis model (default = 0)")
     print("Supported Models")
     print("    0 - reg-coorelational")
+    print("    1 - mem-reg-coorelational")
     try:
         model = int(input() or 0)
     except ValueError:
         print("Value supplied not numerical. Please supply a numeric value corresponding to a supported model.")
         return
 
-    if model != 0:
+    if model < 0 or model > 1:
         print("Model not within supported range. Please enter a supported model value.")
-        return 
+        return
+
+    # Output Form
+    print("Specify the output form (default = 0)")
+    print("Supported Forms")
+    print("    0 - coorelation matrix")
+    try:
+        form = int(input() or 0)
+    except ValueError:
+        print("Value supplied not numerical. Please supply a numeric value corresponding to a supported output form.")
+        return
+
+    if form < 0 or form > 1:
+        print("Output not within supported range. Please enter a supported output form value.")
+        return
 
     # Verbosity
     print("Verbose? (default = 0)")
@@ -120,14 +134,14 @@ def runInputAndModel():
         print("Value supplied is not either 0 or 1. Please supply a valid value.")
         return
 
-    runModel(arch, mode, instructionIterations, outputFileName, instructionsFile, numInstructions, verbose)
+    runModel(arch, mode, instructionIterations, outputFileName, instructionsFile, numInstructions, form, verbose)
 
 
 
-def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile = "", numInstructions = 1, verbose = 0):
+def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile = "", numInstructions = 1, form = 0, verbose = 0):
     #
     # Generate instructions or load them from a file
-    #
+    # 
     if mode == 0:
         # Instructions are generated randomly using the generateInstruction module
         instructionList = []
@@ -227,5 +241,7 @@ if len(sys.argv) > 1:
             )
 
         runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], arguments[4], int(arguments[5]), int(arguments[6]))
+    else:
+        runInputAndModel()
 else:
     runInputAndModel()

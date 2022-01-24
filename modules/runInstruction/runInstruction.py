@@ -170,7 +170,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         valueRead = memoryStructure[addr]
 
         memoryTransaction = MemoryTransaction("read", valueRead, addr, size)
-        registerStateList.memoryReads.append(memoryTransaction)
+        registerStateList.memoryReads[-1].append(memoryTransaction)
 
         if(verbose):
             print("pc of read:", pc)
@@ -185,7 +185,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         memoryStructure[addr] = data
 
         memoryTransaction = MemoryTransaction("write", data, addr, size)
-        registerStateList.memoryWrites.append(memoryTransaction)
+        registerStateList.memoryWrites[-1].append(memoryTransaction)
 
         if(verbose):        
             print("pc of write:", pc)

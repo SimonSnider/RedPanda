@@ -10,7 +10,7 @@ def generateOutput(data, filename):
     Output:
         A single csv file containing the correlation matrix of the specified input.
     """
-    with open(outputFileName + ".csv", 'w') as csvfile: 
+    with open(filename + ".csv", 'w') as csvfile: 
         writer = csv.writer(csvfile) 
 
         # writer.writerow(fields)
