@@ -1,3 +1,5 @@
+from modules.models.stateData import *
+
 n = 24 #number of registers about which we care
 iterPerRegister = 100 #CHANGE THIS NUMBER. STAT MATH HERE
 I = n*iterPerRegister
@@ -18,7 +20,6 @@ def setArch(archType, testV=0):
     Arguments:
     archType -- specifies the architecture to use
     testV -- the number of registers to calculate the correlations between (default = 0), only used if archType = test
-
     Valid Arguments:
     archType -- mips32 , test
     
@@ -31,35 +32,22 @@ def setArch(archType, testV=0):
         n = testV
 
 # list has initial register values, 
-def initialize(dataList: list, iterPerReg: int = 100):
+def initialize(data: RegisterStates, iterPerReg: int = 100):
     """ Initializes the correlation calculator with the data from running an instruction multiple times
-
     Arguments:
     dataList -- the list of data from the run instruction module. [[0s: byte_literal, InitialRegisterState: dict{registerName, registerValue}, InitialResult: dict{registerName, registerValue}],[bytesChanged: byte_literal, RegisterInitial1: dict{registerName, registerValue}, RegisterFinal1: dict{registerName, registerValue}],...]
     iterPerReg -- number of times each combination of changed registers is ran (default = 100)
-
     """
     global iterPerRegister, RegisterInitial, RegisterInitialOutput, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
     iterPerRegister = iterPerReg
-    I = n*iterPerRegister
-    if(I != len(dataList)-1):
-        I = len(dataList)-1
-    RegisterInitial = dataList[0][1]
-    RegisterInitialOutput = dataList[0][2]
-    RegisterInitials = [0]*I
-    RegisterFinals = [0]*I
-    Bs = [0]*I
+    # I = n*iterPerRegister
+    I = len(data.bitmasks)-1
+    RegisterInitial = data.beforeStates[0]
+    RegisterInitialOutput = data.afterStates[0]
+    RegisterInitials = data.beforeStates[1:]
+    RegisterFinals = data.afterStates[1:]
+    Bs = data.bitmasks[1:]
     Ps = [0]*I
-
-    i=0
-    # guessed indices
-    for r in range(len(dataList)-1):
-        item = dataList[r+1]
-        RegisterInitials[i] = item[1]
-        RegisterFinals[i] = item[2]
-        Bs[i] = item[0]
-        i += 1
-
     regList = list(RegisterInitials[0])
 
 
@@ -80,12 +68,11 @@ def computePs():
 
 def computeCorrelations():
     """Calculates the correlation value for each pair of registers. Must call initialize before this.
-
     Return Value:
     M -- n x n list where M[i][j] is the correlation of register i on register j
     """
     computePs()
-    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList
+    global iterPerRegister, RegisterInitial, RegisterInitials, RegisterFinals, Bs, Ps, I, regList, n
     
     M = [[0]*n for _ in range(n)]
     
@@ -94,7 +81,7 @@ def computeCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
+                if(int.from_bytes(Bs[k], 'big')&(1<<(8*(n-i-1))) == 0):
                     bitMaskV = 0
                 else:
                     bitMaskV = 1
@@ -126,4 +113,3 @@ def computeTestCorrelation(i, j):
     if num==0 and denom==0:
         return 1
     return num/denom
-
