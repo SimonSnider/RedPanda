@@ -33,7 +33,9 @@ def setArch(archType, testV=0):
     elif archType.lower() == "test":
         n = testV
 
+
 def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0.5):
+
     """ Initializes the correlation calculator with the data from running an instruction multiple times
 
     Arguments:
