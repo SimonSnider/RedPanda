@@ -6,3 +6,5 @@ Register 29 is correlated with register 16: 1.0
 Register 29 is not correlated with itself: 0.0
 Register 30 is correlated with register 8: 1.0
 Register 30 is not correlated with itself: 0.0
+Register 30 is correlated with the address of read 0: 1.0
+Value of read 30 is correlated with register 0: 1.0

@@ -16,7 +16,7 @@ def generateOutput(data, filename):
             for i in range(len(datai.regToReadAddress)):
                 for j in range(len(datai.regToReadAddress[0])):
                     if (datai.regToReadAddress[i][j] >= datai.threshold):
-                        f.write(f"Register {i} is correlated with the address of read {j}: {data.regToReadAddress[i][j]}\n")
+                        f.write(f"Register {i} is correlated with the address of read {j}: {datai.regToReadAddress[i][j]}\n")
 
             for i in range(len(datai.readDataToReg)):
                 for j in range(len(datai.readDataToReg[0])):
