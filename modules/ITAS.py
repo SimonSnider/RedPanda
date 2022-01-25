@@ -22,7 +22,6 @@ from modules.runInstruction.instructionRunner import generateInstructionData
 from modules.getCorrelations import correlationCalculator as CC 
 from modules.getCorrelations import correlationCalculatorMemory as MC
 from modules.generateInstruction import instructionGenerator as instructionGen
-from modules.createOutput import matrixOutput as output
 import keystone as k
 import sys
 
@@ -109,6 +108,21 @@ def runInputAndModel():
         print("Model not within supported range. Please enter a supported model value.")
         return 
 
+    # Analysis Model
+    print("Specify the output model (default = 0)")
+    print("Supported Models")
+    print("    0 - matrix")
+    print("    0 - threshold")
+    try:
+        outputModel = int(input() or 0)
+    except ValueError:
+        print("Value supplied not numerical. Please supply a numeric value corresponding to a supported model.")
+        return
+
+    if outputModel < 0 or outputModel > 1:
+        print("Model not within supported range. Please enter a supported model value.")
+        return 
+
     # Verbosity
     print("Verbose? (default = 0)")
     try:
@@ -121,14 +135,21 @@ def runInputAndModel():
         print("Value supplied is not either 0 or 1. Please supply a valid value.")
         return
 
-    runModel(arch, mode, instructionIterations, outputFileName, instructionsFile, numInstructions, verbose)
+    runModel(arch, mode, instructionIterations, outputFileName, outputModel, instructionsFile, numInstructions, verbose)
 
 
 
-def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile = "", numInstructions = 1, verbose = 0):
+def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, instructionsFile = "", numInstructions = 1, verbose = 0):
     #
     # Generate instructions or load them from a file
     #
+    if outputModel == 0:
+        from modules.createOutput import matrixOutput as output
+    elif outputModel == 1:
+        from modules.createOutput import thresholdOutput as output
+    else:
+        from modules.createOutput import matrixOutput as output
+
     if mode == 0:
         # Instructions are generated randomly using the generateInstruction module
         instructionList = []
