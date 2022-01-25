@@ -184,7 +184,7 @@ def computeRegToReadAddrCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*memReadAddrs.ps[k][j]
             if num == 0 and denom == 0:
@@ -204,7 +204,7 @@ def computeRegToWriteAddrCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*memWriteAddrs.ps[k][j]
             if num == 0 and denom == 0:
@@ -224,7 +224,7 @@ def computeRegToReadValCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*memReadVals.ps[k][j]
             if num == 0 and denom == 0:
@@ -244,7 +244,7 @@ def computeRegToWriteValCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*memWriteVals.ps[k][j]
             if num == 0 and denom == 0:
