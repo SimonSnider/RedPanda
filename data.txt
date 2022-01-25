@@ -1,0 +1,8 @@
+
+Correlations with >= 0.5
+Register 28 is correlated with register 24: 1.0
+Register 28 is not correlated with itself: 0.0
+Register 29 is correlated with register 16: 1.0
+Register 29 is not correlated with itself: 0.0
+Register 30 is correlated with register 8: 1.0
+Register 30 is not correlated with itself: 0.0

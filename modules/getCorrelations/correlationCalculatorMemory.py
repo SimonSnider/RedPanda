@@ -65,10 +65,10 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
 
     regList = list(regs.inputs[0])
 
-    memReads = []
-    memReadVals = []
-    memWrites = []
-    memWriteVals = []
+    memReads0 = []
+    memReadVals0 = []
+    memWrites0 = []
+    memWriteVals0 = []
 
     for currentMemoryIteration in data.memoryReads:
         tempList = []
@@ -76,8 +76,8 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
         for currentMemoryTransaction in currentMemoryIteration:
             tempList.append(currentMemoryTransaction.address)
             tempValList.append(currentMemoryTransaction.value)
-        memReads.append(tempList)
-        memReadVals.append(tempValList)
+        memReads0.append(tempList)
+        memReadVals0.append(tempValList)
        
     for currentMemoryIteration in data.memoryWrites:
         tempList = []
@@ -85,22 +85,22 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
         for currentMemoryTransaction in currentMemoryIteration:
             tempList.append(currentMemoryTransaction.address)
             tempValList.append(currentMemoryTransaction.value)
-        memWrites.append(tempList)
-        memWriteVals.append(tempValList)
+        memWrites0.append(tempList)
+        memWriteVals0.append(tempValList)
 
-    if(len(memReads) == 0): memReads = [[]]
-    if(len(memWrites) == 0): memWrites = [[]]
-    if(len(memWriteVals) == 0): memWriteVals = [[]]
-    if(len(memReadVals) == 0): memReadVals = [[]]
+    if(len(memReads0) == 0): memReads0 = [[]]
+    if(len(memWrites0) == 0): memWrites0 = [[]]
+    if(len(memWriteVals0) == 0): memWriteVals0 = [[]]
+    if(len(memReadVals0) == 0): memReadVals0 = [[]]
     
-    memReadAddrs.initialOutput = memReads[0]
-    memReadVals.initialInput = memReadVals[0]
-    memWriteAddrs.initialOutput = memWrites[0]
-    memWriteVals.initialOutput = memWriteVals[0]
-    memReadAddrs.outputs = memReads[1:]
-    memReadVals.inputs = memReadVals[1:]
-    memWriteAddrs.outputs = memWrites[1:]
-    memWriteVals.outputs = memWriteVals[1:]
+    memReadAddrs.initialOutput = memReads0[0]
+    memReadVals.initialInput = memReadVals0[0]
+    memWriteAddrs.initialOutput = memWrites0[0]
+    memWriteVals.initialOutput = memWriteVals0[0]
+    memReadAddrs.outputs = memReads0[1:]
+    memReadVals.inputs = memReadVals0[1:]
+    memWriteAddrs.outputs = memWrites0[1:]
+    memWriteVals.outputs = memWriteVals0[1:]
 
     maxLengthReads = len(memReadAddrs.initialOutput)
     # replace with math.max function python equivalent
@@ -172,7 +172,7 @@ def computeRegToRegCorrelations():
             if num == 0 and denom == 0:
                 m[i][j] = 0
                 if i == j:
-                    m[i][j] = "reflexive"
+                    m[i][j] = 1
             else:
                 m[i][j] = num/denom
     

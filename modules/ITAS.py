@@ -22,7 +22,7 @@ from modules.runInstruction.instructionRunner import generateInstructionData
 #from modules.getCorrelations import correlationCalculator as CC 
 from modules.getCorrelations import correlationCalculatorMemory as MC
 from modules.generateInstruction import instructionGenerator as instructionGen
-import keystone as k
+from keystone import *
 import sys
 
 
@@ -150,6 +150,8 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     else:
         from modules.createOutput import matrixOutput as output
 
+    instructionsFile = "modules/"+instructionsFile
+
     if mode == 0:
         # Instructions are generated randomly using the generateInstruction module
         instructionList = []
@@ -177,7 +179,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         instructionList = []
         
         # Instantiate the Keystone assembler to assemble instructions
-        KS = k.Ks(k.KS_ARCH_MIPS,k.KS_MODE_MIPS32 + k.KS_MODE_BIG_ENDIAN)
+        KS = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
         ADDRESS = 0x0000
 
         # Read file
