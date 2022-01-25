@@ -162,6 +162,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     elif mode == 1:
         # Instructions are given in byte format in a text file
         instructionList = []
+        numInstructions = 0
 
         # Read file
         with open(instructionsFile) as f:
@@ -174,9 +175,11 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
                 continue;
 
             instructionList.append(bytes(line, encoding="raw_unicode_escape"))
+            numInstructions = numInstructions + 1
     elif mode == 2:
         # Instructions are given in an unassembled format in a text file
         instructionList = []
+        numInstructions = 0
         
         # Instantiate the Keystone assembler to assemble instructions
         KS = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
@@ -196,6 +199,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
             encoding, count = KS.asm(code, ADDRESS)
 
             instructionList.append(encoding)
+            numInstructions += 1
     else:
         print("Mode supplied invalid. Must be 0, 1, or 2")
         return
