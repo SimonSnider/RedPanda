@@ -19,10 +19,10 @@ Arguments:
 
 import os
 from modules.runInstruction.instructionRunner import generateInstructionData
-from modules.getCorrelations import correlationCalculator as CC 
+#from modules.getCorrelations import correlationCalculator as CC 
 from modules.getCorrelations import correlationCalculatorMemory as MC
 from modules.generateInstruction import instructionGenerator as instructionGen
-import keystone as k
+from keystone import *
 import sys
 
 
@@ -139,7 +139,7 @@ def runInputAndModel():
 
 
 
-def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, instructionsFile = "", numInstructions = 1, verbose = 0):
+def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, instructionsFile = "", numInstructions = 1, verbose = 0, threshold = 0.5):
     #
     # Generate instructions or load them from a file
     #
@@ -149,6 +149,8 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         from modules.createOutput import thresholdOutput as output
     else:
         from modules.createOutput import matrixOutput as output
+
+    instructionsFile = "modules/"+instructionsFile
 
     if mode == 0:
         # Instructions are generated randomly using the generateInstruction module
@@ -177,7 +179,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         instructionList = []
         
         # Instantiate the Keystone assembler to assemble instructions
-        KS = k.Ks(k.KS_ARCH_MIPS,k.KS_MODE_MIPS32 + k.KS_MODE_BIG_ENDIAN)
+        KS = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
         ADDRESS = 0x0000
 
         # Read file
@@ -211,7 +213,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     
     for i in range(1):
         dat = instructionData.registerStateLists[i]
-        MC.initialize(dat, instructionIterations)
+        MC.initialize(dat, instructionIterations, threshold)
         analyzedData.append(MC.computeCorrelations())
 
     output.generateOutput(analyzedData, outputFileName)
@@ -238,12 +240,14 @@ if len(sys.argv) > 1:
         print("Read instruction arguments: \nArchitecture:", arguments[0], 
             "\nInstruction Mode:", arguments[1], 
             "\nInstruction Iterations:", arguments[2], 
-            "\nOutput File Name:", arguments[3], 
-            "\nInstructions File:", arguments[4], 
-            "\nNumber of Instructions to Generate:", arguments[5],
-            "\nVerbose:", arguments[6]
+            "\nOutput File Name:", arguments[3],
+            "\nOutput Mode: ", arguments[4],
+            "\nOutput Threshold: ", arguments[5],  
+            "\nInstructions File:", arguments[6], 
+            "\nNumber of Instructions to Generate:", arguments[7],
+            "\nVerbose:", arguments[8]
             )
 
-        runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], arguments[4], int(arguments[5]), int(arguments[6]))
+        runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], int(arguments[4]), arguments[6], int(arguments[7]), int(arguments[8]), float(arguments[5]))
 else:
     runInputAndModel()

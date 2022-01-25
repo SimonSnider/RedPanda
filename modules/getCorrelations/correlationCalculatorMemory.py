@@ -34,7 +34,7 @@ def setArch(archType, testV=0):
         n = testV
 
 
-def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0.5):
+def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5):
 
     """ Initializes the correlation calculator with the data from running an instruction multiple times
 
@@ -44,7 +44,6 @@ def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0
 
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
-
     thresh = threshold
     
     iterPerRegister = iterPerReg
@@ -56,18 +55,16 @@ def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0
     regs.outputs = data.afterStates[1:]
     Bs = data.bitmasks[1:]
     regs.ps = [0]*I
-    
     memReadVals.ps = [0]*I
     memReadAddrs.ps = [0]*I
     memWriteAddrs.ps = [0]*I
     memWriteVals.ps = [0]*I
 
     regList = list(regs.inputs[0])
-
-    memReads = []
-    memReadVals = []
-    memWrites = []
-    memWriteVals = []
+    memReads0 = []
+    memReadVals0 = []
+    memWrites0 = []
+    memWriteVals0 = []
 
     for currentMemoryIteration in data.memoryReads:
         tempList = []
@@ -75,8 +72,8 @@ def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0
         for currentMemoryTransaction in currentMemoryIteration:
             tempList.append(currentMemoryTransaction.address)
             tempValList.append(currentMemoryTransaction.value)
-        memReads.append(tempList)
-        memReadVals.append(tempValList)
+        memReads0.append(tempList)
+        memReadVals0.append(tempValList)
        
     for currentMemoryIteration in data.memoryWrites:
         tempList = []
@@ -84,22 +81,22 @@ def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0
         for currentMemoryTransaction in currentMemoryIteration:
             tempList.append(currentMemoryTransaction.address)
             tempValList.append(currentMemoryTransaction.value)
-        memWrites.append(tempList)
-        memWriteVals.append(tempValList)
+        memWrites0.append(tempList)
+        memWriteVals0.append(tempValList)
 
-    if(len(memReads) == 0): memReads = [[]]
-    if(len(memWrites) == 0): memWrites = [[]]
-    if(len(memWriteVals) == 0): memWriteVals = [[]]
-    if(len(memReadVals) == 0): memReadVals = [[]]
+    if(len(memReads0) == 0): memReads0 = [[]]
+    if(len(memWrites0) == 0): memWrites0 = [[]]
+    if(len(memWriteVals0) == 0): memWriteVals0 = [[]]
+    if(len(memReadVals0) == 0): memReadVals0 = [[]]
     
-    memReadAddrs.initialOutput = memReads[0]
-    memReadVals.initialInput = memReadVals[0]
-    memWriteAddrs.initialOutput = memWrites[0]
-    memWriteVals.initialOutput = memWriteVals[0]
-    memReadAddrs.outputs = memReads[1:]
-    memReadVals.inputs = memReadVals[1:]
-    memWriteAddrs.outputs = memWrites[1:]
-    memWriteVals.outputs = memWriteVals[1:]
+    memReadAddrs.initialOutput = memReads0[0]
+    memReadVals.initialInput = memReadVals0[0]
+    memWriteAddrs.initialOutput = memWrites0[0]
+    memWriteVals.initialOutput = memWriteVals0[0]
+    memReadAddrs.outputs = memReads0[1:]
+    memReadVals.inputs = memReadVals0[1:]
+    memWriteAddrs.outputs = memWrites0[1:]
+    memWriteVals.outputs = memWriteVals0[1:]
 
     maxLengthReads = len(memReadAddrs.initialOutput)
     # replace with math.max function python equivalent
@@ -165,13 +162,13 @@ def computeRegToRegCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*regs.ps[k].get(regList[j])
             if num == 0 and denom == 0:
                 m[i][j] = 0
                 if i == j:
-                    m[i][j] = "reflexive"
+                    m[i][j] = 1
             else:
                 m[i][j] = num/denom
     
@@ -187,7 +184,7 @@ def computeRegToReadAddrCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*memReadAddrs.ps[k][j]
             if num == 0 and denom == 0:
@@ -207,7 +204,7 @@ def computeRegToWriteAddrCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*memWriteAddrs.ps[k][j]
             if num == 0 and denom == 0:
@@ -227,7 +224,7 @@ def computeRegToReadValCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*memReadVals.ps[k][j]
             if num == 0 and denom == 0:
@@ -247,7 +244,7 @@ def computeRegToWriteValCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*memWriteVals.ps[k][j]
             if num == 0 and denom == 0:
@@ -272,5 +269,4 @@ def computeCorrelations():
     M.regToWriteData = computeRegToWriteValCorrelations()
     M.readDataToReg = computeRegToReadValCorrelations()
     M.threshold = thresh
-
     return M

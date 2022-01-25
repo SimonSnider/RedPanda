@@ -86,6 +86,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             if (verbose): print("saving before reg state")
             registerStateList.bitmasks.append(bitmask)
             registerStateList.beforeStates.append(getRegisterState(panda, cpu))
+            registerStateList.memoryReads.append([])
+            registerStateList.memoryWrites.append([])
         if (verbose):
             code = panda.virtual_memory_read(cpu, pc, 4)
             for i in md.disasm(code, pc):
@@ -156,6 +158,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         lowerBound = -(2**(31 - regBoundsCount))
         registerStateList.beforeStates.pop()
         registerStateList.bitmasks.pop()
+        registerStateList.memoryReads.pop()
+        registerStateList.memoryWrites.pop()
         return -1
 
     panda.enable_memcb()
