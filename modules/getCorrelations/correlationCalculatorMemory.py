@@ -5,6 +5,7 @@ n = 24 #number of registers about which we care
 iterPerRegister = 100
 I = n*iterPerRegister
 Bs = -1 #B_i
+thresh = 0.5
 
 regs = IntermediateData()
 memReadVals = IntermediateData()
@@ -32,7 +33,9 @@ def setArch(archType, testV=0):
     elif archType.lower() == "test":
         n = testV
 
-def initialize(data: RegisterStateList, iterPerReg: int = 100):
+
+def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0.5):
+
     """ Initializes the correlation calculator with the data from running an instruction multiple times
 
     Arguments:
@@ -40,7 +43,9 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100):
     iterPerReg -- number of times each combination of changed registers is ran (default = 100)
 
     """
-    global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs
+    global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
+
+    thresh = threshold
     
     iterPerRegister = iterPerReg
     I = len(data.bitmasks)-1
@@ -59,21 +64,49 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100):
 
     regList = list(regs.inputs[0])
 
-    memReadAddrs.initialOutput = data.memoryReads[0]
-    memReadVals.initialInput = data.memoryReadVales[0]
-    memWriteAddrs.initialOutput = data.memoryWrites[0]
-    memWriteVals.initialOutput = data.memoryWriteValues[0]
-    memReadAddrs.outputs = data.memoryReads[1:]
-    memReadVals.inputs = data.memoryReadValues[1:]
-    memWriteAddrs.outputs = data.memoryWrites[1:]
-    memWriteVals.outputs = data.memoryWriteValues[1:]
+    memReads = []
+    memReadVals = []
+    memWrites = []
+    memWriteVals = []
 
-    maxLengthReads = 0
+    for currentMemoryIteration in data.memoryReads:
+        tempList = []
+        tempValList = []
+        for currentMemoryTransaction in currentMemoryIteration:
+            tempList.append(currentMemoryTransaction.address)
+            tempValList.append(currentMemoryTransaction.value)
+        memReads.append(tempList)
+        memReadVals.append(tempValList)
+       
+    for currentMemoryIteration in data.memoryWrites:
+        tempList = []
+        tempValList = []
+        for currentMemoryTransaction in currentMemoryIteration:
+            tempList.append(currentMemoryTransaction.address)
+            tempValList.append(currentMemoryTransaction.value)
+        memWrites.append(tempList)
+        memWriteVals.append(tempValList)
+
+    if(len(memReads) == 0): memReads = [[]]
+    if(len(memWrites) == 0): memWrites = [[]]
+    if(len(memWriteVals) == 0): memWriteVals = [[]]
+    if(len(memReadVals) == 0): memReadVals = [[]]
+    
+    memReadAddrs.initialOutput = memReads[0]
+    memReadVals.initialInput = memReadVals[0]
+    memWriteAddrs.initialOutput = memWrites[0]
+    memWriteVals.initialOutput = memWriteVals[0]
+    memReadAddrs.outputs = memReads[1:]
+    memReadVals.inputs = memReadVals[1:]
+    memWriteAddrs.outputs = memWrites[1:]
+    memWriteVals.outputs = memWriteVals[1:]
+
+    maxLengthReads = len(memReadAddrs.initialOutput)
     # replace with math.max function python equivalent
     for ls in memReadAddrs.outputs:
         if len(ls) > maxLengthReads:
             maxLengthReads = len(ls)
-    maxLengthWrites = 0
+    maxLengthWrites = len(memWriteAddrs.initialOutput)
     for ls in memWriteAddrs.outputs:
         if len(ls) > maxLengthWrites:
             maxLengthWrites = len(ls)
@@ -230,7 +263,7 @@ def computeCorrelations():
     Return Value:
     M -- n x m list where M[i][j] is the correlation of register i on register/memory access j
     """
-    global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs
+    global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
     M = Correlations()
     
     M.regToReg = computeRegToRegCorrelations()
@@ -238,5 +271,6 @@ def computeCorrelations():
     M.regToWriteAddress = computeRegToWriteAddrCorrelations()
     M.regToWriteData = computeRegToWriteValCorrelations()
     M.readDataToReg = computeRegToReadValCorrelations()
+    M.threshold = thresh
 
     return M
