@@ -1,9 +1,14 @@
-
+Instruction: andi $a0, $a2, 0xfa9a
 Correlations with >= 0.5
-Register 9 is not correlated with itself: 0.0
+Register 6 is correlated with register 4: 1.0
 Register 26 is not correlated with itself: 0.0
 Register 27 is not correlated with itself: 0.0
 Register 28 is not correlated with itself: 0.0
 Register 29 is not correlated with itself: 0.0
-Register 10 is correlated with the address of read 0: 1.0
-Value of read 10 is correlated with register 0: 1.0
+Instruction: max_a.b $w22, $w2, $w14
+Correlations with >= 0.5
+Register 6 is correlated with register 4: 1.0
+Register 26 is not correlated with itself: 0.0
+Register 27 is not correlated with itself: 0.0
+Register 28 is not correlated with itself: 0.0
+Register 29 is not correlated with itself: 0.0

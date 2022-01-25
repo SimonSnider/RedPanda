@@ -1,7 +1,7 @@
 from modules.models.correlations import *
 import csv
 
-def generateOutput(data, filename):
+def generateOutput(instructionNames, data, filename):
     """
     Generates output for a Correlation Data Object in the form of a matrix printed in csv format.
 
@@ -15,7 +15,9 @@ def generateOutput(data, filename):
         writer = csv.writer(csvfile) 
 
         # writer.writerow(fields)
-        for singleInstructionData in data:
+        for index, singleInstructionData in enumerate(data):
+            writer.writerow(["Instruction:", instructionNames[index]])
+
             writer.writerow(["Reg to Reg Correlations"])
             writer.writerows(singleInstructionData.regToReg)
             

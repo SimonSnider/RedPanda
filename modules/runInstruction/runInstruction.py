@@ -71,6 +71,11 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         nonlocal instIndex, initialState, stateData
         loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
         stateData.instructions.append(instructions[instIndex])
+        code = panda.virtual_memory_read(cpu, ADDRESS, 4)
+        for i in md.disasm(code, 0):
+            instr = i.mnemonic + " " + i.op_str
+            stateData.instructionNames.append(instr)
+            break
         randomizeRegisters(panda, cpu)
         initialState = getRegisterState(panda, cpu)
         if (verbose): print("setup done")
@@ -117,6 +122,11 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         stateData.registerStateLists.append(copy.copy(registerStateList))
                         loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
                         stateData.instructions.append(instructions[instIndex])
+                        code = panda.virtual_memory_read(cpu, ADDRESS, 4)
+                        for i in md.disasm(code, ADDRESS):
+                            instr = i.mnemonic + " " + i.op_str
+                            stateData.instructionNames.append(instr)
+                            break
                         registerStateList = RegisterStateList()
                         regStateIndex = 0
                         bitmask = b'\x00\x00\x00\x00'

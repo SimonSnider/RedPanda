@@ -1,9 +1,10 @@
 from modules.models.correlations import *
 
-def generateOutput(data, filename):
+def generateOutput(instructionNames, data, filename):
     filename = filename + ".txt"
     with open(filename, 'w') as f:
-        for datai in data:
+        for index, datai in enumerate(data):
+            f.write("Instruction: " + instructionNames[index])
             f.write("\nCorrelations with >= " + str(datai.threshold) + "\n")
 
             for i in range(len(datai.regToReg)):
