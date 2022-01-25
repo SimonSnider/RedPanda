@@ -34,7 +34,7 @@ def setArch(archType, testV=0):
         n = testV
 
 
-def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0.5):
+def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5):
 
     """ Initializes the correlation calculator with the data from running an instruction multiple times
 
@@ -45,6 +45,7 @@ def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
 
+    RegisterStates = RegisterStateList
     thresh = threshold
     
     iterPerRegister = iterPerReg

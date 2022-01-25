@@ -7,7 +7,7 @@ class Correlations:
 	regToWriteAddress: "list[list[float]]" = field(default_factory=list)
 	regToWriteData: "list[list[float]]" = field(default_factory=list)
 	readDataToReg: "list[list[float]]" = field(default_factory=list)
-	threshold: float
+	threshold: float = 0
 
 @dataclass
 class IntermediateData:
