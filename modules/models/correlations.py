@@ -11,8 +11,8 @@ class Correlations:
 
 @dataclass
 class IntermediateData:
-	initialInput: "list[int]" = field(default_factory=list)
-	initialOutput: "list[int]" = field(default_factory=list)
-	inputs: "list[int]" = field(default_factory=list)
-	outputs:"list[int]" = field(default_factory=list)
-	ps: "list[list[int]]" = field(default_factory=list)
+	initialInput: "dict[str, int]" = field(default_factory=list)
+	initialOutput: "dict[str, int]" = field(default_factory=list)
+	inputs: "list[dict[str, int]]" = field(default_factory=list)
+	outputs:"list[dict[str, int]]" = field(default_factory=list)
+	ps: "list[int]" = field(default_factory=list)

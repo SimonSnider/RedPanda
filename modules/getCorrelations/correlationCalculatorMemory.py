@@ -55,14 +55,12 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     regs.outputs = data.afterStates[1:]
     Bs = data.bitmasks[1:]
     regs.ps = [0]*I
-    
     memReadVals.ps = [0]*I
     memReadAddrs.ps = [0]*I
     memWriteAddrs.ps = [0]*I
     memWriteVals.ps = [0]*I
 
     regList = list(regs.inputs[0])
-
     memReads0 = []
     memReadVals0 = []
     memWrites0 = []
@@ -164,7 +162,7 @@ def computeRegToRegCorrelations():
             denom = 0
             num = 0
             for k in range(I):
-                bitMaskV = getBitVals(Bs[k], 8*(n-i-1))
+                bitMaskV = getBitVals(Bs[k], 1*(i))
                 denom += bitMaskV
                 num += bitMaskV*regs.ps[k].get(regList[j])
             if num == 0 and denom == 0:
@@ -271,5 +269,4 @@ def computeCorrelations():
     M.regToWriteData = computeRegToWriteValCorrelations()
     M.readDataToReg = computeRegToReadValCorrelations()
     M.threshold = thresh
-    print(M)
     return M

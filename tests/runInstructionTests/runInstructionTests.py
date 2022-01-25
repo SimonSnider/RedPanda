@@ -92,8 +92,8 @@ class TestScript(unittest.TestCase):
             self.assertIsInstance(read, MemoryTransaction)
         for write in lwStates.memoryWrites[0]:
             self.assertIsInstance(write, MemoryTransaction)
-            
-            
+
+
 
 
 if __name__ == '__main__':
