@@ -1,3 +1,4 @@
+from modules.models.correlations import *
 import csv
 
 def generateOutput(data, filename):
