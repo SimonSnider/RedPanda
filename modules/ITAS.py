@@ -188,14 +188,10 @@ def runModel(arch, mode, instructionIterations, outputFileName, instructionsFile
     MC.setArch("mips32")
     analyzedData = []
     
-    instructionKeys = list(instructionData.keys())
     for i in range(1):
-        dat = instructionData[instructionKeys[i]]
-        MC.initialize(dat, 1)
-        print(MC.computeCorrelations())
+        dat = instructionData.registerStateLists[i]
+        MC.initialize(dat, instructionIterations)
         analyzedData.append(MC.computeCorrelations())
-
-    # fields = ['InstructionName', 'Coorelation'] 
 
     output.generateOutput(analyzedData, outputFileName)
 
