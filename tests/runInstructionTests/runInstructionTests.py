@@ -88,8 +88,10 @@ class TestScript(unittest.TestCase):
         swStates = stateData.registerStateLists[1]
         self.assertEqual(len(lwStates.memoryReads), n*24 + 1)
         self.assertEqual(len(swStates.memoryWrites), n*24 + 1)
-        self.assertEqual(lwStates.memoryReads[0], MemoryTransaction)
-        self.assertEqual(swStates.memoryWrites[0], MemoryTransaction)
+        for read in lwStates.memoryReads[0]:
+            self.assertIsInstance(read, MemoryTransaction)
+        for write in lwStates.memoryWrites[0]:
+            self.assertIsInstance(write, MemoryTransaction)
             
             
 

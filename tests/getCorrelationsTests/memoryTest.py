@@ -37,7 +37,7 @@ def testMemRead():
     memoryReads.append([1])
     # memoryWrites.append([0])
 
-    data = RegisterStates()
+    data = RegisterStateList()
     data.beforeStates = beforeStates
     data.afterStates = afterStates
     data.memoryReads = memoryReads
@@ -88,7 +88,7 @@ def testMemWrite():
     memoryWrites.append([1])
     memoryWriteVals.append([2])
 
-    data = RegisterStates()
+    data = RegisterStateList()
     data.beforeStates = beforeStates
     data.afterStates = afterStates
     data.memoryReads = memoryReads

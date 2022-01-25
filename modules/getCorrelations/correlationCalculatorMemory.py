@@ -44,8 +44,6 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
 
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
-
-    RegisterStates = RegisterStateList
     thresh = threshold
     
     iterPerRegister = iterPerReg
@@ -273,5 +271,5 @@ def computeCorrelations():
     M.regToWriteData = computeRegToWriteValCorrelations()
     M.readDataToReg = computeRegToReadValCorrelations()
     M.threshold = thresh
-
+    print(M)
     return M

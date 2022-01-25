@@ -158,6 +158,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         lowerBound = -(2**(31 - regBoundsCount))
         registerStateList.beforeStates.pop()
         registerStateList.bitmasks.pop()
+        registerStateList.memoryReads.pop()
+        registerStateList.memoryWrites.pop()
         return -1
 
     panda.enable_memcb()
