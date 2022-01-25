@@ -147,8 +147,8 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         from modules.createOutput import matrixOutput as output
     elif outputModel == 1:
         from modules.createOutput import thresholdOutput as output
-    else:
-        from modules.createOutput import matrixOutput as output
+    #else:
+        #from modules.createOutput import matrixOutput as output
 
     instructionsFile = "modules/"+instructionsFile
 
@@ -211,12 +211,12 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     MC.setArch("mips32")
     analyzedData = []
     
-    for i in range(1):
+    for i in range(numInstructions):
         dat = instructionData.registerStateLists[i]
         MC.initialize(dat, instructionIterations, threshold)
         analyzedData.append(MC.computeCorrelations())
 
-    output.generateOutput(analyzedData, outputFileName)
+    output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
 
 if len(sys.argv) > 1:
     if sys.argv[1] == "-c":

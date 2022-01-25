@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 @dataclass
 class StateData:
     instructions: "list[bytes]" = field(default_factory=list)
+    instructionNames: "list[str]" = field(default_factory=list)
     registerStateLists: "list[RegisterStateList]" = field(default_factory=list)
 
 @dataclass
