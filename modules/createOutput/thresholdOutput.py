@@ -1,6 +1,7 @@
 from modules.models.correlations import *
 
 def generateOutput(data, filename):
+    filename = filename + ".txt"
     with open(filename, 'w') as f:
         f.write("Correlations with >= " + str(data.threshold) + "\n")
 
