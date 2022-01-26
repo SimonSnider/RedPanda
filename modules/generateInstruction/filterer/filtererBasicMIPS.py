@@ -22,10 +22,15 @@ def filterInstruction(instruction, verbose=False):
     for insn in md.disasm(instruction, 0x1000):
         if(verbose):
             print("%s\t%s" % (insn.mnemonic, insn.op_str))
+            print("Groups:", insn.groups)
 
         mnemonic = insn.mnemonic
 
         if(mnemonic in ["beq", "bne", "bgtz", "bltz", "bgez", "blez", "addi"]):
+            return False
+
+        groups = insn.groups
+        if(any(item in [CS_GRP_INVALID, CS_GRP_JUMP, CS_GRP_CALL, CS_GRP_RET, CS_GRP_INT, CS_GRP_IRET, CS_GRP_PRIVILEGE, MIPS_GRP_FPIDX, MIPS_GRP_FP64BIT, MIPS_GRP_MICROMIPS]  for item in groups)):
             return False
 
         if len(insn.operands) > 0:
