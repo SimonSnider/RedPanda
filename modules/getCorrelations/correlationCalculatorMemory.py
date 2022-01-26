@@ -1,5 +1,6 @@
 from modules.models.stateData import *
 from modules.models.correlations import *
+from modules.runInstruction.stateManager import skippedMipsRegs
 
 n = 24 #number of registers about which we care
 iterPerRegister = 100
@@ -169,6 +170,8 @@ def computeRegToRegCorrelations():
                 m[i][j] = 0
                 if i == j:
                     m[i][j] = 1
+            elif i == j and regList[i] in skippedMipsRegs:
+                m[i][j] = 1
             else:
                 m[i][j] = num/denom
     
