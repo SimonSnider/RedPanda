@@ -26,7 +26,7 @@ All arguments and system settings will be prompted after running the command.
 Sometimes it is useful to leverage the same settings over the course of multiple runs of ITAS without needing to input the same settings on command line each time. When this functionality is desired, you can use the ITAS configurable mode to accomplish it. Said mode is initialized as follows:
 <b>
 ```
-python3 modules/ITAS -c 
+python3 modules/ITAS.py -c 
 ```
 </b>
 To use config mode simply open <a>modules/debug.cfg</a> and edit the interior settings to match your desired settings.
