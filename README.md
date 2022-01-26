@@ -16,7 +16,7 @@ This installs the current version of ITAS to your python3 environment.
 To run ITAS in the default mode use the following command:
 <b>
 ```
-python3 modules/ITAS
+python3 modules/ITAS.py
 ```
 </b>
 All arguments and system settings will be prompted after running the command.
