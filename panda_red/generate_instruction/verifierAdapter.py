@@ -1,7 +1,6 @@
 from capstone import *
 from capstone.mips import *
 from dataclasses import dataclass
-import sys
 
 @dataclass
 class Verifier:
