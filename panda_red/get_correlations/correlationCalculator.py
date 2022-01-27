@@ -33,7 +33,7 @@ def setArch(archType, testV=0):
         n = testV
 
 # list has initial register values, 
-def initialize(data: RegisterStates, iterPerReg: int = 100, threshold: float = 0.5):
+def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5):
     """ Initializes the correlation calculator with the data from running an instruction multiple times
     Arguments:
     dataList -- the list of data from the run instruction module. [[0s: byte_literal, InitialRegisterState: dict{registerName, registerValue}, InitialResult: dict{registerName, registerValue}],[bytesChanged: byte_literal, RegisterInitial1: dict{registerName, registerValue}, RegisterFinal1: dict{registerName, registerValue}],...]
