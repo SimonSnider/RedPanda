@@ -4,6 +4,10 @@
 The PANDA Instruction Taint Analysis System (PANDA-RED) can be installed and run under default settings by following the instructions below.
 
 ## Installation
+#Requirements
+* Ubuntu 20.04
+* Python 3.7 or above
+
 Close the git repository and navigate to the parent folder of the project. Then run:
 ```
 pip install .
