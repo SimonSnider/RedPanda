@@ -10,6 +10,12 @@ import math
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
 
 def initializePanda(architecture="mips"):
+    """
+    Arguments:
+        architecture -- the architecture that panda will be set up to emulate. Supported architectures: "mips"
+    Outputs: 
+        Returns an instance of panda with the specified architecture
+    """
     panda = Panda("mips",
         extra_args=["-M", "configurable", "-nographic"],
         raw_monitor=True)
@@ -37,6 +43,13 @@ def initializeMemory(panda: Panda, memName, memSize=2 * 1024 * 1024, address=0):
     panda.map_memory(memName, memSize, address)
     
 def generateRandomMemoryValues(minValue = -(2**(31)), maxValue = (2**31) - 1):
+    """
+    Arguments: 
+        minValue -- the minimum value for the randomized value (inclusive)
+        maxValue -- the maximum value for the randomized value (inclusive)
+    Outputs: 
+        returns a random 4-byte value between minValue and maxValue
+    """
     return generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
 
 def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff', minValue = -(2**(31)), maxValue = (2**31) - 1):
@@ -77,6 +90,7 @@ def randomizeMemory(panda):
     Outputs:
         randomizes the memory of panda
     """
+    # TODO: why is this here. I was gonna remove this but Jake wants it, so here it remains
     return
 
 def getRegisterState(panda: Panda, cpu):
