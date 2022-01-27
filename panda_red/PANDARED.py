@@ -22,7 +22,7 @@ from modules.runInstruction.instructionRunner import generateInstructionData
 #from modules.getCorrelations import correlationCalculator as CC 
 from modules.getCorrelations import correlationCalculatorMemory as MC
 from modules.generateInstruction import instructionGenerator as instructionGen
-from keystone import *
+from keystone.keystone import *
 import sys
 
 
