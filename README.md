@@ -1,39 +1,39 @@
 <t> PANDA Taint Modeling </t>
 
 # Quick Start Guide
-The PANDA Instruction Taint Analysis System (PANDA-ITAS) can be installed and run under default settings by following the instructions below.
+The PANDA Instruction Taint Analysis System (PANDA-RED) can be installed and run under default settings by following the instructions below.
 
 ## Installation
 Close the git repository and navigate to the parent folder of the project. Then run:
 ```
 pip install .
 ```
-This installs the current version of ITAS to your python3 environment.
+This installs the current version of RED to your python3 environment.
 
 
 ## Running
 ### Default Mode
-To run ITAS in the default mode use the following command:
+To run RED in the default mode use the following command:
 <b>
 ```
-python3 modules/ITAS.py
+python3 modules/PANDARED.py
 ```
 </b>
 All arguments and system settings will be prompted after running the command.
 <br><br/>
 
 ### Config Mode
-Sometimes it is useful to leverage the same settings over the course of multiple runs of ITAS without needing to input the same settings on command line each time. When this functionality is desired, you can use the ITAS configurable mode to accomplish it. Said mode is initialized as follows:
+Sometimes it is useful to leverage the same settings over the course of multiple runs of RED without needing to input the same settings on command line each time. When this functionality is desired, you can use the RED configurable mode to accomplish it. Said mode is initialized as follows:
 <b>
 ```
-python3 modules/ITAS.py -c 
+python3 modules/PANDARED.py -c 
 ```
 </b>
 To use config mode simply open <a>modules/debug.cfg</a> and edit the interior settings to match your desired settings.
 <br></br>
 
 ### System Arguments
-There are a variety of arguments to pass into ITAS. Below is a full list of what they mean and the types are input they expect. For argument field that specify a list of options, specify the list number as input during runtime.
+There are a variety of arguments to pass into RED. Below is a full list of what they mean and the types are input they expect. For argument field that specify a list of options, specify the list number as input during runtime.
 
 #### Output File Name
 This specifies the name of the output file. This argument does not take in file type as that is generated based on the desired output format. 
