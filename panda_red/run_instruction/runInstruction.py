@@ -1,10 +1,10 @@
 from pandare import Panda
-from modules.runInstruction.stateManager import *
+from panda_red.run_instruction.stateManager import *
 from capstone import *
 from capstone.mips import *
 import math
-from modules.generateInstruction.bitGenerator import *
-from modules.models.stateData import *
+from panda_red.generate_instruction.bitGenerator import *
+from panda_red.models.stateData import *
 import copy
 
 

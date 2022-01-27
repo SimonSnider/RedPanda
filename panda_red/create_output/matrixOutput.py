@@ -1,4 +1,4 @@
-from modules.models.correlations import *
+from panda_red.models.correlations import *
 import csv
 
 def generateOutput(instructionNames, data, filename):

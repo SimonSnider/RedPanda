@@ -1,6 +1,6 @@
-from modules.generateInstruction import verifierAdapter as verAdapt
-from modules.generateInstruction import bitGenerator as bitGen
-from modules.generateInstruction.filterer import filtererBasicMIPS as fBMIPS
+from panda_red.generate_instruction import verifierAdapter as verAdapt
+from panda_red.generate_instruction import bitGenerator as bitGen
+from panda_red.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
 
 def initialize(arch="mips32", littleEndian=False):
     """Initializes an architecture to generate instructions
