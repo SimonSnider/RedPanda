@@ -1,5 +1,4 @@
-from dataclasses import dataclass, field, asdict
-import json
+from dataclasses import dataclass, field
 
 @dataclass
 class StateData:
@@ -22,10 +21,3 @@ class MemoryTransaction:
     address: int
     size: int
 
-def stateDataToJson(data: StateData):
-    class MyEncoder(json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, bytes):
-                return ("0x" + obj.hex())
-            return json.JSONEncoder.default(self, obj)
-    return json.dumps(asdict(data), cls=MyEncoder)
