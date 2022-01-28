@@ -15,6 +15,6 @@ def saveStateData(data: StateData, filename):
             if isinstance(obj, bytes):
                 return ("0x" + obj.hex())
             return json.JSONEncoder.default(self, obj)
-    stateDataJson = json.dumps(asdict(data))
+    stateDataJson = json.dumps(asdict(data), cls=MyEncoder)
     with open(filename + ".json", 'w') as jsonFile:
         jsonFile.write(stateDataJson)
