@@ -6,6 +6,7 @@ likely to be related given a particular threshold. For more details, see our mat
 
 from panda_red.models.stateData import *
 from panda_red.models.correlations import *
+import math
 
 n = 24 #number of registers about which we care
 iterPerRegister = 100 # iterations run per set of registers randomized
@@ -42,7 +43,7 @@ def setArch(archType, testV=0):
         n = testV
 
 
-def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5):
+def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5, pValue: bool = True):
 
     """ Initializes the correlation calculator with the data from running an instruction multiple times
 
@@ -54,6 +55,8 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
     thresh = threshold
+    if pValue:
+        thresh = computeThreshold(threshold)
     
     iterPerRegister = iterPerReg
     I = len(data.bitmasks)-1
@@ -129,6 +132,43 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
         lengthen(ls, maxLengthWrites)
     for ls in memReadVals.inputs:
         lengthen(ls, maxLengthReads)
+
+def binomialSum(q, c):
+    """
+    q -- 1-p, where p is the p-value chosen by the user
+    c -- a correlation coefficient
+    This function computes the probability that two variables are correlated given a
+    correlation coefficient and a desired probability
+    """
+    sum = 0.0
+    n = iterPerRegister
+    for x in n*q..n:
+        sum += math.combination(n, x*n)*((1-c)**x)*(c**(n-x))
+    return sum
+
+
+
+def computeThreshold(p):
+    """
+    p -- desired p-value
+    This function interpolates the minimum threshold for a correlation 
+    coefficient given a desired p-value
+    """
+    q = 1 - p
+    allowance = p*p # TODO: generalize?
+    up = 1
+    low = 0
+    c = (up + low) / 2
+    sum = binomialSum(q, c)
+    while(Abs(sum - q) > allowance):
+        if binomialSum > q:
+            low = c
+        else:
+            high = c
+        c = (up + low) / 2
+    return c
+
+
 
 def lengthen(ls, length):
     """
