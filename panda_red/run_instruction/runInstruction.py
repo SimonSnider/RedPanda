@@ -21,10 +21,6 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0):
         Sets the program counter to address
     """
     panda.physical_memory_write(address, bytes(instruction))
-    panda.physical_memory_write(address + len(instruction), bytes(b"\x00\x00\x00\x00"))
-    # create a jump instruction
-    jump = b"\x08\x00\x00\x00"
-    panda.physical_memory_write(address + 2*len(instruction), bytes(jump))
     
     cpu.env_ptr.active_tc.PC = address
     return
@@ -51,7 +47,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     Outputs:
         returns a StateData object containing the instructions run and the program state data for each
     """
-    ADDRESS = 0
+    ADDRESS = 0x1000
     stateData = StateData()
     registerStateList = RegisterStateList()
     regStateIndex = 0
@@ -67,8 +63,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
     @panda.cb_after_machine_init
     def setup(cpu):
-        initializeMemory(panda, "mymem", address=ADDRESS)
         nonlocal instIndex, initialState, stateData
+        initializeMemory(panda, "mymem", address=ADDRESS)
         loadInstruction(panda, cpu, instructions[instIndex], ADDRESS)
         stateData.instructions.append(instructions[instIndex])
         code = panda.virtual_memory_read(cpu, ADDRESS, 4)
@@ -104,11 +100,15 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     def translateAll(env, pc):
         return True
 
+    @panda.cb_top_loop
+    def printThing(cpuState):
+        print("Hey look I hit a thing")
+
     @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
         if (verbose): print("getInstValues")
         nonlocal regStateIndex, instIndex, bitmask, registerStateList, regBoundsCount
-        if (pc == 4):
+        if (pc == ADDRESS+4):
             regBoundsCount = 0
             if (verbose): print("saving reg state after run", regStateIndex)
             registerStateList.afterStates.append(getRegisterState(panda, cpu))

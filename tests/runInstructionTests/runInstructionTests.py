@@ -1,12 +1,12 @@
 import unittest
 
 from capstone import *
-from modules.runInstruction import runInstruction
-from modules.runInstruction.stateManager import *
+from panda_red.run_instruction import runInstruction
+from panda_red.run_instruction.stateManager import *
 from keystone import *
-from modules.generateInstruction import instructionGenerator
+from panda_red.generate_instruction import instructionGenerator
 import math
-from modules.models.stateData import *
+from panda_red.models.stateData import *
 
 panda = initializePanda()
 instGen = instructionGenerator.initialize()
@@ -22,22 +22,22 @@ def isPowerOfTwo(n):
 
 class TestScript(unittest.TestCase):
 
-    # def testRunMipsInstructionOnce(self):
-    #     instruction = "andi $t0, $t1, 0"
-    #     print(instruction)
-    #     CODE = instruction.encode('UTF-8')
-    #     ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
+    def testRunMipsInstructionOnce(self):
+        instruction = "andi $t0, $t1, 0"
+        print(instruction)
+        CODE = instruction.encode('UTF-8')
+        ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
 
-    #     ADDRESS = 0x0000
-    #     encoding, count = ks.asm(CODE, ADDRESS)
-    #     data: StateData = runInstruction.runInstructions(panda, [encoding], 1, verbose = True)
-    #     self.assertEqual(len(data.registerStateLists), 1)
-    #     regStateList = data.registerStateLists[0]
-    #     self.assertIsInstance(regStateList, RegisterStateList)
-    #     self.assertEqual(len(regStateList.beforeStates), 1 * 24 + 1)
-    #     self.assertEqual(len(regStateList.afterStates), 1 * 24 + 1)
-    #     self.assertNotEqual(regStateList.beforeStates[0].get("T0"), 0)
-    #     self.assertEqual(regStateList.afterStates[0].get("T0"), 0)
+        ADDRESS = 0x1000
+        encoding, count = ks.asm(CODE, ADDRESS)
+        data: StateData = runInstruction.runInstructions(panda, [encoding], 1, verbose = True)
+        self.assertEqual(len(data.registerStateLists), 1)
+        regStateList = data.registerStateLists[0]
+        self.assertIsInstance(regStateList, RegisterStateList)
+        self.assertEqual(len(regStateList.beforeStates), 1 * 24 + 1)
+        self.assertEqual(len(regStateList.afterStates), 1 * 24 + 1)
+        self.assertNotEqual(regStateList.beforeStates[0].get("T0"), 0)
+        self.assertEqual(regStateList.afterStates[0].get("T0"), 0)
 
 
     # def testRunInstructionsMips(self):
@@ -65,33 +65,33 @@ class TestScript(unittest.TestCase):
     #             self.assertIsInstance(regStateList.afterStates[i], dict)
     #             self.assertTrue(isPowerOfTwo(int.from_bytes(regStateList.bitmasks[i], 'big', signed=False)))
 
-    def testRunInstructionsMemoryMips(self):
-        instruction = "lw $t2, 0($t4)"
-        instruction2 = "sw $t2, 0($t4)"
-        CODE = instruction.encode('UTF-8')
-        CODE2 = instruction2.encode('UTF-8')
-        ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
+    # def testRunInstructionsMemoryMips(self):
+    #     instruction = "lw $t2, 0($t4)"
+    #     instruction2 = "sw $t2, 0($t4)"
+    #     CODE = instruction.encode('UTF-8')
+    #     CODE2 = instruction2.encode('UTF-8')
+    #     ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
 
-        ADDRESS = 0x0000
-        encoding, count = ks.asm(CODE, ADDRESS)
-        encoding2, count = ks.asm(CODE2, ADDRESS)
-        instructions = [encoding, encoding2]
-        inst = 2
-        n = 5
+    #     ADDRESS = 0x0000
+    #     encoding, count = ks.asm(CODE, ADDRESS)
+    #     encoding2, count = ks.asm(CODE2, ADDRESS)
+    #     instructions = [encoding, encoding2]
+    #     inst = 2
+    #     n = 5
 
 
-        stateData = runInstruction.runInstructions(panda, instructions, n, True)
-        self.assertIsInstance(stateData, StateData)
-        self.assertEqual(len(stateData.instructions), inst)
-        self.assertEqual(len(stateData.registerStateLists), inst)
-        lwStates = stateData.registerStateLists[0]
-        swStates = stateData.registerStateLists[1]
-        self.assertEqual(len(lwStates.memoryReads), n*24 + 1)
-        self.assertEqual(len(swStates.memoryWrites), n*24 + 1)
-        for read in lwStates.memoryReads[0]:
-            self.assertIsInstance(read, MemoryTransaction)
-        for write in lwStates.memoryWrites[0]:
-            self.assertIsInstance(write, MemoryTransaction)
+    #     stateData = runInstruction.runInstructions(panda, instructions, n, True)
+    #     self.assertIsInstance(stateData, StateData)
+    #     self.assertEqual(len(stateData.instructions), inst)
+    #     self.assertEqual(len(stateData.registerStateLists), inst)
+    #     lwStates = stateData.registerStateLists[0]
+    #     swStates = stateData.registerStateLists[1]
+    #     self.assertEqual(len(lwStates.memoryReads), n*24 + 1)
+    #     self.assertEqual(len(swStates.memoryWrites), n*24 + 1)
+    #     for read in lwStates.memoryReads[0]:
+    #         self.assertIsInstance(read, MemoryTransaction)
+    #     for write in lwStates.memoryWrites[0]:
+    #         self.assertIsInstance(write, MemoryTransaction)
 
 
 
