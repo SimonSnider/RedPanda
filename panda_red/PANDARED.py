@@ -18,10 +18,10 @@ Arguments:
 """
 
 import os
-from modules.runInstruction.instructionRunner import generateInstructionData
+from panda_red.run_instruction.instructionRunner import generateInstructionData
 #from modules.getCorrelations import correlationCalculator as CC 
-from modules.getCorrelations import correlationCalculatorMemory as MC
-from modules.generateInstruction import instructionGenerator as instructionGen
+from panda_red.get_correlations import correlationCalculatorMemory as MC
+from panda_red.generate_instruction import instructionGenerator as instructionGen
 from keystone.keystone import *
 import sys
 
@@ -144,13 +144,13 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     # Generate instructions or load them from a file
     #
     if outputModel == 0:
-        from modules.createOutput import matrixOutput as output
+        from panda_red.create_output import matrixOutput as output
     elif outputModel == 1:
-        from modules.createOutput import thresholdOutput as output
+        from panda_red.create_output import thresholdOutput as output
     #else:
         #from modules.createOutput import matrixOutput as output
 
-    instructionsFile = "modules/"+instructionsFile
+    instructionsFile = "panda_red/"+instructionsFile
 
     if mode == 0:
         # Instructions are generated randomly using the generateInstruction module
