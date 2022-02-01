@@ -170,8 +170,6 @@ def computeRegToRegCorrelations():
                 m[i][j] = 0
                 if i == j:
                     m[i][j] = 1
-            elif i == j and regList[i] in skippedMipsRegs:
-                m[i][j] = 1
             else:
                 m[i][j] = num/denom
     

@@ -127,7 +127,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         panda.end_analysis()
                         return 0
             
-                bitmask = int.to_bytes(1<<(31-nextReg), 4, 'big')
+                bitmask = int.to_bytes(1<<(nextReg), 4, 'big')
             regStateIndex += 1
         return 0
 
