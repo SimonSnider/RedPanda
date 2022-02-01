@@ -1,12 +1,12 @@
 import unittest
 
 from capstone import *
-from modules.runInstruction import runInstruction
-from modules.runInstruction.stateManager import *
+from panda_red.run_instruction import runInstruction
+from panda_red.run_instruction.stateManager import *
 from keystone import *
-from modules.generateInstruction import instructionGenerator
+from panda_red.generate_instruction import instructionGenerator
 import math
-from modules.models.stateData import *
+from panda_red.models.stateData import *
 
 panda = initializePanda()
 instGen = instructionGenerator.initialize()

@@ -1,4 +1,5 @@
 from pandare import Panda
+from pytest import skip
 from panda_red.run_instruction.stateManager import *
 from capstone import *
 from capstone.mips import *
@@ -20,21 +21,24 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0):
         then loads a jump instruction immediately after it to loop through that instruction.
         Sets the program counter to address
     """
+    jump_instr = b""
+    if (panda.arch_name == "mips"):
+        jump_instr = b"\x08\x00\x00\x00"
     panda.physical_memory_write(address, bytes(instruction))
-    panda.physical_memory_write(address + len(instruction), bytes(b"\x00\x00\x00\x00"))
     # create a jump instruction
-    jump = b"\x08\x00\x00\x00"
-    panda.physical_memory_write(address + 2*len(instruction), bytes(jump))
+    panda.physical_memory_write(address + len(instruction), bytes(jump_instr))
     
     cpu.env_ptr.active_tc.PC = address
     return
 
 def getNextValidBit(panda: Panda, regNum):
-    # 
+    skippedRegs = []
+    if (panda.arch_name == "mips"):
+        skippedRegs = skippedMipsRegs
     regs = list(panda.arch.registers.keys())
     count = 0
     for i in range(len(regs)):
-        if (regs[i] not in skippedMipsRegs):
+        if (regs[i] not in skippedRegs):
             if (count >= regNum):
                 return i
             else:
