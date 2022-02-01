@@ -1,4 +1,4 @@
-from modules.runInstruction.stateManager import *
+from panda_red.run_instruction.stateManager import *
 from pandare import Panda
 from capstone import *
 from capstone.mips import *
