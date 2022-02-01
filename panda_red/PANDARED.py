@@ -156,9 +156,13 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         # Instructions are generated randomly using the generateInstruction module
         instructionList = []
         instructionGenerator = instructionGen.initialize(arch)
-
+        if arch == "mips32":
+            from panda_red.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
+        else:
+            print("How did you get here?")
+            return
         for _ in range(numInstructions):
-            instructionList.append(instructionGen.generateInstruction(instructionGenerator))
+            instructionList.append(instructionGen.generateInstruction(instructionGenerator, fBMIPS))
     elif mode == 1:
         # Instructions are given in byte format in a text file
         instructionList = []

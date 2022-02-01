@@ -2,6 +2,8 @@ from panda_red.generate_instruction import verifierAdapter as verAdapt
 from panda_red.generate_instruction import bitGenerator as bitGen
 from panda_red.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
 
+
+
 def initialize(arch="mips32", littleEndian=False):
     """Initializes an architecture to generate instructions
 
@@ -12,9 +14,11 @@ def initialize(arch="mips32", littleEndian=False):
     Valid Arguments:
         mips32 -- Use the MIPS architecture
     """
+    # instructionGenerator = InstructionGenerator()
+    # instructionGenerator.verifier = verAdapt.initialize(arch, littleEndian)
     return verAdapt.initialize(arch, littleEndian)
 
-def generateInstruction(instructionGenerator, verbose=False):
+def generateInstruction(instructionGenerator, filterer, verbose=False):
     """Generates a single instruction in the currently selected ISA
     Instructions generated in this way are valid instructions for the current ISA 
     and are runnable on the currently tested Taint-Tracker system.
@@ -37,7 +41,7 @@ def generateInstruction(instructionGenerator, verbose=False):
             continue
 
         # Check if the instruction should be filtered out for the current implementation selection
-        if(not fBMIPS.filterInstruction(randomInstructionBytes)):
+        if(not filterer.filterInstruction(randomInstructionBytes)):
             continue
 
         break;
