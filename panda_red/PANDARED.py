@@ -17,6 +17,8 @@ Arguments:
             reg-coorelational -- calculate coorelation between register values before and after an instruction is run
 """
 
+import math
+import random
 import os
 from panda_red.run_instruction.instructionRunner import generateInstructionData
 #from modules.getCorrelations import correlationCalculator as CC 
@@ -24,7 +26,7 @@ from panda_red.get_correlations import correlationCalculatorMemory as MC
 from panda_red.generate_instruction import instructionGenerator as instructionGen
 from keystone.keystone import *
 import sys
-
+import argparse
 
 module_location = os.path.abspath(__file__)
 module_dir = os.path.dirname(module_location)
@@ -137,9 +139,9 @@ def runInputAndModel():
 
     runModel(arch, mode, instructionIterations, outputFileName, outputModel, instructionsFile, numInstructions, verbose)
 
-
-
-def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, instructionsFile = "", numInstructions = 1, verbose = 0, threshold = 0.5):
+def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, instructionsFile = "", numInstructions = 1, verbose = 0, threshold = 0.5, seed = random.randint(-214322, 1421535)):
+    print(seed)
+   
     #
     # Generate instructions or load them from a file
     #
@@ -149,8 +151,6 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         from panda_red.create_output import thresholdOutput as output
     #else:
         #from modules.createOutput import matrixOutput as output
-
-    instructionsFile = "panda_red/"+instructionsFile
 
     if mode == 0:
         # Instructions are generated randomly using the generateInstruction module
@@ -222,36 +222,68 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
 
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
 
-if len(sys.argv) > 1:
-    if sys.argv[1] == "-c":
-        # arguments list
-        arguments = []
+parser = argparse.ArgumentParser()
+parser.add_argument("-architecture", type=str, help="the instruction set architecture to generate and run instructions in", choices=["mips32"])
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-random_instructions", type=int, help="a number of random instructions to generate")
+group.add_argument("-bytes_file", type=str, help="path to a file with a list of byte-assembled instructions")
+group.add_argument("-instructions_file", type=str, help="path to a file with a list of unassembled instructions")
+parser.add_argument("-iterations", type=int, help="the number of times an instruction is randomly run for each register in the specified ISA")
+parser.add_argument("-analysis_model", type=int, help="the mathematical model used for analysis: 0 - reg-correlations, 1 - mem-reg-correlations", choices=[0, 1])
+parser.add_argument("-output_model", type=int, help="choose the model for output: 0 - matrix, 1 - threshold", choices=[0,1])
+parser.add_argument("-name", type=str, help="the name for the current run of the system, will become the name of the output file")
+parser.add_argument("-v", "--verbose", help="enable verbose mode for each system step", action="store_true")
+parser.add_argument("-i", "--intermediate", help="print a file containing the register contents of each run", action="store_true")
+parser.add_argument("-threshold", type=float, help="the correlation threshold for instructions to register as tainted")
+parser.add_argument("-seed", type=int, help="the seed to generate instructions with")
 
-        # Read file
-        fname = "debug.cfg"
-        debug_file = os.path.join(module_dir, fname)
-        with open(debug_file) as f:
-            lines = f.readlines()
-
-        # Parse file
-        for line in lines:
-            # Ignore comments and blank lines
-            if (line[0] == '#') or (len(line.rstrip('\n')) < 1):
-                continue;
-
-            arguments.append(line.rstrip('\n'))
-        print(len(arguments))
-        print("Read instruction arguments: \nArchitecture:", arguments[0], 
-            "\nInstruction Mode:", arguments[1], 
-            "\nInstruction Iterations:", arguments[2], 
-            "\nOutput File Name:", arguments[3],
-            "\nOutput Mode: ", arguments[4],
-            "\nOutput Threshold: ", arguments[5],  
-            "\nInstructions File:", arguments[6], 
-            "\nNumber of Instructions to Generate:", arguments[7],
-            "\nVerbose:", arguments[8]
-            )
-
-        runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], int(arguments[4]), arguments[6], int(arguments[7]), int(arguments[8]), float(arguments[5]))
+args = parser.parse_args()
+if(args.random_instructions):
+    mode = 0
+elif(args.bytes_file):
+    mode = 1
+elif(args.instructions_file):
+    mode = 2
 else:
-    runInputAndModel()
+    print("Must specify an instruction source")
+    quit()
+
+if(args.seed):
+    runModel(args.architecture, mode, args.iterations, args.name, args.output_model, args.instructions_file, args.random_instructions, args.verbose, args.threshold, args.seed)
+else:
+    runModel(args.architecture, mode, args.iterations, args.name, args.output_model, args.instructions_file, args.random_instructions, args.verbose, args.threshold)
+
+# if len(sys.argv) > 1:
+#     if sys.argv[1] == "-c":
+#         # arguments list
+#         arguments = []
+
+#         # Read file
+#         fname = "debug.cfg"
+#         debug_file = os.path.join(module_dir, fname)
+#         with open(debug_file) as f:
+#             lines = f.readlines()
+
+#         # Parse file
+#         for line in lines:
+#             # Ignore comments and blank lines
+#             if (line[0] == '#') or (len(line.rstrip('\n')) < 1):
+#                 continue;
+
+#             arguments.append(line.rstrip('\n'))
+#         print(len(arguments))
+#         print("Read instruction arguments: \nArchitecture:", arguments[0], 
+#             "\nInstruction Mode:", arguments[1], 
+#             "\nInstruction Iterations:", arguments[2], 
+#             "\nOutput File Name:", arguments[3],
+#             "\nOutput Mode: ", arguments[4],
+#             "\nOutput Threshold: ", arguments[5],  
+#             "\nInstructions File:", arguments[6], 
+#             "\nNumber of Instructions to Generate:", arguments[7],
+#             "\nVerbose:", arguments[8]
+#             )
+
+#         runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], int(arguments[4]), arguments[6], int(arguments[7]), int(arguments[8]), float(arguments[5]))
+# else:
+#     runInputAndModel()
+
