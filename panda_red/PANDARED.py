@@ -152,8 +152,6 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     #else:
         #from modules.createOutput import matrixOutput as output
 
-    # instructionsFile = "modules/"+instructionsFile
-
     if mode == 0:
         # Instructions are generated randomly using the generateInstruction module
         instructionList = []

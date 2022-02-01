@@ -1,11 +1,18 @@
+"""
+This file takes in data describing register values, memory values, and memory locations of 
+reads and writes before and after each instruction is run. It outputs which values are most
+likely to be related given a particular threshold. For more details, see our mathematical model.
+"""
+
 from panda_red.models.stateData import *
 from panda_red.models.correlations import *
 
 n = 24 #number of registers about which we care
-iterPerRegister = 100
-I = n*iterPerRegister
+iterPerRegister = 100 # iterations run per set of registers randomized
+I = n*iterPerRegister # total number of iterations run
 Bs = -1 #B_i
-thresh = 0.5
+thresh = 0.5 # minimum correlation coefficient required for two elements to be considered correlated
+# later, users will have the option to compute the threshold given a p-value
 
 regs = IntermediateData()
 memReadVals = IntermediateData()
@@ -13,6 +20,7 @@ memReadAddrs = IntermediateData()
 memWriteVals = IntermediateData()
 memWriteAddrs = IntermediateData()
 
+# regList is overwritten; its value is left in for reference by developers
 regList = ["ZERO", "AT", "V0", "V1", "A0", "A1", "A2", "A3", "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "T8", "T9", "K0", "K1", "GP", "SP", "FP", "RA"]
 
 def setArch(archType, testV=0):
@@ -39,8 +47,9 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     """ Initializes the correlation calculator with the data from running an instruction multiple times
 
     Arguments:
-    dataList -- the RegisterStates from the run instruction module. ]
+    dataList -- the RegisterStates from the run instruction module.
     iterPerReg -- number of times each combination of changed registers is ran (default = 100)
+    threshold -- the minimum computed correlation coefficient for two elements (registers, memory location, memory value) to be considered correlated
 
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
@@ -121,24 +130,54 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     for ls in memReadVals.inputs:
         lengthen(ls, maxLengthReads)
 
-
 def lengthen(ls, length):
+    """
+    ls -- a list with at most length elements
+    length -- an integer
+
+    The function adds -1's to ls until it has length elements. This lengthening
+    allows us to assume that lists describing reads or writes have the same length.
+    """
     remaining = length - len(ls)
     while remaining > 0:
         ls.append(-1)
         remaining -= 1
 
 def calcAreValuesUnequal(v1, v2):
+    """
+    v1, v2 -- integer representations of values in memory
+
+    The function outputs 1 if the values differ and 0 otherwise. 
+    """
     if(v1 != v2):
         return 1
     return 0
         
 def getBitVals(bitmask, bitVal):
+    """
+    bitmask -- a string of bits with one bit for each register that describes which
+        registers were randomized in a particular iteration of a particular instruction
+    bitval -- an index describing the location of the bit describing the register in question
+
+    The function outputs the value of the bit in the bitmask that corresponds to bitVal
+    """
     if(int.from_bytes(bitmask, 'big') & (1 << bitVal) == 0):
         return 0
     return 1
 
 def computeMemPs(listLength, initialList, newLists, ps):
+    """
+    listLength -- the maximal length of any list of read (or write) descriptions
+        In MIPS, this value will always be one or zero.
+    initialList -- initial values of reads (or writes) of an instruction before a small
+        subset of registers is randomized.
+    newLists -- lists of values of reads (or writes) of after execution of an instruction
+        for which a small subset of registers is randomized
+    ps -- A list for output
+
+    This function computes the portion of our p-vector in our math model that deals with memory.
+    For more details, see our mathematical model.
+    """
     global I
     for iter in range(I):
         newList = [0]*listLength
@@ -147,6 +186,13 @@ def computeMemPs(listLength, initialList, newLists, ps):
         ps[iter] = newList
 
 def computeRegToRegCorrelations():
+    """
+    This function computes the correlations between the values of registers before
+    instructions are executed to their values after execution utilizing a
+    predetermined scheme of randomizing in which, currently, one register is 
+    randomized per iteration.
+    For more details, see our mathematical model.
+    """
     global iterPerRegister, Bs, n, regList, I, regs
     for iter in range(I):
         newDict = {}
@@ -175,6 +221,10 @@ def computeRegToRegCorrelations():
     return m
     
 def computeRegToReadAddrCorrelations():
+    """
+    This function is another component of our math model. It analyzes how values in registers
+    are correlated with the addresses from which values are read.
+    """
     global memReadAddrs, n, I, Bs
     computeMemPs(len(memReadAddrs.initialOutput), memReadAddrs.initialOutput, memReadAddrs.outputs, memReadAddrs.ps)
     
@@ -195,6 +245,10 @@ def computeRegToReadAddrCorrelations():
     return m
     
 def computeRegToWriteAddrCorrelations():
+    """
+    This function is a component of our math model. It analyzes how values in registers
+    are correlated with the addresses into which values are written
+    """
     global memWriteAddrs, n, I, Bs
     computeMemPs(len(memWriteAddrs.initialOutput), memWriteAddrs.initialOutput, memWriteAddrs.outputs, memWriteAddrs.ps)
     
@@ -215,6 +269,10 @@ def computeRegToWriteAddrCorrelations():
     return m
     
 def computeRegToReadValCorrelations():
+    """
+    This function is a component of our math model. It analyzes how values in regsiters
+    are correlated with the values read out of memory.
+    """
     global memReadVals, n, I, Bs
     computeMemPs(len(memReadVals.initialInput), memReadVals.initialInput, memReadVals.inputs, memReadVals.ps)
     
@@ -235,6 +293,10 @@ def computeRegToReadValCorrelations():
     return m
     
 def computeRegToWriteValCorrelations():
+    """
+    This function is a component of our math model. It analyzes how values in registers
+    are correlated with the values written into memory.
+    """
     global memWriteVals, n, I, Bs
     computeMemPs(len(memWriteVals.initialOutput), memWriteVals.initialOutput, memWriteVals.outputs, memWriteVals.ps)
     
@@ -258,7 +320,7 @@ def computeRegToWriteValCorrelations():
 def computeCorrelations():
     """Calculates the correlation value for each pair of registers. Must call initialize before this.
     Return Value:
-    M -- n x m list where M[i][j] is the correlation of register i on register/memory access j
+    M -- n x m list where M[i][j] represents the correlation of register i on register/memory access j
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
     M = Correlations()

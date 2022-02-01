@@ -20,3 +20,4 @@ class MemoryTransaction:
     value: int
     address: int
     size: int
+
