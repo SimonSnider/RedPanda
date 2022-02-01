@@ -14,8 +14,6 @@ def initialize(arch="mips32", littleEndian=False):
     Valid Arguments:
         mips32 -- Use the MIPS architecture
     """
-    # instructionGenerator = InstructionGenerator()
-    # instructionGenerator.verifier = verAdapt.initialize(arch, littleEndian)
     return verAdapt.initialize(arch, littleEndian)
 
 def generateInstruction(instructionGenerator, filterer, verbose=False):
