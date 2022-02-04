@@ -5,6 +5,7 @@ from random import randint, seed
 from pandare.arch import PandaArch
 from pandare.panda import Panda
 from panda_red.generate_instruction.bitGenerator import *
+from pandare.panda.plugins.taint2 import *
 import math
 
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
@@ -57,7 +58,7 @@ def generateRandomMemoryValues(minValue = -(2**(31)), maxValue = (2**31) - 1):
     """
     return generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
 
-def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff', minValue = -(2**(31)), maxValue = (2**31) - 1):
+def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff', minValue = -(2**(31)), maxValue = (2**31) - 1, bool: taintRegs = False):
     """
     Arguments:
         panda -- the instance of panda that will have its registers randomized
@@ -73,6 +74,8 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
             if (regname in skippedMipsRegs or not getBit(regBitMask, reg)): continue
             num = generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
             panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
+            if (taintRegs):
+            	taint2_label_reg_additive(reg, 0, reg)
     return
 
 def setRegisters(panda: Panda, cpu, registerSate: dict):
