@@ -58,7 +58,8 @@ def generateRandomMemoryValues(minValue = -(2**(31)), maxValue = (2**31) - 1):
     """
     return generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
 
-def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff', minValue = -(2**(31)), maxValue = (2**31) - 1, bool: taintRegs = False):
+def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff',
+                       minValue = -(2**(31)), maxValue = (2**31) - 1, taintRegs: bool = False):
     """
     Arguments:
         panda -- the instance of panda that will have its registers randomized
@@ -75,7 +76,12 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
             num = generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
             panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
             if (taintRegs):
-            	taint2_label_reg_additive(reg, 0, reg)
+                # TODO:
+                # next statement is probably a C function only. replace with taint_label_reg(self, reg_num, label)
+                # include also panda.taint_enable()
+                panda.taint_enable()
+                panda.taint_label_reg(reg, 0, reg)
+            	# taint2_label_reg_additive(reg, 0, reg)
     return
 
 def setRegisters(panda: Panda, cpu, registerSate: dict):

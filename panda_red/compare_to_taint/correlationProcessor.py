@@ -87,7 +87,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             if (verbose): print("tainting registers before execution")
             
             # Randomize the registers specified by the bitmask to be a value between lowerBound and upperBound
-            randomizeRegisters(panda, cpu, minValue = lowerBound, maxValue = upperBound)
+            randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound, taintRegs=True)
 
         if (verbose):
             # Display the instruction that is about to be executed
