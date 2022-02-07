@@ -26,6 +26,8 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0):
     jump_instr = b""
     if (panda.arch_name == "mips"):
         jump_instr = b"\x08\x00\x00\x00"
+    elif (panda.arch_name == "x86_64"):
+        jump_instr = b"\xE9\x00\x00\x00\x00"
     panda.physical_memory_write(address, bytes(instruction))
     
     panda.physical_memory_write(address + len(instruction), bytes(jump_instr))
@@ -74,10 +76,14 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     regBoundsCount = 0
     upperBound = 2**(31) - 1
     lowerBound = -(2**31)
-    bitmask = b'\x00\x00\x00\x00'
-    md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
+    bitmask = b'\0'*len(panda.arch.registers)
     initialState = {}
     memoryStructure = dict()
+
+    if (panda.arch_name == "mips"):
+        md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
+    elif (panda.arch_name == "x86_64"):
+        md = Cs(CS_ARCH_X86, CS_MODE_64+ CS_MODE_BIG_ENDIAN)
 
      # This callback handles all of the initial setup of panda before it begins executing instructions
     @panda.cb_after_machine_init
@@ -143,7 +149,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
         nonlocal regStateIndex, instIndex, bitmask, registerStateList, regBoundsCount
-        if (pc == 4):
+        if (pc == ADDRESS + len(instructions[instIndex])):
 
             # Save the register state after executing the instruction
             if (verbose): print("saving reg state after run", regStateIndex)

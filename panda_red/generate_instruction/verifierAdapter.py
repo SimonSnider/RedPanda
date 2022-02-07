@@ -16,6 +16,9 @@ def initialize(arch, littleEndian=False):
     if(arch == "mips32"):
         verifier.arch = CS_ARCH_MIPS
         verifier.mode = CS_MODE_MIPS32
+    elif (arch == "x86_64"):
+        verifier.arch = CS_ARCH_X86
+        verifier.mode = CS_MODE_64
     else:
         raise ValueError("Verifier architecture selection invalid. Maybe it is not implemented?", arch)
 
