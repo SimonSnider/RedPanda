@@ -86,7 +86,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         if (pc == ADDRESS):
             if (verbose): print("tainting registers before execution")
             
-            # Randomize the registers specified by the bitmask to be a value between lowerBound and upperBound
+            # Randomize the registers to a value between lowerBound and upperBound
             randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound, taintRegs=True)
 
         if (verbose):
@@ -130,7 +130,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         # TODO: double check regBounds reduction rate
         upperBound = 2**(31 - math.floor(regBoundsCount/6)) - 1
         lowerBound = -(2**(31 - math.floor(regBoundsCount/6)))
-        randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound)
+        randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound) # retaint registers???
         panda.arch.set_pc(cpu, ADDRESS)
         return -1
 

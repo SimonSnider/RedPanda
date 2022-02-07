@@ -17,6 +17,8 @@ def initializePanda(architecture="mips"):
     Outputs: 
         Returns an instance of panda with the specified architecture
     """
+
+
     
     # TODO: Change "mips32" in the rest of the code to "mips"
     arch = architecture
@@ -25,6 +27,7 @@ def initializePanda(architecture="mips"):
     panda = Panda(arch,
         extra_args=["-M", "configurable", "-nographic"],
         raw_monitor=True)
+    panda.taint_enable()
     return panda
 
 def setRandomSeed(random_seed):
@@ -76,10 +79,6 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
             num = generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
             panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
             if (taintRegs):
-                # TODO:
-                # next statement is probably a C function only. replace with taint_label_reg(self, reg_num, label)
-                # include also panda.taint_enable()
-                panda.taint_enable()
                 panda.taint_label_reg(reg, 0, reg)
             	# taint2_label_reg_additive(reg, 0, reg)
     return
