@@ -8,7 +8,7 @@ from panda_red.generate_instruction.bitGenerator import *
 import math
 
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
-skippedX86Regs = []
+skippedX86Regs = ['RSP', 'RBP']
 
 def initializePanda(architecture="mips"):
     """
@@ -68,12 +68,17 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
         for registers 1 through n, if the nth bit in the regBitMask is 1, sets the nth register to a random value.
         Will not randomize register necessary for hardware execution, such as ZERO, Stack Pointers, Kernel registers, Return Addresses, Etc.
     """
+    
     if (panda.arch_name == "mips"):
         regSize = 4
         skippedRegs = skippedMipsRegs
     elif (panda.arch_name == "x86_64"):
         regSize = 8
         skippedRegs = skippedX86Regs
+    else:
+        regSize = 4
+        skippedRegs = []
+
     if (panda.arch_name == "mips"):
         # skippedRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
         for (regname, reg) in panda.arch.registers.items():
