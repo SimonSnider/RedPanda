@@ -7,6 +7,7 @@ Arguments:
         arg2 -- arch -- specifies the architecture for which the system is run (default = MIPS32)
         Valid Arguments:
             mips32 -- Use the MIPS architecture
+            x86_64 -- Use the x86_64 architecture
 
         arg3 -- instructionTotal -- specifies the total number of random instructions to generate data for (default = 1)
 
@@ -44,6 +45,7 @@ def runInputAndModel():
     print("Specify an architecture (default = 0)")
     print("Supported Architectures")
     print("    0 - mips32")
+    print("    1 - x86_64")
     try:
         arch = int(input() or 0)
     except ValueError:
@@ -226,7 +228,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     #
     # Generate coorelation data from the instruction results
     #
-    MC.setArch("mips32")
+    MC.setArch(arch)
     analyzedData = []
     
     for i in range(numInstructions):
@@ -237,7 +239,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-architecture", type=str, help="the instruction set architecture to generate and run instructions in", choices=["mips32"])
+parser.add_argument("-architecture", type=str, help="the instruction set architecture to generate and run instructions in", choices=["mips32", "x86_64"])
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-random_instructions", type=int, help="a number of random instructions to generate")
 group.add_argument("-bytes_file", type=str, help="path to a file with a list of byte-assembled instructions")
