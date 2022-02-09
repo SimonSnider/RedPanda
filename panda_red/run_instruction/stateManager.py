@@ -80,7 +80,6 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
             panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
             if (taintRegs):
                 panda.taint_label_reg(reg, 0, reg)
-            	# taint2_label_reg_additive(reg, 0, reg)
     return
 
 def setRegisters(panda: Panda, cpu, registerSate: dict):

@@ -138,4 +138,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
-    return
+    model = {}
+    for (regname, reg) in panda.arch.registers.items():
+        # list of TaintQuery objects
+        model[(regname, reg)] = panda.taint_get_reg(reg).get_labels()
+    return model
