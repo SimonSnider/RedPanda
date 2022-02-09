@@ -4,7 +4,29 @@
 The PANDA Instruction Taint Analysis System (PANDA-RED) can be installed and run under default settings by following the instructions below.
 
 ## Installation
-### Requirements
+### Running with Dockerfile
+* Ubuntu 20.04 or above
+* docker
+
+Additionally, the latest docker image for both pandare and python. Use the following commands to get them:
+```
+docker pull pandare/panda
+docker pull python
+```
+
+In the repository, there is a Dockerfile that uses these images to build the dependencies needed for Red PANDA. Building and running a shell in the Dockerfile may require root privledges but will allow you to run Red PANDA:
+
+```
+docker build -t image .
+docker run -it image bash
+```
+
+Then you should be able to successfully run:
+```
+python3 panda_red/PANDARED.py <arguments>
+```
+
+### Non-Dockerfile Requirements
 * Ubuntu 20.04
 * Python 3.7 or above
 
@@ -13,7 +35,6 @@ Close the git repository and navigate to the parent folder of the project. Then 
 pip install .
 ```
 This installs the current version of RED to your python3 environment.
-
 
 ## Running
 ### Default Mode
