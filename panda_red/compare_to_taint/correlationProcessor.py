@@ -25,9 +25,9 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0):
     jump_instr = b""
     if (panda.arch_name == "mips"):
         jump_instr = b"\x08\x00\x00\x00"
-    
     adr = address
     for instruction in instructions:
+        print(instruction)
         panda.physical_memory_write(adr, bytes(instruction))
         adr += len(bytes(instruction))
     
@@ -68,19 +68,33 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     Outputs:
         returns a StateData object containing the instructions run and the program state data for each
     """
+    print("begin run instructions")
     ADDRESS = 0
     iters = 0
     regBoundsCount = 0
     upperBound = 2**(31) - 1
     lowerBound = -(2**31)
     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
+    stopaddress = 0
 
-    STOPADDRESS = loadInstructions(panda, panda.get_cpu(), instructions, ADDRESS)
+    # This callback handles all of the initial setup of panda before it begins executing instructions
+    @panda.cb_after_machine_init
+    def setup(cpu):
+        nonlocal stopaddress
+        # Initialize memory and load the first instruction in to initialize the emulation loop
+        initializeMemory(panda, "mymem", address=ADDRESS)
+        stopaddress = loadInstructions(panda, cpu, instructions, ADDRESS)
+
+
+        # Generate the initial state before instruction execution
+        if (verbose): print("setup done")
+
+
 
     # This callback executes before each instruction is executed, it handles randomizing the registers and saving the before states
     @panda.cb_insn_exec
     def randomRegState(cpu, pc):
-
+        print("randomize register state")
         # Check if the panda is about to execute the instruction that is being tested. 
         # The register state only needs randomized before that instruction
         if (pc == ADDRESS):
@@ -106,6 +120,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
+        print("after insn exec")
         nonlocal regBoundsCount, iters
 
         if (pc >= STOPADDRESS):

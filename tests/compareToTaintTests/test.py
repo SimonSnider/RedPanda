@@ -21,7 +21,6 @@ def testModelCollection():
     # instructions = [encoding, encoding2]
     instructions = [encoding]
     n = 5
-
     pandaModel = runInstructions(panda, instructions, n, True)
     print(pandaModel)
 
