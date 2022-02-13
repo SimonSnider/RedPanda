@@ -1,5 +1,5 @@
 from pandare import Panda
-from pytest import skip
+#from pytest import skip
 from capstone import *
 from capstone.mips import *
 import math
@@ -120,6 +120,11 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     def translateAll(env, pc):
         return True
 
+    @panda.cb_after_block_exec
+    def getTaint(_, _, exitCode):
+        for (regname, reg) in panda.arch.registers.items():
+            print(panda.taint_get_reg(reg))
+    
     # This callback executes after each instruction execution. It handles saving the after register state and 
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
@@ -128,9 +133,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
         if (pc >= stopaddress):
             global model
-            for (regname, reg) in panda.arch.registers.items():
+            #for (regname, reg) in panda.arch.registers.items():
                 # for reg2 in panda.taint_get_reg(reg)
-                print(panda.taint_get_reg(reg))
+                #print(panda.taint_get_reg(reg))
             if (iters >= n-1):
                 panda.end_analysis()
             iters += 1
