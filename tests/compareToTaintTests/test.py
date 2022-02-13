@@ -9,7 +9,7 @@ from panda_red.models.stateData import *
 panda = initializePanda()
 
 def testModelCollection():
-    instruction = "add $t1, $t2, $t3"
+    instruction = "add $t1, $t2, $zero"
     # instruction2 = "sw $t2, 0($t4)"
     CODE = instruction.encode('UTF-8')
     # CODE2 = instruction2.encode('UTF-8')

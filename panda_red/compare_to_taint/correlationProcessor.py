@@ -6,6 +6,8 @@ import math
 import copy
 from panda_red.run_instruction.stateManager import *
 
+model = {}
+first = True
 
 # TODO: change to load all instructions at once
 def loadInstructions(panda: Panda, cpu, instructions, address=0):
@@ -20,7 +22,8 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0):
         then loads a jump instruction immediately after it to loop through that instruction.
         Sets the program counter to address
     """
-
+    for (regname, reg) in panda.arch.registers.items():
+        model[(regname, reg)] = [0]*len(panda.arch.registers.items())
     # get the appropriate jump instruction encoding for the architecture
     jump_instr = b""
     if (panda.arch_name == "mips"):
@@ -68,7 +71,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     Outputs:
         returns a StateData object containing the instructions run and the program state data for each
     """
-    print("begin run instructions")
     ADDRESS = 0
     iters = 0
     regBoundsCount = 0
@@ -83,6 +85,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         nonlocal stopaddress
         # Initialize memory and load the first instruction in to initialize the emulation loop
         initializeMemory(panda, "mymem", address=ADDRESS)
+        panda.taint_enable()
         stopaddress = loadInstructions(panda, cpu, instructions, ADDRESS)
 
 
@@ -99,9 +102,10 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         # The register state only needs randomized before that instruction
         if (pc == ADDRESS):
             if (verbose): print("tainting registers before execution")
-            
+            global first
             # Randomize the registers to a value between lowerBound and upperBound
-            randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound, taintRegs=True)
+            randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound, taintRegs=first)
+            first = False
 
         if (verbose):
             # Display the instruction that is about to be executed
@@ -120,11 +124,13 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
-        print("after insn exec")
         nonlocal regBoundsCount, iters
 
-        if (pc >= STOPADDRESS):
-            
+        if (pc >= stopaddress):
+            global model
+            for (regname, reg) in panda.arch.registers.items():
+                # for reg2 in panda.taint_get_reg(reg)
+                print(panda.taint_get_reg(reg))
             if (iters >= n-1):
                 panda.end_analysis()
             iters += 1
@@ -154,7 +160,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
     model = {}
-    for (regname, reg) in panda.arch.registers.items():
+    # for (regname, reg) in panda.arch.registers.items():
         # list of TaintQuery objects
-        model[(regname, reg)] = panda.taint_get_reg(reg).get_labels()
+        # model[(regname, reg)] = panda.taint_get_reg(reg).get_labels()
+        # print(panda.taint_check_reg(reg))
     return model

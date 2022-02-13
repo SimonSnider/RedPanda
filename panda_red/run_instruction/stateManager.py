@@ -26,7 +26,7 @@ def initializePanda(architecture="mips"):
     panda = Panda(arch,
         extra_args=["-M", "configurable", "-nographic"],
         raw_monitor=True)
-    panda.taint_enable()
+    # panda.taint_enable()
     return panda
 
 def setRandomSeed(random_seed):
@@ -78,7 +78,8 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
             num = generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
             panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
             if (taintRegs):
-                panda.taint_label_reg(reg, 0, reg)
+                print("tainting "+str(reg))
+                panda.taint_label_reg(reg, reg)
     return
 
 def setRegisters(panda: Panda, cpu, registerSate: dict):
