@@ -16,17 +16,19 @@ def initialize(arch, littleEndian=False):
     if(arch == "mips32"):
         verifier.arch = CS_ARCH_MIPS
         verifier.mode = CS_MODE_MIPS32
+        verifier.disassembler = Cs(verifier.arch, 
+                               verifier.mode + 
+                                    (not not littleEndian) * CS_MODE_LITTLE_ENDIAN + # 1 * CS_MODE_LITTLE_ENDIAN if littleEndian is true - 0 otherwise
+                                    (not littleEndian) * CS_MODE_BIG_ENDIAN)         # 1 * CS_MODE_BIG_ENDIAN if littleEndian is false - 0 otherwise
     elif (arch == "x86_64"):
         verifier.arch = CS_ARCH_X86
         verifier.mode = CS_MODE_64
+        verifier.disassembler = Cs(verifier.arch, verifier.mode)
     else:
         raise ValueError("Verifier architecture selection invalid. Maybe it is not implemented?", arch)
 
     # Instantiate Dissassembler in either little endian or big endian mode
-    verifier.disassembler = Cs(verifier.arch, 
-                               verifier.mode + 
-                                    (not not littleEndian) * CS_MODE_LITTLE_ENDIAN + # 1 * CS_MODE_LITTLE_ENDIAN if littleEndian is true - 0 otherwise
-                                    (not littleEndian) * CS_MODE_BIG_ENDIAN)         # 1 * CS_MODE_BIG_ENDIAN if littleEndian is false - 0 otherwise
+    
     verifier.disassembler.detail = True
 
     # return the new verifier object

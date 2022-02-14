@@ -13,7 +13,7 @@ skippedX86Regs = ['RSP', 'RBP']
 def initializePanda(architecture="mips"):
     """
     Arguments:
-        architecture -- the architecture that panda will be set up to emulate. Supported architectures: "mips"
+        architecture -- the architecture that panda will be set up to emulate. Supported architectures: "mips", "x86_84"
     Outputs: 
         Returns an instance of panda with the specified architecture
     """
@@ -79,12 +79,11 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
         regSize = 4
         skippedRegs = []
 
-    if (panda.arch_name == "mips"):
-        # skippedRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
-        for (regname, reg) in panda.arch.registers.items():
-            if (regname in skippedRegs or not getBit(regBitMask, reg)): continue
-            num = generateRandomBytes(regSize, minValue=minValue, maxValue=maxValue)
-            panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
+
+    for (regname, reg) in panda.arch.registers.items():
+        if (regname in skippedRegs or not getBit(regBitMask, reg)): continue
+        num = generateRandomBytes(regSize, minValue=minValue, maxValue=maxValue)
+        panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
     return
 
 def setRegisters(panda: Panda, cpu, registerSate: dict):

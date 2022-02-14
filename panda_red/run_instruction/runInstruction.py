@@ -6,6 +6,7 @@ from capstone.mips import *
 import math
 from panda_red.generate_instruction.bitGenerator import *
 from panda_red.models.stateData import *
+import keystone
 import copy
 
 
@@ -23,16 +24,21 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0):
     """
 
     # get the appropriate jump instruction encoding for the architecture
+
     jump_instr = b""
     if (panda.arch_name == "mips"):
         jump_instr = b"\x08\x00\x00\x00"
+        panda.physical_memory_write(address, bytes(instruction))
+        panda.physical_memory_write(address + len(instruction), bytes(jump_instr))
     elif (panda.arch_name == "x86_64"):
-        jump_instr = b"\xE9\x00\x00\x00\x00"
-    panda.physical_memory_write(address, bytes(instruction))
+        ks = keystone.Ks(keystone.KS_ARCH_X86, keystone.KS_MODE_64)
+        jmpInstr = "JMP -" + str(len(instruction))
+        jump_instr, count = ks.asm(jmpInstr.encode("UTF-8"), address)
+        panda.physical_memory_write(address, bytes(instruction))
+        panda.physical_memory_write(address + len(instruction), bytes(jump_instr))
     
-    panda.physical_memory_write(address + len(instruction), bytes(jump_instr))
     
-    cpu.env_ptr.active_tc.PC = address
+    panda.arch.set_pc(cpu, address)
     return
 
 def getNextValidReg(panda: Panda, regNum):
@@ -76,14 +82,15 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     regBoundsCount = 0
     upperBound = 2**(31) - 1
     lowerBound = -(2**31)
-    bitmask = b'\0'*len(panda.arch.registers)
+    numRegs = len(panda.arch.registers)
+    bitmask = b'\0'*(math.ceil(numRegs/8))
     initialState = {}
     memoryStructure = dict()
 
     if (panda.arch_name == "mips"):
         md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
     elif (panda.arch_name == "x86_64"):
-        md = Cs(CS_ARCH_X86, CS_MODE_64+ CS_MODE_BIG_ENDIAN)
+        md = Cs(CS_ARCH_X86, CS_MODE_64)
 
      # This callback handles all of the initial setup of panda before it begins executing instructions
     @panda.cb_after_machine_init
@@ -183,7 +190,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         # Reset nonlocal variables for beginning of next instruction emulation
                         registerStateList = RegisterStateList()
                         regStateIndex = 0
-                        bitmask = b'\x00\x00\x00\x00'
+                        bitmask = b'\0'*(math.ceil(numRegs/8))
                         return 0
                     else:
 
@@ -194,7 +201,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         return 0
             
                 # Update the bitmask to randomize the next valid register
-                bitmask = int.to_bytes(1<<(31-nextReg), 4, 'big')
+                bitmask = int.to_bytes(1<<(numRegs-1-nextReg), (math.ceil(numRegs/8)), 'big')
             regStateIndex += 1
         return 0
 

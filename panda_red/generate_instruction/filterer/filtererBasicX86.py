@@ -16,7 +16,7 @@ def filterInstruction(instruction, verbose=False):
         Returns false otherwise
     """
 
-    md = Cs(CS_ARCH_X86, CS_MODE_64 + CS_MODE_BIG_ENDIAN)
+    md = Cs(CS_ARCH_X86, CS_MODE_64)
     md.detail = True
 
     for insn in md.disasm(instruction, 0x1000):
