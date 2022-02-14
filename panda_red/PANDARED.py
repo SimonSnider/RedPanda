@@ -195,7 +195,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         if (arch == "mips32"):
             KS = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
         elif (arch == "x86_64"):
-            KS = Ks(KS_ARCH_X86,KS_MODE_64 + KS_MODE_BIG_ENDIAN)
+            KS = Ks(KS_ARCH_X86,KS_MODE_64)
         else:
             print("How did you get here?")
             return
