@@ -120,8 +120,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     def translateAll(env, pc):
         return True
 
+    #This callback executes before/in between every block of instructions
     @panda.cb_after_block_exec
-    def getTaint(_, _, exitCode):
+    def getTaint(arg1, arg2, exitCode):
         for (regname, reg) in panda.arch.registers.items():
             print(panda.taint_get_reg(reg))
     
