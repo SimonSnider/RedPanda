@@ -21,5 +21,6 @@ def taint(cpu, pc):
         print("tainting "+str(reg)+" "+regname)
         panda.taint_label_reg(reg, reg)
         print(panda.taint_get_reg(reg))
+    panda.end_analysis()
             
 panda.run()
