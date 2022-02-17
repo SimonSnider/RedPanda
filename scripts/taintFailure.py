@@ -19,11 +19,10 @@ def setup(cpu):
 @panda.cb_insn_exec
 def randomRegState(cpu, pc):
     skippedRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
-    print('p')
     for (regname, reg) in panda.arch.registers.items():
         # if (regname in skippedRegs): continue
         panda.arch.set_reg(cpu, regname, reg)
-        print("tainting "+str(reg)+" "+regname)
+        print("tainting reg "+str(reg)+" ("+regname+")")
         panda.taint_label_reg(reg, reg)
         print(panda.taint_get_reg(reg))
 
@@ -31,8 +30,8 @@ def randomRegState(cpu, pc):
 @panda.cb_after_insn_exec
 def end(cpu, pc):
     if pc > 4:
-        for (regname, reg) in panda.arch.registers.items():
-            print(panda.taint_get_reg(reg))
+        # for (regname, reg) in panda.arch.registers.items():
+        #     print(panda.taint_get_reg(reg))
         panda.end_analysis()
     return 0
 
@@ -42,5 +41,9 @@ def end(cpu, pc):
 def translateAll(env, pc):
     return True
 
+
+@panda.cb_insn_translate
+def translateAllAgain(env, pc):
+    return True
 
 panda.run()
