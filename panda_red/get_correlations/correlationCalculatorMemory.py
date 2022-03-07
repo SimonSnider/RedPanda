@@ -40,7 +40,8 @@ def setArch(archType, testV=0):
         n = 32
     elif archType.lower() == "test":
         n = testV
-
+    elif archType.lower() == 'x86':
+        n = 16
 
 def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5):
 
@@ -53,6 +54,7 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
 
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
+
     thresh = threshold
     
     iterPerRegister = iterPerReg
@@ -70,6 +72,7 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     memWriteVals.ps = [0]*I
 
     regList = list(regs.inputs[0])
+    n = len(regList)
     memReads0 = []
     memReadVals0 = []
     memWrites0 = []
