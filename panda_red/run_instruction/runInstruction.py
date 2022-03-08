@@ -54,6 +54,8 @@ def getNextValidReg(panda: Panda, regNum):
     skippedRegs = []
     if (panda.arch_name == "mips"):
         skippedRegs = skippedMipsRegs
+    elif (panda.arch_name == "x86_64"):
+    	skippedRegs = skippedX86Regs
     regs = list(panda.arch.registers.keys())
     count = 0
     for i in range(len(regs)):
@@ -201,7 +203,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         return 0
             
                 # Update the bitmask to randomize the next valid register
-                bitmask = int.to_bytes(1<<(numRegs-1-nextReg), (math.ceil(numRegs/8)), 'big')
+                bitmask = int.to_bytes(1<<(nextReg), (math.ceil(numRegs/8)), 'big')
             regStateIndex += 1
         return 0
 

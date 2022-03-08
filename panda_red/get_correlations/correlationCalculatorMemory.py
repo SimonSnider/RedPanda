@@ -72,6 +72,7 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     memWriteVals.ps = [0]*I
 
     regList = list(regs.inputs[0])
+    #print(regList)
     n = len(regList)
     memReads0 = []
     memReadVals0 = []
