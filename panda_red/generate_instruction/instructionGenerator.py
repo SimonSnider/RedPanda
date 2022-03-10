@@ -13,6 +13,7 @@ def initialize(arch="mips32", littleEndian=False):
 
     Valid Arguments:
         mips32 -- Use the MIPS architecture
+        x86_64 -- Use the x86_64 architecture
     """
     return verAdapt.initialize(arch, littleEndian)
 

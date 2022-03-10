@@ -7,6 +7,7 @@ Arguments:
         arg2 -- arch -- specifies the architecture for which the system is run (default = MIPS32)
         Valid Arguments:
             mips32 -- Use the MIPS architecture
+            x86_64 -- Use the x86_64 architecture
 
         arg3 -- instructionTotal -- specifies the total number of random instructions to generate data for (default = 1)
 
@@ -44,6 +45,7 @@ def runInputAndModel():
     print("Specify an architecture (default = 0)")
     print("Supported Architectures")
     print("    0 - mips32")
+    print("    1 - x86_64")
     try:
         arch = int(input() or 0)
     except ValueError:
@@ -52,6 +54,8 @@ def runInputAndModel():
 
     if arch == 0:
         arch = 'mips32'
+    elif arch == 1:
+        arch = "x86_64"
     else:
         print("Architecture not within supported range. Please enter a supported architecture value.")
         return
@@ -157,12 +161,14 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         instructionList = []
         instructionGenerator = instructionGen.initialize(arch)
         if arch == "mips32":
-            from panda_red.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
+            from panda_red.generate_instruction.filterer import filtererBasicMIPS as filter
+        elif arch == "x86_64":
+            from panda_red.generate_instruction.filterer import filtererBasicX86 as filter
         else:
             print("How did you get here?")
             return
         for _ in range(numInstructions):
-            instructionList.append(instructionGen.generateInstruction(instructionGenerator, fBMIPS))
+            instructionList.append(instructionGen.generateInstruction(instructionGenerator, filter))
     elif mode == 1:
         # Instructions are given in byte format in a text file
         instructionList = []
@@ -186,7 +192,13 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         numInstructions = 0
         
         # Instantiate the Keystone assembler to assemble instructions
-        KS = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
+        if (arch == "mips32"):
+            KS = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
+        elif (arch == "x86_64"):
+            KS = Ks(KS_ARCH_X86,KS_MODE_64)
+        else:
+            print("How did you get here?")
+            return
         ADDRESS = 0x0000
 
         # Read file
@@ -216,7 +228,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     #
     # Generate coorelation data from the instruction results
     #
-    MC.setArch("mips32")
+    MC.setArch(arch)
     analyzedData = []
     
     for i in range(numInstructions):
@@ -227,7 +239,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-architecture", type=str, help="the instruction set architecture to generate and run instructions in", choices=["mips32"])
+parser.add_argument("-architecture", type=str, help="the instruction set architecture to generate and run instructions in", choices=["mips32", "x86_64"])
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-random_instructions", type=int, help="a number of random instructions to generate")
 group.add_argument("-bytes_file", type=str, help="path to a file with a list of byte-assembled instructions")
