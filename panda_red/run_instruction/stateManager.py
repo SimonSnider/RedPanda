@@ -10,9 +10,23 @@ import math
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']
 
 def initializePanda(architecture="mips"):
-    panda = Panda("mips",
+    """
+    Arguments:
+        architecture -- the architecture that panda will be set up to emulate. Supported architectures: "mips"
+    Outputs: 
+        Returns an instance of panda with the specified architecture
+    """
+
+
+    
+    # TODO: Change "mips32" in the rest of the code to "mips"
+    arch = architecture
+    if (arch == "mips32"):
+        arch = "mips"
+    panda = Panda(arch,
         extra_args=["-M", "configurable", "-nographic"],
         raw_monitor=True)
+    # panda.taint_enable()
     return panda
 
 def setRandomSeed(random_seed):
@@ -37,9 +51,17 @@ def initializeMemory(panda: Panda, memName, memSize=2 * 1024 * 1024, address=0):
     panda.map_memory(memName, memSize, address)
     
 def generateRandomMemoryValues(minValue = -(2**(31)), maxValue = (2**31) - 1):
+    """
+    Arguments: 
+        minValue -- the minimum value for the randomized value (inclusive)
+        maxValue -- the maximum value for the randomized value (inclusive)
+    Outputs: 
+        returns a random 4-byte value between minValue and maxValue
+    """
     return generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
 
-def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff', minValue = -(2**(31)), maxValue = (2**31) - 1):
+def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff',
+                       minValue = -(2**(31)), maxValue = (2**31) - 1, taintRegs: bool = False):
     """
     Arguments:
         panda -- the instance of panda that will have its registers randomized
@@ -55,6 +77,10 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
             if (regname in skippedMipsRegs or not getBit(regBitMask, reg)): continue
             num = generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
             panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
+            if (taintRegs):
+                print("tainting "+str(reg)+" "+regname)
+                panda.taint_label_reg(reg, reg)
+                print(panda.taint_get_reg(reg))
     return
 
 def setRegisters(panda: Panda, cpu, registerSate: dict):
@@ -77,6 +103,7 @@ def randomizeMemory(panda):
     Outputs:
         randomizes the memory of panda
     """
+    # TODO: why is this here. I was gonna remove this but Jake wants it, so here it remains
     return
 
 def getRegisterState(panda: Panda, cpu):

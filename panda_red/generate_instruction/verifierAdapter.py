@@ -1,12 +1,8 @@
 from capstone import *
 from capstone.mips import *
 from dataclasses import dataclass
+from panda_red.models.verifier import Verifier
 
-@dataclass
-class Verifier:
-     disassembler = -1
-     arch = -1
-     mode = -1
 
 # instantiate the Capstone object (disassembler)
 def initialize(arch, littleEndian=False):
