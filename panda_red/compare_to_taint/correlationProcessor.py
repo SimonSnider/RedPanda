@@ -1,3 +1,4 @@
+
 from pandare import Panda
 #from pytest import skip
 from capstone import *
@@ -120,12 +121,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     def translateAll(env, pc):
         return True
 
-    #This callback executes before/in between every block of instructions
-    @panda.cb_after_block_exec
-    def getTaint(arg1, arg2, exitCode):
-        for (regname, reg) in panda.arch.registers.items():
-            print(panda.taint_get_reg(reg))
-    
     # This callback executes after each instruction execution. It handles saving the after register state and 
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
@@ -134,9 +129,15 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
         if (pc >= stopaddress):
             global model
-            #for (regname, reg) in panda.arch.registers.items():
+            for (regname, reg) in panda.arch.registers.items():
                 # for reg2 in panda.taint_get_reg(reg)
-                #print(panda.taint_get_reg(reg))
+#                print(panda.taint_get_reg(reg))
+                result = panda.taint_get_reg(reg)[0]
+                if(result is not None):
+#                    print(result)
+                    model[(regname, reg)] = result.get_labels()
+                else:
+                    model[(regname, reg)] = [reg]
             if (iters >= n-1):
                 panda.end_analysis()
             iters += 1
@@ -165,7 +166,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
-    model = {}
+#    model = {}
     # for (regname, reg) in panda.arch.registers.items():
         # list of TaintQuery objects
         # model[(regname, reg)] = panda.taint_get_reg(reg).get_labels()
