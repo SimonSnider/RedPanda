@@ -370,19 +370,20 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
     def getInstValuesTaint(cpu, pc):
-        nonlocal regBoundsCount, iters
+        nonlocal regBoundsCount, iters, model
         print(iters)
         if (pc == stopaddress):
-            nonlocal model
             for (regname, reg) in panda.arch.registers.items():
                 print("Checking taint of register " + regname)
                 result = panda.taint_get_reg(reg)[0]
+                print("results " + str(result))
                 if(result is not None):
                     labels = result.get_labels()
+                    print(labels)
                     for label in labels:
                         model[reg][label] += 1
 
-            if (iters >= n-1):
+            if (iters >= n):
                 panda.end_analysis()
             iters += 1
         return 0
@@ -408,9 +409,5 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
-    for i in range(size):
-        for j in range(size):
-            model[i][j] = model[i][j]
-    print("model:")
-    print(model)
+
     return stateData, model
