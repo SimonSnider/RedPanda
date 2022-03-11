@@ -8,7 +8,8 @@ from panda_red.generate_instruction.bitGenerator import *
 from panda_red.models.stateData import *
 import keystone
 import copy
-first = True
+#first = True
+skippedRegs = []
 
 def loadInstructions(panda: Panda, cpu, instructions, address=0):
     """
@@ -22,7 +23,7 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0):
         then loads a jump instruction immediately after it to loop through that instruction.
         Sets the program counter to address
     """
-    nonlocal skippedRegs
+    #nonlocal skippedRegs
     # get the appropriate jump instruction encoding for the architecture
     jump_instr = b""
     adr = address
@@ -32,12 +33,12 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0):
         adr += len(bytes(instruction))
     if (panda.arch_name == "mips"):
         jump_instr = b"\x08\x00\x00\x00"
-        skippedRegs = skippedMipsRegs
+        #skippedRegs = skippedMipsRegs
     elif (panda.arch_name == "x86_64"):
         ks = keystone.Ks(keystone.KS_ARCH_X86, keystone.KS_MODE_64)
         jmpInstr = "JMP -" + str(adr)
         jump_instr, count = ks.asm(jmpInstr.encode("UTF-8"), address)
-        skippedRegs = skippedX86Regs
+        #skippedRegs = skippedX86Regs
     
     panda.physical_memory_write(adr, bytes(jump_instr))
     panda.arch.set_pc(cpu, address)
@@ -53,12 +54,12 @@ def getNextValidReg(panda: Panda, regNum):
         the "skipped regs" specifications from the stateManager module. returns -1 if there are no more
         valid registers
     """
-    nonlocal skippedRegs
-    # skippedRegs = []
-    # if (panda.arch_name == "mips"):
-    #     skippedRegs = skippedMipsRegs
-    # if (panda.arch_name == "x86_64"):
-    #     skippedRegs = skippedX86Regs
+    global skippedRegs
+    skippedRegs = []
+    if (panda.arch_name == "mips"):
+        skippedRegs = skippedMipsRegs
+    if (panda.arch_name == "x86_64"):
+        skippedRegs = skippedX86Regs
     regs = list(panda.arch.registers.keys())
     count = 0
     for i in range(len(regs)):
@@ -95,8 +96,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     stopaddress = 0
     model = {}
     iters = 0
-    size = len(panda.arch.register.items())
-    model = [[0] * size] * size
+    size = len(panda.arch.registers.items())
+    model = [[0] * size for _ in range(size)]
 
     if (panda.arch_name == "mips"):
         md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
@@ -106,7 +107,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
      # This callback handles all of the initial setup of panda before it begins executing instructions
     @panda.cb_after_machine_init
     def setup(cpu):
-        nonlocal instIndex, initialState, stateData, stopaddress, model
+        nonlocal instIndex, initialState, stateData, stopaddress, model, size
        
         # Initialize memory and load the first instruction in to initialize the emulation loop
         initializeMemory(panda, "mymem", address=ADDRESS)
@@ -134,7 +135,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
         # initialize the model with zeros
         for (regname, reg) in panda.arch.registers.items():
-            model[(regname, reg)] = [0]*len(panda.arch.registers.items())
+            model[reg] = [0]*size #len(panda.arch.registers.items())
         if (verbose): print("setup done")
 
     # gather instruction data
@@ -355,8 +356,10 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     #This callback executes before/in between every block of instructions
     @panda.cb_after_block_exec
     def getTaint(arg1, arg2, exitCode):
+        print("in getTaint")
         for (regname, reg) in panda.arch.registers.items():
             taintQuery = panda.taint_get_reg(reg)[0]
+            print(panda.taint_get_reg(reg))
             if(taintQuery is not None):
                 labels = taintQuery.get_labels()
                 for label in labels:
@@ -403,4 +406,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     for i in range(size):
         for j in range(size):
             model[i][j] = model[i][j]
+    print("model:")
+    print(model)
     return stateData, model

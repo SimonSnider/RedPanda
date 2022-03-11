@@ -42,6 +42,7 @@ class TestScript(unittest.TestCase):
         self.assertEqual(len(regStateList.afterStates), 1 * 24 + 1)
         self.assertNotEqual(regStateList.beforeStates[0].get("T0"), 0)
         self.assertEqual(regStateList.afterStates[0].get("T0"), 0)
+        print(model)
 
     # def testRunX86InstructionOnce(self):
     #     panda = initializePanda("x86_64")
