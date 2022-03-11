@@ -22,6 +22,7 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0):
         then loads a jump instruction immediately after it to loop through that instruction.
         Sets the program counter to address
     """
+    nonlocal skippedRegs
     # get the appropriate jump instruction encoding for the architecture
     jump_instr = b""
     adr = address
@@ -31,10 +32,12 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0):
         adr += len(bytes(instruction))
     if (panda.arch_name == "mips"):
         jump_instr = b"\x08\x00\x00\x00"
+        skippedRegs = skippedMipsRegs
     elif (panda.arch_name == "x86_64"):
         ks = keystone.Ks(keystone.KS_ARCH_X86, keystone.KS_MODE_64)
         jmpInstr = "JMP -" + str(adr)
         jump_instr, count = ks.asm(jmpInstr.encode("UTF-8"), address)
+        skippedRegs = skippedX86Regs
     
     panda.physical_memory_write(adr, bytes(jump_instr))
     panda.arch.set_pc(cpu, address)
@@ -50,11 +53,12 @@ def getNextValidReg(panda: Panda, regNum):
         the "skipped regs" specifications from the stateManager module. returns -1 if there are no more
         valid registers
     """
-    skippedRegs = []
-    if (panda.arch_name == "mips"):
-        skippedRegs = skippedMipsRegs
-    if (panda.arch_name == "x86_64"):
-        skippedRegs = skippedX86Regs
+    nonlocal skippedRegs
+    # skippedRegs = []
+    # if (panda.arch_name == "mips"):
+    #     skippedRegs = skippedMipsRegs
+    # if (panda.arch_name == "x86_64"):
+    #     skippedRegs = skippedX86Regs
     regs = list(panda.arch.registers.keys())
     count = 0
     for i in range(len(regs)):
@@ -91,7 +95,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     stopaddress = 0
     model = {}
     iters = 0
-    first  = True
+    size = len(panda.arch.register.items())
+    model = [[0] * size] * size
 
     if (panda.arch_name == "mips"):
         md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
@@ -336,10 +341,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         # The register state only needs randomized before that instruction
         if (pc == ADDRESS):
             if (verbose): print("tainting registers before execution")
-            nonlocal first
             # Randomize the registers to a value between lowerBound and upperBound
-            randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound, taintRegs=first)
-            first = False
+            randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound, taintRegs=True)
 
         if (verbose):
             # Display the instruction that is about to be executed
@@ -353,7 +356,12 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_after_block_exec
     def getTaint(arg1, arg2, exitCode):
         for (regname, reg) in panda.arch.registers.items():
-            print(panda.taint_get_reg(reg))
+            taintQuery = panda.taint_get_reg(reg)[0]
+            if(taintQuery is not None):
+                labels = taintQuery.get_labels()
+                for label in labels:
+                    # TODO: make sure datatypes work
+                    model[reg][label] += 1
 
     # This callback executes after each instruction execution. It handles saving the after register state and 
     # handles instruction switching, bitmask updating, and emulation termination
@@ -392,4 +400,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
+    for i in range(size):
+        for j in range(size):
+            model[i][j] = model[i][j]
     return stateData, model
