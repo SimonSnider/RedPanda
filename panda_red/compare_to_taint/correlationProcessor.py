@@ -5,7 +5,7 @@ from capstone.mips import *
 import math
 import copy
 from panda_red.run_instruction.stateManager import *
-
+import keystone
 model = {}
 first = True
 
@@ -26,13 +26,17 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0):
         model[(regname, reg)] = [0]*len(panda.arch.registers.items())
     # get the appropriate jump instruction encoding for the architecture
     jump_instr = b""
-    if (panda.arch_name == "mips"):
-        jump_instr = b"\x08\x00\x00\x00"
     adr = address
     for instruction in instructions:
         print(instruction)
         panda.physical_memory_write(adr, bytes(instruction))
         adr += len(bytes(instruction))
+    if (panda.arch_name == "mips"):
+        jump_instr = b"\x08\x00\x00\x00"
+    elif (panda.arch_name == "x86_64"):
+        ks = keystone.Ks(keystone.KS_ARCH_X86, keystone.KS_MODE_64)
+        jmpInstr = "JMP -" + str(adr)
+        jump_instr, count = ks.asm(jmpInstr.encode("UTF-8"), address)
     
     panda.physical_memory_write(adr, bytes(jump_instr))
     cpu.env_ptr.active_tc.PC = address
