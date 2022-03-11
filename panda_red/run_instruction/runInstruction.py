@@ -375,10 +375,12 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         if (pc == stopaddress):
             nonlocal model
             for (regname, reg) in panda.arch.registers.items():
+                print("Checking taint of register " + regname)
                 result = panda.taint_get_reg(reg)[0]
-                labels = result.get_labels()
-                for label in labels:
-                    model[reg][label] += 1
+                if(result is not None):
+                    labels = result.get_labels()
+                    for label in labels:
+                        model[reg][label] += 1
 
             if (iters >= n-1):
                 panda.end_analysis()

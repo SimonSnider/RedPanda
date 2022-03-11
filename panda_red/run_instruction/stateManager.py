@@ -84,11 +84,14 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
         skippedRegs = []
 
 
+    print(taintRegs)
     for (regname, reg) in panda.arch.registers.items():
         if (regname in skippedRegs or not getBit(regBitMask, reg)): continue
         num = generateRandomBytes(regSize, minValue=minValue, maxValue=maxValue)
         panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
-        if (taintRegs): panda.taint_label_reg(reg, reg)
+        if (taintRegs):
+            print("tainting")
+            panda.taint_label_reg(reg, reg)
     return
 
 def setRegisters(panda: Panda, cpu, registerSate: dict):
