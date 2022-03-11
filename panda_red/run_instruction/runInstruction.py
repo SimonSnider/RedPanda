@@ -372,11 +372,14 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     def getInstValuesTaint(cpu, pc):
         nonlocal regBoundsCount, iters
         print(iters)
-        if (pc >= stopaddress):
+        if (pc == stopaddress):
             nonlocal model
-            #for (regname, reg) in panda.arch.registers.items():
-                # for reg2 in panda.taint_get_reg(reg)
-                #print(panda.taint_get_reg(reg))
+            for (regname, reg) in panda.arch.registers.items():
+                result = panda.taint_get_reg(reg)[0]
+                labels = result.get_labels()
+                for label in labels:
+                    model[reg][label] += 1
+
             if (iters >= n-1):
                 panda.end_analysis()
             iters += 1
