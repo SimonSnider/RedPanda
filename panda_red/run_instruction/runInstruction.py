@@ -356,15 +356,15 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     #This callback executes before/in between every block of instructions
     @panda.cb_after_block_exec
     def getTaint(arg1, arg2, exitCode):
-        print("in getTaint")
-        for (regname, reg) in panda.arch.registers.items():
-            taintQuery = panda.taint_get_reg(reg)[0]
-            print(panda.taint_get_reg(reg))
-            if(taintQuery is not None):
-                labels = taintQuery.get_labels()
-                for label in labels:
-                    # TODO: make sure datatypes work
-                    model[reg][label] += 1
+        print("in getTaint-depricated")
+#        for (regname, reg) in panda.arch.registers.items():
+#            taintQuery = panda.taint_get_reg(reg)[0]
+#            print(panda.taint_get_reg(reg))
+#            if(taintQuery is not None):
+#                labels = taintQuery.get_labels()
+#                for label in labels:
+#                    # TODO: make sure datatypes work
+#                    model[reg][label] += 1
 
     # This callback executes after each instruction execution. It handles saving the after register state and 
     # handles instruction switching, bitmask updating, and emulation termination
@@ -378,8 +378,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                 result = panda.taint_get_reg(reg)[0]
                 print("results " + str(result))
                 if(result is not None):
-                    labels = result.get_labels()
-                    print(labels)
+                    labels = panda.taint_get_reg(reg)[0].get_labels()
+                    print(panda.taint_get_reg(reg)[0].get_labels())
                     for label in labels:
                         model[reg][label] += 1
 
@@ -410,4 +410,4 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
 
-    return stateData, model
+    return [stateData, model]

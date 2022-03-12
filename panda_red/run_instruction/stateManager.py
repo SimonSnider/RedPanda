@@ -62,7 +62,7 @@ def generateRandomMemoryValues(minValue = -(2**(31)), maxValue = (2**31) - 1):
     return generateRandomBytes(4, minValue=minValue, maxValue=maxValue)
 
 def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff',
-                       minValue = -(2**(31)), maxValue = (2**31) - 1, taintRegs: bool = False):
+                       minValue = -(2**(31)), maxValue = (2**31) - 1, taintRegs = False):
     """
     Arguments:
         panda -- the instance of panda that will have its registers randomized

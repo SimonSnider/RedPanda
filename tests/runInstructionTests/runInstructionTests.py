@@ -33,7 +33,7 @@ class TestScript(unittest.TestCase):
 
         ADDRESS = 0x0000
         encoding, count = ks.asm(CODE, ADDRESS)
-        data: StateData = None
+#        data: StateData = None
         data, model = runInstruction.runInstructions(panda, [encoding], 1, verbose = True)
         self.assertEqual(len(data.registerStateLists), 1)
         regStateList = data.registerStateLists[0]
