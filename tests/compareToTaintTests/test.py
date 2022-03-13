@@ -7,6 +7,7 @@ from keystone import *
 from panda_red.generate_instruction import instructionGenerator
 import math
 from panda_red.models.stateData import *
+from panda_red.runInstruction.stateManager import *
 
 def test1():
     """
@@ -85,7 +86,11 @@ def testModelCollection():
     # instructions = [encoding, encoding2]
     instructions = [encoding]
     n = 5
-    pandaModel = runInstructions(panda, instructions, n, True)
-    print(pandaModel)
+    ourModel, pandaModel = runInstructions(panda, instructions, n, True)
+    output = compare(pandaModel, ourModel))
+    print(output)
+    assert output == [{}, {}]
+
+    
 
 testModelCollection()
