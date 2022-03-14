@@ -3,7 +3,7 @@ from panda_red.compare_to_taint.taintComparer import *
 from capstone import *
 from panda_red.run_instruction.runInstruction import *
 from panda_red.run_instruction.stateManager import *
-from keystone import *
+from keystone.keystone import *
 from panda_red.generate_instruction import instructionGenerator
 import math
 from panda_red.models.stateData import *
@@ -87,7 +87,7 @@ def testModelCollection():
     # instructions = [encoding, encoding2]
     instructions = [encoding]
     n = 5
-    ourModel, pandaModel = runInstructions(panda, instructions, n, True)
+    [ourModel, pandaModel] = runInstructions(panda, instructions, n, True)
     calc.setArch("mips")
 
     states = RegisterStateList()

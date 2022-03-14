@@ -1,12 +1,13 @@
 from pandare import Panda
 from pytest import skip
 from panda_red.run_instruction.stateManager import *
+from panda_red.run_instruction.runInstruction import *
 from capstone import *
 from capstone.mips import *
 import math
 from panda_red.generate_instruction.bitGenerator import *
 from panda_red.models.stateData import *
-import keystone
+import keystone.keystone
 import copy
 #first = True
 skippedRegs = []
