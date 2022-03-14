@@ -55,6 +55,8 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
     thresh = threshold
+    print("length of afterStates: " +str(len(data.afterStates)))
+    n = len(data.afterStates)
     if pValue:
         thresh = computeThreshold(threshold)
     
@@ -243,7 +245,6 @@ def computeRegToRegCorrelations():
         regs.ps[iter] = newDict
 
     m = [[0]*n for _ in range(n)]
-    print(n, len(m), len(m[0]))
     for i in range(n):
         for j in range(n):
             denom = 0
@@ -367,9 +368,6 @@ def computeCorrelations():
     M = Correlations()
     
     M.regToReg = computeRegToRegCorrelations()
-    print("------------------------------------------------------------")
-    print(len(M.regToReg), len(M.regToReg[0]))
-    print(M.regToReg)
     M.regToReadAddress = computeRegToReadAddrCorrelations()
     M.regToWriteAddress = computeRegToWriteAddrCorrelations()
     M.regToWriteData = computeRegToWriteValCorrelations()
