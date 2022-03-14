@@ -142,8 +142,8 @@ def binomialSum(q, c):
     """
     sum = 0.0
     n = iterPerRegister
-    for x in n*q..n:
-        sum += math.combination(n, x*n)*((1-c)**x)*(c**(n-x))
+    for x in range(math.floor(n*q),n):
+        sum += math.comb(n, x*n)*((1-c)**x)*(c**(n-x))
     return sum
 
 
@@ -160,11 +160,11 @@ def computeThreshold(p):
     low = 0
     c = (up + low) / 2
     sum = binomialSum(q, c)
-    while(Abs(sum - q) > allowance):
-        if binomialSum > q:
+    while(abs(sum - c) > allowance):
+        if sum > q:
             low = c
         else:
-            high = c
+            up = c
         c = (up + low) / 2
     return c
 
@@ -241,8 +241,9 @@ def computeRegToRegCorrelations():
         for reg in Ri0.keys():
             newDict[reg] = calcAreValuesUnequal(regs.initialOutput.get(reg), Rif.get(reg))
         regs.ps[iter] = newDict
-        
+
     m = [[0]*n for _ in range(n)]
+    print(n, len(m), len(m[0]))
     for i in range(n):
         for j in range(n):
             denom = 0
@@ -366,6 +367,9 @@ def computeCorrelations():
     M = Correlations()
     
     M.regToReg = computeRegToRegCorrelations()
+    print("------------------------------------------------------------")
+    print(len(M.regToReg), len(M.regToReg[0]))
+    print(M.regToReg)
     M.regToReadAddress = computeRegToReadAddrCorrelations()
     M.regToWriteAddress = computeRegToWriteAddrCorrelations()
     M.regToWriteData = computeRegToWriteValCorrelations()

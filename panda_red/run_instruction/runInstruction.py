@@ -381,7 +381,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     labels = panda.taint_get_reg(reg)[0].get_labels()
                     print(panda.taint_get_reg(reg)[0].get_labels())
                     for label in labels:
-                        model[reg][label] += 1
+                        model[label][reg] += 1
 
             if (iters >= n):
                 panda.end_analysis()
