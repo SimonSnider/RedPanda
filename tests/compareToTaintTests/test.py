@@ -8,6 +8,7 @@ from panda_red.generate_instruction import instructionGenerator
 import math
 from panda_red.models.stateData import *
 from panda_red.run_instruction.stateManager import *
+from panda_red.get_correlations import correlationCalculatorMemory as calc
 
 def test1():
     """
@@ -87,7 +88,20 @@ def testModelCollection():
     instructions = [encoding]
     n = 5
     ourModel, pandaModel = runInstructions(panda, instructions, n, True)
-    output = compare(pandaModel, ourModel)
+    calc.setArch("mips")
+
+    states = RegisterStateList()
+    first = ourModel.registerStateLists[0]
+    last = ourModel.registerStateLists[-1]
+    states.bitmasks = first.bitmasks
+    states.beforeStates = first.beforeStates
+    states.afterStates = last.afterStates
+    states.memoryReads = last.memoryReads
+    states.memoryWrites = last.memoryWrites
+    calc.initialize(states, len(panda.arch.registers))
+    corr = calc.computeCorrelations()
+    output = compare(pandaModel, corr)
+
     print(output)
     assert output == [{}, {}]
 
