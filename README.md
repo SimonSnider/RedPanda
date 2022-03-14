@@ -2,8 +2,11 @@
 
 # Quick Start Guide
 The PANDA Instruction Taint Analysis System (PANDA-RED) can be installed and run under default settings by following the instructions below.
+* <a href="#installationSection">Installation</a>
+* <a href="#runningSection">Running the System</a>
+* <a href="#exampleSection">Examples</a>
 
-## Installation
+<h2 id="installationSection">Installation</h2>
 ### Running with Dockerfile
 * Ubuntu 20.04 or above
 * docker
@@ -26,7 +29,7 @@ Then you should be able to successfully run:
 python3 panda_red/PANDARED.py <arguments>
 ```
 
-### Non-Dockerfile Requirements
+### Non-Dockerfile Requirements (Note: This method is currently not recommended and is missing complete installation instructions)
 * Ubuntu 20.04
 * Python 3.7 or above
 
@@ -36,7 +39,7 @@ pip install .
 ```
 This installs the current version of RED to your python3 environment.
 
-## Running
+<h2 id="runningSection">Running</h2>
 ### Default Mode
 To run RED in the default mode use the following command:
 <b>
@@ -51,7 +54,7 @@ All arguments and system settings will be prompted after running the command.
 Sometimes it is useful to leverage the same settings over the course of multiple runs of RED without needing to input the same settings on command line each time. When this functionality is desired, you can use the RED configurable mode to accomplish it. Said mode is initialized as follows:
 <b>
 ```
-python3 modules/PANDARED.py -c 
+python3 modules/PANDARED.py -f
 ```
 </b>
 To use config mode simply open <a>modules/debug.cfg</a> and edit the interior settings to match your desired settings.
@@ -80,6 +83,59 @@ This specifies the output format of the system. By default the system produces a
 
 #### Verbose?
 The specifies if you wish the system to output debug and progress messages.
+
+<h2 id=exampleSection>Examples</h2>
+
+### Creating a Configuration File From Scratch
+Argument configuration files can be a useful tool for storing complex sets of system arguments. Red Panda provides functionality to store whole configurations and partial configurations in files. Below is an example of creating one of these files from scratch and using it to execute a Red Panda instance.
+<ol>
+  <li>
+  Begin by creating a new text file to store the custom configuration. Then open the file in a text editor.
+    
+    ```
+    
+    touch my_config.txt
+    
+    ```
+  </li>
+  <li>
+  Once open specify the arguments desired for the configuration. This configuration is going to use the MIPS architecture with a focus on high instruction iteration counts. To do so we construct each line to be a single argument defined using the same syntax as on the command line. The value given for the argument is found on the following line.
+    
+  ```
+  -architecture
+  mips32
+  -iterations
+  100
+  -analysis_model
+  1
+  -output_model
+  threshold
+  -threshold
+  .5
+  ```
+  Notice that this argument list does not contain all the required arguments for a system run. Arguments not specified in the configuration file are specified during program execution, allowing for greater flexibility in configuration file uses.
+  </li>
+  <li>
+  Now that the file is complete we can execute it using the following command:
+    
+    ```
+    ./python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_config_run @my_config.txt
+    ```
+  Notice that the two required arguments of instruction source and execution name are still specified. If we wanted to keep either of these consistent between runs we could move them to the configurable file much like the others.
+  </li>
+</ol>
+
+### Using Non-random Instructions
+Text
+
+### Using Non-random Byte Strings
+Text
+
+### Understanding Matrix Output
+Text
+
+### Understanding Threshold Output
+Text
 
 # Package Import Implementation
 To import the modules into the test files or scripts, run pip install . at the head of the tree (panda-taint-models folder)
