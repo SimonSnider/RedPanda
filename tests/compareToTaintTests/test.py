@@ -1,13 +1,13 @@
 from panda_red.models.correlations import *
 from panda_red.compare_to_taint.taintComparer import *
 from capstone import *
-from panda_red.compare_to_taint.correlationProcessor import *
+from panda_red.run_instruction.runInstruction import *
 from panda_red.run_instruction.stateManager import *
 from keystone import *
 from panda_red.generate_instruction import instructionGenerator
 import math
 from panda_red.models.stateData import *
-from panda_red.runInstruction.stateManager import *
+from panda_red.run_instruction.stateManager import *
 
 def test1():
     """
@@ -87,7 +87,7 @@ def testModelCollection():
     instructions = [encoding]
     n = 5
     ourModel, pandaModel = runInstructions(panda, instructions, n, True)
-    output = compare(pandaModel, ourModel))
+    output = compare(pandaModel, ourModel)
     print(output)
     assert output == [{}, {}]
 
