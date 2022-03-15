@@ -95,9 +95,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     initialState = {}
     memoryStructure = dict()
     stopaddress = 0
-    model = {}
     iters = 0
     size = len(panda.arch.registers.items())
+    modelList = []
     model = [[0] * size for _ in range(size)]
 
     if (panda.arch_name == "mips"):
@@ -239,6 +239,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         panda.delete_callback("manageread")
                         panda.delete_callback("managewrite")
 
+                        instIndex = 0;
+                        loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
+
                         return 0
             
                 # Update the bitmask to randomize the next valid register
@@ -357,7 +360,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     #This callback executes before/in between every block of instructions
     @panda.cb_after_block_exec
     def getTaint(arg1, arg2, exitCode):
-        print("in getTaint-depricated")
+        print("in getTaint-deprecated")
 #        for (regname, reg) in panda.arch.registers.items():
 #            taintQuery = panda.taint_get_reg(reg)[0]
 #            print(panda.taint_get_reg(reg))
@@ -371,7 +374,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
     def getInstValuesTaint(cpu, pc):
-        nonlocal regBoundsCount, iters, model
+        nonlocal regBoundsCount, iters, model, instIndex
         print(iters)
         if (pc == stopaddress):
             for (regname, reg) in panda.arch.registers.items():
@@ -385,7 +388,16 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         model[label][reg] += 1
 
             if (iters >= n):
-                panda.end_analysis()
+                if(instIndex > len(instructions)):
+                    # Instruction Finished collecting iterations
+                    # Switching to next instruction
+                    instIndex += 1
+                    iters = 0
+                    modelList.append(model)
+                    model = [[0] * size for _ in range(size)]
+                    loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
+                else:
+                    panda.end_analysis()
             iters += 1
         return 0
 
@@ -411,4 +423,4 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
 
-    return [stateData, model]
+    return [stateData, modelList]
