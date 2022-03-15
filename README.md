@@ -92,14 +92,12 @@ Argument configuration files can be a useful tool for storing complex sets of sy
   <li>
   Begin by creating a new text file to store the custom configuration. Then open the file in a text editor.
     
-    ```
     
     touch my_config.txt
-    
-    ```
   </li>
   <li>
   Once open specify the arguments desired for the configuration. This configuration is going to use the MIPS architecture with a focus on high instruction iteration counts. To do so we construct each line to be a single argument defined using the same syntax as on the command line. The value given for the argument is found on the following line.
+    
     
   ```
   -architecture
@@ -117,25 +115,67 @@ Argument configuration files can be a useful tool for storing complex sets of sy
   </li>
   <li>
   Now that the file is complete we can execute it using the following command:
-    
-    ```
-    ./python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_config_run @my_config.txt
-    ```
+  
+
+    python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_config_run @my_config.txt
   Notice that the two required arguments of instruction source and execution name are still specified. If we wanted to keep either of these consistent between runs we could move them to the configurable file much like the others.
   </li>
 </ol>
 
 ### Using Non-random Instructions
-Text
+<ol>
+  <li>
+  Using instructions from a source other than random can be useful for getting models for a subset of an assembly language. Red Panda supports this using non-random instruction lists. In order to do so first begin by creating a file for the desired instructions to be stored.
+    
+    touch my_instructions.txt
+  </li>
+  <li>
+  Open the file and enter the instructions which you desire to run. The entered instructions must all be in the same instruction set architecture and be viable assembly for the keystone assembler. Here the add and sub instructions are entered for the mips ISA. Save and close the file afterwards.
+    
+  ```
+  add $t0, $t1, $t2
+  sub $t4, $t2, $t6
+  ```
+  </li>
+  <li>
+  Once the instructions are written it is time to run Red Panda. In order to run the system using the instruction list you must use the -instructions_file argument in place of the -random_instructions argument. The usage of which can be found as follows:
+    
+  ```
+  python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_instructions_run ...
+    
+  # Becomes
+    
+  python3 /panda_red/PANDARED.py -instructions_file=my_instructions.txt -name=my_instructions_run ...
+  ```
+  </li>
+</ol>
 
 ### Using Non-random Byte Strings
-Text
+<ol>
+  <li>
+  text
+    
+    touch my_bytes.txt
+  </li>
+  <li>
+  text
+    
+  ```
+  
+  ```
+  </li>
+  <li>
+  text
+    
+    python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_config_run @my_config.txt
+  </li>
+</ol>
 
 ### Understanding Matrix Output
 Text
 
 ### Understanding Threshold Output
-Text
+
 
 # Package Import Implementation
 To import the modules into the test files or scripts, run pip install . at the head of the tree (panda-taint-models folder)
