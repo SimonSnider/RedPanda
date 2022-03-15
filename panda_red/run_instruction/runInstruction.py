@@ -242,7 +242,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         return 0
             
                 # Update the bitmask to randomize the next valid register
-                bitmask = int.to_bytes(1<<(numRegs-1-nextReg), (math.ceil(numRegs/8)), 'big')
+                bitmask = int.to_bytes(1<<(nextReg), (math.ceil(numRegs/8)), 'big')
             regStateIndex += 1
         return 0
 
