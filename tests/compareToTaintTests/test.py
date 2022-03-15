@@ -87,7 +87,7 @@ def testModelCollection():
     # instructions = [encoding, encoding2]
     instructions = [encoding]
     n = 5
-    ourModel, pandaModel = runInstructions(panda, instructions, n, True)
+    [ourModel, pandaModel] = runInstructions(panda, instructions, n, True)
     calc.setArch("mips")
 
     states = RegisterStateList()
