@@ -223,18 +223,24 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     #
     # Run the instructions through the Panda.re engine
     #
-    instructionData = generateInstructionData(arch, instructionList, instructionIterations, verbose)
-
+    instructionData, pandaModels = generateInstructionData(arch, instructionList, instructionIterations, verbose)
+    print(len(instructionData.registerStateLists), len(pandaModels))
     #
     # Generate coorelation data from the instruction results
     #
-    MC.setArch(arch)
+    # MC.setArch(arch)
     analyzedData = []
-    
+
     for i in range(numInstructions):
         dat = instructionData.registerStateLists[i]
+        pandaModel = pandaModels[i]
+
         MC.initialize(dat, instructionIterations, threshold)
-        analyzedData.append(MC.computeCorrelations())
+        calcdCorrelations = MC.computeCorrelations()
+        analyzedData.append(calcdCorrelations)
+
+        comparison = TC.compare(pandaModel, calcdCorrelations)
+        print(comparison)
 
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
 

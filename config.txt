@@ -1,0 +1,14 @@
+-architecture
+mips32
+-instructions_file
+inst.txt
+-analysis_model
+1
+-output_model
+0
+-name
+o
+-iterations
+10
+-threshold
+0.5
