@@ -238,7 +238,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
 
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
 parser.add_argument("-architecture", type=str, help="the instruction set architecture to generate and run instructions in", choices=["mips32", "x86_64"])
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-random_instructions", type=int, help="a number of random instructions to generate")
