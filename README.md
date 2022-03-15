@@ -7,6 +7,7 @@ The PANDA Instruction Taint Analysis System (PANDA-RED) can be installed and run
 * <a href="#exampleSection">Examples</a>
 
 <h2 id="installationSection">Installation</h2>
+
 ### Running with Dockerfile
 * Ubuntu 20.04 or above
 * docker
@@ -40,12 +41,15 @@ pip install .
 This installs the current version of RED to your python3 environment.
 
 <h2 id="runningSection">Running</h2>
+
 ### Default Mode
 To run RED in the default mode use the following command:
 <b>
+  
 ```
 python3 modules/PANDARED.py
 ```
+  
 </b>
 All arguments and system settings will be prompted after running the command.
 <br><br/>
@@ -61,28 +65,68 @@ To use config mode simply open <a>modules/debug.cfg</a> and edit the interior se
 <br></br>
 
 ### System Arguments
-There are a variety of arguments to pass into RED. Below is a full list of what they mean and the types are input they expect. For argument field that specify a list of options, specify the list number as input during runtime.
+There are a variety of arguments to pass into RED. Below is a full list of what they mean and the types are input they expect. For argument fields that specify a list of options, specify the list number as input during runtime.
 
-#### Output File Name
-This specifies the name of the output file. This argument does not take in file type as that is generated based on the desired output format. 
+#### Architecture (-architecture)
+Specifies the instructions set architecture RED PANDA is to run in. This also determines the ISA instructions are generated in during run time.
 
-#### Architecture
-This specifies which architecture to generate and run instructions in. Currently MIPS is the only supported instruction set.
+Valid Options
+* mips32 - The MIPS instruction set
+* x86-64 - The x86-64 or AMD64 instruction set
 
-#### Instructions Mode
-This specifies the input format of instructions to the system. The default of zero randomly generates instructions in the chosen architecture. Byte-specified mode takes a list of pre-assembled bytes corresponding to chosen instructions to run the current architecture. Text-specified mode takes a list of chosen unassembled instructions. By default these optional modes are given parameters in <a>modules/byte_specifications.txt</a> and <a>modules/instruction_specifications.txt</a> respectively.
+Usage Example: ``-architecture=mips32``
 
-#### Instruction Iterations
-This specifies the number of times each instructions is run through panda with random inputs.
+#### Instruction Source (-random_instructions, -bytes_file, -instructions_file)
+Determines the source of instructions during the RED PANDA run. Instructions have three different supported sources. The -random_instructions option uses RED PANDA's internal instruction generator to randomly generate valid instructions in the system. The -bytes_file option allows you to specify a new line delimited file of assembled instructions in byte format. The -instructions_file option does the same using unassembled instructions in a chosen ISA.
 
-#### Analysis Model
+##### Random Instructions
+Valid Options
+* Any positive 32-bit integer
+
+Usage Example: ``-random_instructions=186``
+
+##### Bytes File
+Valid Options
+* the path to a file holding instruction bytes
+
+Usage Example: ``-bytes_file=bytes.txt``
+
+##### Instructions File
+Valid Options
+* the path to a file holding unassembled instructions
+
+Usage Example: ``-instructions_file=instructions.txt``
+
+#### Instruction Iterations (-iterations)
+Specifies the number of times an instruction is run to collect correlation data for a particular register. Note that this means that an architecture with 32 registers will run 32 times the entered number.
+
+Valid Options
+* Any positive 32-bit integer
+
+Usage Example: ``-iterations=12``
+
+#### Analysis Model (-analysis_model)
 This specifies which type of analysis the system will perform. Currently reg-correlational and mem-reg-correlational perform the same analysis without or with memory tracking.
 
-#### Output Format
+Valid Options
+* Any positive 32-bit integer
+
+Usage Example: ``-analysis_model=``
+
+#### Output Format (-output_model)
 This specifies the output format of the system. By default the system produces a square matrix mapping the correlation between input and output.
 
-#### Verbose?
+#### Verbose? (-v/--verbose)
 The specifies if you wish the system to output debug and progress messages.
+
+#### Intermediate Output (-i/--intermediate)
+text
+
+#### Output Threshold (-threshold)
+text
+
+#### Random Generation Seed (-seed)
+text
 
 <h2 id=exampleSection>Examples</h2>
 
