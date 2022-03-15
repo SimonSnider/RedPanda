@@ -1,0 +1,10 @@
+-architecture
+mips32
+-iterations
+100
+-analysis_model
+1
+-output_model
+1
+-threshold
+.5

@@ -254,6 +254,8 @@ parser.add_argument("-threshold", type=float, help="the correlation threshold fo
 parser.add_argument("-seed", type=int, help="the seed to generate instructions with")
 
 args = parser.parse_args()
+
+print(args)
 if(args.random_instructions):
     mode = 0
 elif(args.bytes_file):
