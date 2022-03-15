@@ -374,7 +374,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
     def getInstValuesTaint(cpu, pc):
-        nonlocal regBoundsCount, iters, model, instIndex
+        nonlocal regBoundsCount, iters, model, instIndex, modelList
         print(iters)
         if (pc == stopaddress):
             for (regname, reg) in panda.arch.registers.items():
@@ -388,15 +388,16 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         model[label][reg] += 1
 
             if (iters >= n):
-                if(instIndex > len(instructions)):
+                if(instIndex < len(instructions) - 1):
                     # Instruction Finished collecting iterations
                     # Switching to next instruction
                     instIndex += 1
-                    iters = 0
+                    iters = -1
                     modelList.append(model)
                     model = [[0] * size for _ in range(size)]
                     loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
                 else:
+                    modelList.append(model)
                     panda.end_analysis()
             iters += 1
         return 0

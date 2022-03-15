@@ -1,1 +1,3 @@
 add $t0, $t1, $zero
+add $t5, $t7, $t6
+
