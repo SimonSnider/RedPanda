@@ -109,24 +109,45 @@ Usage Example: ``-iterations=12``
 This specifies which type of analysis the system will perform. Currently reg-correlational and mem-reg-correlational perform the same analysis without or with memory tracking.
 
 Valid Options
-* Any positive 32-bit integer
+* 0 - generate correlations between registers only (currently only supported for basic mips functionality)
+* 1 - generate correlations between registers and memory
 
-Usage Example: ``-analysis_model=``
+Usage Example: ``-analysis_model=1``
 
 #### Output Format (-output_model)
-This specifies the output format of the system. By default the system produces a square matrix mapping the correlation between input and output.
+This specifies the output format of the system.
+
+Valid Options
+* 0 - matrix output (generates a matrix where ones in the matrix represent correlations between inputs in the row and outputs in the column)
+* 1 - threshold output (generates a human readable message of unexpected correlations based on a p-value threshold)
+
+Usage Example: ``-output_model=1``
 
 #### Verbose? (-v/--verbose)
 The specifies if you wish the system to output debug and progress messages.
 
+Usage Example: ``-v``
+
 #### Intermediate Output (-i/--intermediate)
-text
+Generates another json file of the full output of the randomly run instructions.
+
+Usage Example: ``-i``
 
 #### Output Threshold (-threshold)
-text
+The p-value threshold required for threshold output to recognize and output a correlation.
+
+Valid Options
+* Any decimal value between 0 and 1
+
+Usage Example: ``-threshold=0.55``
 
 #### Random Generation Seed (-seed)
-text
+A seed used by the random instruction generator. Used to ensure randomly generated instruction lists are consistent between runs.
+
+Valid Options
+* Any 32-bit integer
+
+Usage Example: ``-seed=1352389``
 
 <h2 id=exampleSection>Examples</h2>
 
@@ -184,42 +205,13 @@ Argument configuration files can be a useful tool for storing complex sets of sy
   <li>
   Once the instructions are written it is time to run Red Panda. In order to run the system using the instruction list you must use the -instructions_file argument in place of the -random_instructions argument. The usage of which can be found as follows:
     
+  Random Instructions: `` python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_instructions_run ... `` Becomes
+    
   ```
-  python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_instructions_run ...
-    
-  # Becomes
-    
   python3 /panda_red/PANDARED.py -instructions_file=my_instructions.txt -name=my_instructions_run ...
   ```
   </li>
 </ol>
-
-### Using Non-random Byte Strings
-<ol>
-  <li>
-  text
-    
-    touch my_bytes.txt
-  </li>
-  <li>
-  text
-    
-  ```
-  
-  ```
-  </li>
-  <li>
-  text
-    
-    python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_config_run @my_config.txt
-  </li>
-</ol>
-
-### Understanding Matrix Output
-Text
-
-### Understanding Threshold Output
-
 
 # Package Import Implementation
 To import the modules into the test files or scripts, run pip install . at the head of the tree (panda-taint-models folder)
