@@ -43,16 +43,22 @@ This installs the current version of RED to your python3 environment.
 <h2 id="runningSection">Running</h2>
 
 ### Default Mode
-To run RED in the default mode use the following command:
+To run RED PANDA in the default mode use the following command:
 <b>
   
 ```
-python3 modules/PANDARED.py
+python3 panda_red/PANDARED.py <arguments>
 ```
   
 </b>
-All arguments and system settings will be prompted after running the command.
-<br><br/>
+The following arguments must be specified on the command line:
+  
+* Name
+* Architecture
+* Instruction Source
+* Instruction Iterations
+* Analysis Model
+* Output Model
 
 ### Config Mode
 Sometimes it is useful to leverage the same settings over the course of multiple runs of RED without needing to input the same settings on command line each time. When this functionality is desired, you can use the RED configurable mode to accomplish it. Said mode is initialized as follows:
@@ -66,6 +72,14 @@ To use config mode simply open <a>modules/debug.cfg</a> and edit the interior se
 
 ### System Arguments
 There are a variety of arguments to pass into RED. Below is a full list of what they mean and the types are input they expect. For argument fields that specify a list of options, specify the list number as input during runtime.
+
+#### Name (-name)
+Specifies the name of the system run. Used to generate output files.
+
+Valid Options
+* Any valid string
+
+Usage Example: ``-name=default``
 
 #### Architecture (-architecture)
 Specifies the instructions set architecture RED PANDA is to run in. This also determines the ISA instructions are generated in during run time.
