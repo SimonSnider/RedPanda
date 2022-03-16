@@ -9,6 +9,7 @@ from panda_red.generate_instruction.bitGenerator import *
 from panda_red.models.stateData import *
 import keystone.keystone
 import copy
+from panda_red.create_output.intermediateJsonOutput import *
 #first = True
 skippedRegs = []
 
@@ -206,6 +207,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     if (instIndex < len(instructions)-1):
                         if (verbose): print("switching instructions")
                         instIndex += 1
+                        
                         stateData.registerStateLists.append(copy.copy(registerStateList))
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
                         stateData.instructions.append(instructions[instIndex])
@@ -239,7 +241,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         panda.delete_callback("manageread")
                         panda.delete_callback("managewrite")
 
-                        instIndex = 0;
+                        instIndex = 0
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
 
                         return 0
@@ -378,12 +380,12 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         print(iters)
         if (pc == stopaddress):
             for (regname, reg) in panda.arch.registers.items():
-                print("Checking taint of register " + regname)
+                # print("Checking taint of register " + regname)
                 result = panda.taint_get_reg(reg)[0]
-                print("results " + str(result))
+                # print("results " + str(result))
                 if(result is not None):
                     labels = panda.taint_get_reg(reg)[0].get_labels()
-                    print(panda.taint_get_reg(reg)[0].get_labels())
+                    # print(panda.taint_get_reg(reg)[0].get_labels())
                     for label in labels:
                         model[label][reg] += 1
 
@@ -423,5 +425,5 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
-
+    saveStateData(stateData, "intermediate")
     return [stateData, modelList]
