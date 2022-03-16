@@ -84,7 +84,6 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
         skippedRegs = []
 
 
-    print(taintRegs)
     for (regname, reg) in panda.arch.registers.items():
         if (taintRegs):
             panda.taint_label_reg(reg, reg)

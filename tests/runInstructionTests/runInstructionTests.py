@@ -67,35 +67,35 @@ class TestScript(unittest.TestCase):
     #     self.assertEqual(regStateList.afterStates[0].get("RAX"), 0)
 
 
-    def testRunInstructionsMips(self):
-        panda = initializePanda("mips")
-        print("num_regs: " + str(len(panda.arch.registers)))
-        instructions = []
-        instGen = instructionGenerator.initialize("mips32")
-        inst = 3
-        n = 1
-        md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32 + CS_MODE_BIG_ENDIAN) # misp32
-        for i in range(inst):
-            instruction = instructionGenerator.generateInstruction(instGen, mipsFilter)
-            instructions.append(instruction)
-            for insn in md.disasm(instruction, 0x1000):
-                print("%s\t%s" %(insn.mnemonic, insn.op_str))
+    # def testRunInstructionsMips(self):
+    #     panda = initializePanda("mips")
+    #     print("num_regs: " + str(len(panda.arch.registers)))
+    #     instructions = []
+    #     instGen = instructionGenerator.initialize("mips32")
+    #     inst = 3
+    #     n = 1
+    #     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32 + CS_MODE_BIG_ENDIAN) # misp32
+    #     for i in range(inst):
+    #         instruction = instructionGenerator.generateInstruction(instGen, mipsFilter)
+    #         instructions.append(instruction)
+    #         for insn in md.disasm(instruction, 0x1000):
+    #             print("%s\t%s" %(insn.mnemonic, insn.op_str))
 
-        data: StateData = None
-        data, model = runInstruction.runInstructions(panda, instructions, n, verbose=True)
-        self.assertEqual(len(data.registerStateLists), inst)
-        for regStateList in data.registerStateLists:
-            self.assertEqual(len(regStateList.bitmasks), n*24 + 1)
-            self.assertEqual(len(regStateList.afterStates), n*24 + 1)
-            self.assertEqual(len(regStateList.beforeStates), n*24 + 1)
-            self.assertEqual(regStateList.bitmasks[0], b'\x00\x00\x00\x00')
-            for i in range(len(regStateList.bitmasks)):
-                self.assertIsInstance(regStateList.bitmasks[i], bytes)
-                self.assertIsInstance(regStateList.beforeStates[i], dict)
-                self.assertIsInstance(regStateList.afterStates[i], dict)
-                self.assertTrue(isPowerOfTwo(int.from_bytes(regStateList.bitmasks[i], 'big', signed=False)))
+    #     data: StateData = None
+    #     data, model = runInstruction.runInstructions(panda, instructions, n, verbose=True)
+    #     self.assertEqual(len(data.registerStateLists), inst)
+    #     for regStateList in data.registerStateLists:
+    #         self.assertEqual(len(regStateList.bitmasks), n*24 + 1)
+    #         self.assertEqual(len(regStateList.afterStates), n*24 + 1)
+    #         self.assertEqual(len(regStateList.beforeStates), n*24 + 1)
+    #         self.assertEqual(regStateList.bitmasks[0], b'\x00\x00\x00\x00')
+    #         for i in range(len(regStateList.bitmasks)):
+    #             self.assertIsInstance(regStateList.bitmasks[i], bytes)
+    #             self.assertIsInstance(regStateList.beforeStates[i], dict)
+    #             self.assertIsInstance(regStateList.afterStates[i], dict)
+    #             self.assertTrue(isPowerOfTwo(int.from_bytes(regStateList.bitmasks[i], 'big', signed=False)))
 
-        saveStateData(data, "intermediate")
+    #     saveStateData(data, "intermediate")
 
     # def testRunInstructionsX86(self):
     #     panda = initializePanda("x86_64")
@@ -124,35 +124,35 @@ class TestScript(unittest.TestCase):
     #             self.assertIsInstance(regStateList.afterStates[i], dict)
     #             self.assertTrue(isPowerOfTwo(int.from_bytes(regStateList.bitmasks[i], 'big', signed=False)))
 
-    # def testRunInstructionsMemoryMips(self):
-    #     panda = initializePanda("mips")
-    #     instruction = "lw $t2, 0($t4)"
-    #     instruction2 = "sw $t2, 0($t4)"
-    #     CODE = instruction.encode('UTF-8')
-    #     CODE2 = instruction2.encode('UTF-8')
-    #     ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
+    def testRunInstructionsMemoryMips(self):
+        panda = initializePanda("mips")
+        instruction = "lw $t2, 0($t4)"
+        instruction2 = "sw $t2, 0($t4)"
+        CODE = instruction.encode('UTF-8')
+        CODE2 = instruction2.encode('UTF-8')
+        ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
 
-    #     ADDRESS = 0x0000
-    #     encoding, count = ks.asm(CODE, ADDRESS)
-    #     encoding2, count = ks.asm(CODE2, ADDRESS)
-    #     instructions = [encoding, encoding2]
-    #     inst = 2
-    #     n = 5
+        ADDRESS = 0x0000
+        encoding, count = ks.asm(CODE, ADDRESS)
+        encoding2, count = ks.asm(CODE2, ADDRESS)
+        instructions = [encoding, encoding2]
+        inst = 2
+        n = 5
 
 
-    #     data: StateData = None
-    #     data, model = runInstruction.runInstructions(panda, instructions, n, True)
-    #     self.assertIsInstance(stateData, StateData)
-    #     self.assertEqual(len(stateData.instructions), inst)
-    #     self.assertEqual(len(stateData.registerStateLists), inst)
-    #     lwStates = stateData.registerStateLists[0]
-    #     swStates = stateData.registerStateLists[1]
-    #     self.assertEqual(len(lwStates.memoryReads), n*24 + 1)
-    #     self.assertEqual(len(swStates.memoryWrites), n*24 + 1)
-    #     for read in lwStates.memoryReads[0]:
-    #         self.assertIsInstance(read, MemoryTransaction)
-    #     for write in lwStates.memoryWrites[0]:
-    #         self.assertIsInstance(write, MemoryTransaction)
+        data: StateData = None
+        data, model = runInstruction.runInstructions(panda, instructions, n, True)
+        self.assertIsInstance(stateData, StateData)
+        self.assertEqual(len(stateData.instructions), inst)
+        self.assertEqual(len(stateData.registerStateLists), inst)
+        lwStates = stateData.registerStateLists[0]
+        swStates = stateData.registerStateLists[1]
+        self.assertEqual(len(lwStates.memoryReads), n*24 + 1)
+        self.assertEqual(len(swStates.memoryWrites), n*24 + 1)
+        for read in lwStates.memoryReads[0]:
+            self.assertIsInstance(read, MemoryTransaction)
+        for write in lwStates.memoryWrites[0]:
+            self.assertIsInstance(write, MemoryTransaction)
 
 
 
