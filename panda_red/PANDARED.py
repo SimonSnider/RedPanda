@@ -225,7 +225,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     # Run the instructions through the Panda.re engine
     #
     instructionData, pandaModels = generateInstructionData(arch, instructionList, instructionIterations, verbose)
-    print(len(instructionData.registerStateLists), len(pandaModels))
+#    print(len(instructionData.registerStateLists), len(pandaModels))
     #
     # Generate coorelation data from the instruction results
     #
