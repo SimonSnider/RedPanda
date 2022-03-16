@@ -25,7 +25,6 @@ from panda_red.run_instruction.instructionRunner import generateInstructionData
 #from modules.getCorrelations import correlationCalculator as CC 
 from panda_red.get_correlations import correlationCalculatorMemory as MC
 from panda_red.generate_instruction import instructionGenerator as instructionGen
-from panda_red.compare_to_taint import taintComparer as TC
 from keystone.keystone import *
 import sys
 import argparse
@@ -224,28 +223,27 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     #
     # Run the instructions through the Panda.re engine
     #
-    instructionData, pandaModels = generateInstructionData(arch, instructionList, instructionIterations, verbose)
-#    print(len(instructionData.registerStateLists), len(pandaModels))
+    instructionData, pandasModel = generateInstructionData(arch, instructionList, instructionIterations, verbose)
+
     #
     # Generate coorelation data from the instruction results
     #
-    # MC.setArch(arch)
+    MC.setArch(arch)
     analyzedData = []
-
+    
     for i in range(numInstructions):
         dat = instructionData.registerStateLists[i]
-        pandaModel = pandaModels[i]
-
         MC.initialize(dat, instructionIterations, threshold)
-        calcdCorrelations = MC.computeCorrelations()
-        analyzedData.append(calcdCorrelations)
+        analyzedData.append(MC.computeCorrelations())
 
-        comparison = TC.compare(pandaModel, calcdCorrelations)
-        print(comparison)
+    #
+    # Compare Correlations
+    #
+    
 
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
 
-parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
+parser = argparse.ArgumentParser()
 parser.add_argument("-architecture", type=str, help="the instruction set architecture to generate and run instructions in", choices=["mips32", "x86_64"])
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-random_instructions", type=int, help="a number of random instructions to generate")
@@ -261,8 +259,6 @@ parser.add_argument("-threshold", type=float, help="the correlation threshold fo
 parser.add_argument("-seed", type=int, help="the seed to generate instructions with")
 
 args = parser.parse_args()
-
-print(args)
 if(args.random_instructions):
     mode = 0
 elif(args.bytes_file):

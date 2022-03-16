@@ -55,8 +55,6 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
     thresh = threshold
-#    print("length of afterStates: " +str(len(data.afterStates[0])))
-    n = len(data.afterStates[0])
     if pValue:
         thresh = computeThreshold(threshold)
     
@@ -144,8 +142,8 @@ def binomialSum(q, c):
     """
     sum = 0.0
     n = iterPerRegister
-    for x in range(math.floor(n*q),n):
-        sum += math.comb(n, x*n)*((1-c)**x)*(c**(n-x))
+    for x in n*q..n:
+        sum += math.combination(n, x*n)*((1-c)**x)*(c**(n-x))
     return sum
 
 
@@ -162,11 +160,11 @@ def computeThreshold(p):
     low = 0
     c = (up + low) / 2
     sum = binomialSum(q, c)
-    while(abs(sum - c) > allowance):
-        if sum > q:
+    while(Abs(sum - q) > allowance):
+        if binomialSum > q:
             low = c
         else:
-            up = c
+            high = c
         c = (up + low) / 2
     return c
 
@@ -243,7 +241,7 @@ def computeRegToRegCorrelations():
         for reg in Ri0.keys():
             newDict[reg] = calcAreValuesUnequal(regs.initialOutput.get(reg), Rif.get(reg))
         regs.ps[iter] = newDict
-
+        
     m = [[0]*n for _ in range(n)]
     for i in range(n):
         for j in range(n):
