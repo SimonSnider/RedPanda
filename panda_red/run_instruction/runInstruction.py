@@ -410,5 +410,4 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
-    saveStateData(stateData, "intermediate")
     return [stateData, modelList]
