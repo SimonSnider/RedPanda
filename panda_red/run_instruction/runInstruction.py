@@ -9,6 +9,7 @@ from panda_red.generate_instruction.bitGenerator import *
 from panda_red.models.stateData import *
 import keystone.keystone
 import copy
+from panda_red.create_output.intermediateJsonOutput import *
 #first = True
 skippedRegs = []
 
@@ -130,7 +131,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
         # disable taint data gathering callbacks
         panda.disable_callback("randomRegStateTaint")
-        panda.disable_callback("getTaint")
         panda.disable_callback("getInstValuesTaint")
         panda.disable_callback("bheTaint")
 
@@ -208,6 +208,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     if (instIndex < len(instructions)-1):
                         if (verbose): print("switching instructions")
                         instIndex += 1
+                        panda.flush_tb()
                         stateData.registerStateLists.append(copy.copy(registerStateList))
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
                         stateData.instructions.append(instructions[instIndex])
@@ -230,7 +231,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                        
                         # enable taint model gathering callbacks
                         panda.enable_callback("randomRegStateTaint")
-                        panda.enable_callback("getTaint")
                         panda.enable_callback("getInstValuesTaint")
                         panda.enable_callback("bheTaint")
                         
@@ -241,7 +241,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         panda.delete_callback("manageread")
                         panda.delete_callback("managewrite")
 
-                        instIndex = 0;
+                        instIndex = 0
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
 
                         return 0
@@ -359,19 +359,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                 break
         return 0
 
-    #This callback executes before/in between every block of instructions
-    @panda.cb_after_block_exec
-    def getTaint(arg1, arg2, exitCode):
-        print("in getTaint-deprecated")
-#        for (regname, reg) in panda.arch.registers.items():
-#            taintQuery = panda.taint_get_reg(reg)[0]
-#            print(panda.taint_get_reg(reg))
-#            if(taintQuery is not None):
-#                labels = taintQuery.get_labels()
-#                for label in labels:
-#                    # TODO: make sure datatypes work
-#                    model[reg][label] += 1
-
     # This callback executes after each instruction execution. It handles saving the after register state and 
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
@@ -394,6 +381,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     iters = -1
                     modelList.append(model)
                     model = [[0] * size for _ in range(size)]
+                    panda.flush_tb()
                     loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
                 else:
                     modelList.append(model)
@@ -422,5 +410,4 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
-
     return [stateData, modelList]

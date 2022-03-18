@@ -12,3 +12,4 @@ o
 10
 -threshold
 0.5
+-v
