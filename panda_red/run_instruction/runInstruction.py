@@ -382,6 +382,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     iters = -1
                     modelList.append(model)
                     model = [[0] * size for _ in range(size)]
+                    panda.flush_tb()
                     loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
                 else:
                     modelList.append(model)
