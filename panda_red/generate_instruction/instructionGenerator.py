@@ -1,3 +1,4 @@
+from panda_red.utilities.printOptions import printStandard, printSubsystemFunction
 from panda_red.generate_instruction import verifierAdapter as verAdapt
 from panda_red.generate_instruction import bitGenerator as bitGen
 from panda_red.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
@@ -33,16 +34,20 @@ def generateInstruction(instructionGenerator, filterer, verbose=False):
     while True:
         randomInstructionBytes = bitGen.generateRandomBytes(4)
         if(verbose):
-            print(bitGen.byteBinaryString(randomInstructionBytes))
+            printStandard("Proposing instruction bytes:" + bitGen.byteBinaryString(randomInstructionBytes))
 
         # Check if the instruction is a valid instruction in the ISA
         if(not verAdapt.isValidInstruction(instructionGenerator, randomInstructionBytes)):
+            if(verbose): printStandard("Byte string not valid for given ISA, throwing out bytes")
             continue
 
         # Check if the instruction should be filtered out for the current implementation selection
         if(not filterer.filterInstruction(randomInstructionBytes)):
+            if(verbose): printStandard("Byte string does not pass filter, throwing out bytes")
             continue
 
         break;
 
+    if(verbose): printStandard("Bytes accepted")
+    else: printSubsystemFunction("Intruction bytes generated: " + bitGen.byteBinaryString(randomInstructionBytes))
     return randomInstructionBytes
