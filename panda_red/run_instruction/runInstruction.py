@@ -203,7 +203,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
  
                 # Find the next valid register to randomize. If nextReg = -1, then it's time to switch the instruction or terminate
                 nextReg = getNextValidReg(panda, math.floor(regStateIndex / n))
-#                print(nextReg, ": Next register ------------------------------------------------------------")
+#                printComment(nextReg, ": Next register ------------------------------------------------------------")
                 if (nextReg == -1):
                     
                     # If there are remaining instructions, save the current register state list to the state data and 
@@ -387,7 +387,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     modelList.append(model)
                     model = [[0] * size for _ in range(size)]
                     panda.flush_tb()
-                    print(instIndex)
+                    printComment(instIndex)
                     loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS, md=md)
                 else:
                     modelList.append(model)
