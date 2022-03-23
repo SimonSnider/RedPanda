@@ -32,9 +32,9 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0, md=None):
     adr = address
     for instruction in instructions:
         # Display the instruction that is about to be executed
-        for i in md.disasm(instruction, 0):
-            printSubsystemFunction("Loading instruction: \t%s\t%s" % (i.mnemonic, i.op_str))
-            break
+#        for i in md.disasm(instruction, 0):
+#            printSubsystemFunction("Loading instruction: \t%s\t%s" % (i.mnemonic, i.op_str))
+#            break
         panda.physical_memory_write(adr, bytes(instruction))
         adr += len(bytes(instruction))
     if (panda.arch_name == "mips"):
