@@ -244,7 +244,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         print(comparison)
 
         from panda_red.create_output import comparisonOutput as compOutput
-        compOutput.generateOutput(instructionData.instructionNames[i], [calcdCorrelations, pandaModel], outputFilename)
+        compOutput.generateOutput(instructionData.instructionNames[i], [calcdCorrelations, pandaModel], outputFileName)
 
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
 
