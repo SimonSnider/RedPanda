@@ -1,7 +1,7 @@
 -architecture
 mips32
--instructions_file
-inst.txt
+-random_instructions
+5
 -analysis_model
 1
 -output_model
@@ -9,7 +9,6 @@ inst.txt
 -name
 o
 -iterations
-10
+1
 -threshold
 0.5
--v

@@ -20,4 +20,4 @@ def function(instruction, architecture, ourCorrelations: Correlations, panda: Pa
     n = 5
     pandaModel = runInstructions(panda, instructions, n, True)
 
-    print(compare(pandaModel, correlations))
+    printComment(compare(pandaModel, correlations))
