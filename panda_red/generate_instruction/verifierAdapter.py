@@ -1,3 +1,4 @@
+from panda_red.utilities.printOptions import printStandard
 from capstone import *
 from capstone.mips import *
 from dataclasses import dataclass
@@ -37,11 +38,11 @@ def initialize(arch, littleEndian=False):
 # given binary code, decide whether it is a valid instruction
 def isValidInstruction(verifier, instruction, verbose=False):
     if(verbose):
-        print("archType: %i; mode: %i" %(verifier.arch, verifier.mode))
+        printStandard("archType: %i; mode: %i" %(verifier.arch, verifier.mode))
 
     # attempt to disassemble whether it is a valid instruction
     for insn in verifier.disassembler.disasm(instruction, 0x1000):
         if (verbose): 
-            print("%s\t%s\t%x" %(insn.mnemonic, insn.op_str, insn.address))
+            printStandard("%s\t%s\t%x" %(insn.mnemonic, insn.op_str, insn.address))
         return True
     return False

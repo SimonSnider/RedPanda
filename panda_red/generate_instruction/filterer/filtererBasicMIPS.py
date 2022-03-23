@@ -1,5 +1,6 @@
 # filterer Module
 # Purpose: reject instructions not functional for current model implementation
+from panda_red.utilities.printOptions import printStandard
 from capstone import *
 from capstone.mips import *
 
@@ -21,8 +22,8 @@ def filterInstruction(instruction, verbose=False):
 
     for insn in md.disasm(instruction, 0x1000):
         if(verbose):
-            print("%s\t%s" % (insn.mnemonic, insn.op_str))
-            print("Groups:", insn.groups)
+            printStandard("%s\t%s" % (insn.mnemonic, insn.op_str))
+            printStandard("Groups:", insn.groups)
 
         mnemonic = insn.mnemonic
 
@@ -44,8 +45,6 @@ def filterInstruction(instruction, verbose=False):
                         return False;
                     continue;
                 if i.type == MIPS_OP_MEM:
-                    if(verbose):
-                        print("Error: Instruction Contains Memory Acess")
                     return False;
         else:
             return False;

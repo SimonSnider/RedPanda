@@ -22,130 +22,23 @@ import math
 import random
 import os
 from panda_red.run_instruction.instructionRunner import generateInstructionData
-#from modules.getCorrelations import correlationCalculator as CC 
 from panda_red.get_correlations import correlationCalculatorMemory as MC
 from panda_red.generate_instruction import instructionGenerator as instructionGen
 from panda_red.compare_to_taint import taintComparer as TC
+from panda_red.utilities.printOptions import *
 from keystone.keystone import *
-import sys
 import argparse
 
 module_location = os.path.abspath(__file__)
 module_dir = os.path.dirname(module_location)
 
-def runInputAndModel():
-    #
-    # Take user input and specify run modes.
-    #
-
-    # File Name
-    print("Specify an output file name (default = data)")
-    outputFileName = input() or "data"
-
-    # Architecture
-    print("Specify an architecture (default = 0)")
-    print("Supported Architectures")
-    print("    0 - mips32")
-    print("    1 - x86_64")
-    try:
-        arch = int(input() or 0)
-    except ValueError:
-        print("Value supplied not numerical. Please supply a numeric value corresponding to a supported architecture.")
-        return
-
-    if arch == 0:
-        arch = 'mips32'
-    elif arch == 1:
-        arch = "x86_64"
-    else:
-        print("Architecture not within supported range. Please enter a supported architecture value.")
-        return
-
-    # Instruction Mode
-    print("Specify a mode (default = 0)")
-    print("Supported Modes")
-    print("    0 - random")
-    print("    1 - byte-specified")
-    print("    2 - text-specified")
-    try:
-        mode = int(input() or 0)
-    except ValueError:
-        print("Value supplied not numerical. Please supply a numeric value corresponding to a supported mode.")
-        return
-
-    numInstructions = 0
-    instructionsFile = ""
-
-    if mode == 0:
-        print("Specify the number of instructions to generate data for (default = 1)")
-        try:
-            numInstructions = int(input() or 1)
-        except ValueError:
-            print("Value supplied not numerical. Please supply a numeric value.")
-            return
-    elif mode == 1:
-        print("Specify the file containing the instructions (default = byte_specifications.txt)")
-        instructionsFile = input() or os.path.join(module_dir, "byte_specifications.txt")
-    elif mode == 2:
-        print("Specify the file containing the instructions (default = instruction_specifications.txt)")
-        instructionsFile = input() or os.path.join(module_dir, "instruction_specifications.txt")
-    else:
-        print("Mode not within supported range. Please enter a supported mode value.")
-        return
-
-    # Instruction Iterations
-    print("Specify the number of times an instruction is run (default = 10)")
-    try:
-        instructionIterations = int(input() or 10)
-    except ValueError:
-        print("Value supplied not numerical. Please supply a numeric value.")
-        return
-
-    # Analysis Model
-    print("Specify the analysis model (default = 0)")
-    print("Supported Models")
-    print("    0 - reg-coorelational")
-    try:
-        model = int(input() or 0)
-    except ValueError:
-        print("Value supplied not numerical. Please supply a numeric value corresponding to a supported model.")
-        return
-
-    if model != 0:
-        print("Model not within supported range. Please enter a supported model value.")
-        return 
-
-    # Analysis Model
-    print("Specify the output model (default = 0)")
-    print("Supported Models")
-    print("    0 - matrix")
-    print("    0 - threshold")
-    try:
-        outputModel = int(input() or 0)
-    except ValueError:
-        print("Value supplied not numerical. Please supply a numeric value corresponding to a supported model.")
-        return
-
-    if outputModel < 0 or outputModel > 1:
-        print("Model not within supported range. Please enter a supported model value.")
-        return 
-
-    # Verbosity
-    print("Verbose? (default = 0)")
-    try:
-        verbose = int(input() or 0)
-    except ValueError:
-        print("Value supplied not numerical. Please supply a numeric value.")
-        return
-    
-    if(verbose < 0 or verbose > 1):
-        print("Value supplied is not either 0 or 1. Please supply a valid value.")
-        return
-
-    runModel(arch, mode, instructionIterations, outputFileName, outputModel, instructionsFile, numInstructions, verbose)
-
 def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, instructionsFile = "", numInstructions = 1, verbose = 0, threshold = 0.5, seed = random.randint(-214322, 1421535)):
-    print(seed)
+    printMainFunction("System initialized in the following mode:")
+    printMainFunctionBody("Architecture: " + arch)
+    printMainFunctionBody("Iterations:   " + str(instructionIterations))
+    printMainFunctionBody("Output Model: " + str(outputModel))
+    printMainFunctionBody("Name:         " + str(outputFileName))
+    printMainFunction("System initialized using seed: " + str(seed))
    
     #
     # Generate instructions or load them from a file
@@ -166,10 +59,10 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         elif arch == "x86_64":
             from panda_red.generate_instruction.filterer import filtererBasicX86 as filter
         else:
-            print("How did you get here?")
+            printError("Specified architecture: " + arch + " not valid")
             return
         for _ in range(numInstructions):
-            instructionList.append(instructionGen.generateInstruction(instructionGenerator, filter))
+            instructionList.append(instructionGen.generateInstruction(instructionGenerator, filter, verbose))
     elif mode == 1:
         # Instructions are given in byte format in a text file
         instructionList = []
@@ -198,7 +91,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         elif (arch == "x86_64"):
             KS = Ks(KS_ARCH_X86,KS_MODE_64)
         else:
-            print("How did you get here?")
+            printError("Specified architecture: " + arch + " not valid")
             return
         ADDRESS = 0x0000
 
@@ -218,32 +111,36 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
             instructionList.append(encoding)
             numInstructions += 1
     else:
-        print("Mode supplied invalid. Must be 0, 1, or 2")
+        printError("Specified mode: " + mode + " not valid")
         return
 
     #
     # Run the instructions through the Panda.re engine
     #
+    printMainFunction("Instruction retrieval complete, beginning to run instructions")
     instructionData, pandaModels = generateInstructionData(arch, instructionList, instructionIterations, verbose)
-#    print(len(instructionData.registerStateLists), len(pandaModels))
     #
     # Generate coorelation data from the instruction results
     #
     # MC.setArch(arch)
+    printMainFunction("Running instructions complete, beginning to analyze correlations")
     analyzedData = []
 
     for i in range(numInstructions):
+        if(verbose): printStandard("Generating correlations for: " + str(instructionList[i]))
         dat = instructionData.registerStateLists[i]
         pandaModel = pandaModels[i]
 
         MC.initialize(dat, instructionIterations, threshold)
-        calcdCorrelations = MC.computeCorrelations()
+        calcdCorrelations = MC.computeCorrelations(verbose)
         analyzedData.append(calcdCorrelations)
 
         comparison = TC.compare(pandaModel, calcdCorrelations)
-        print(comparison)
+        printComment(comparison)
 
+    printMainFunction("Analysis complete, generating output file")
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
+    printMainFunction("Output complete, ending red panda execution")
 
 parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
 parser.add_argument("-architecture", type=str, help="the instruction set architecture to generate and run instructions in", choices=["mips32", "x86_64"])
@@ -262,7 +159,7 @@ parser.add_argument("-seed", type=int, help="the seed to generate instructions w
 
 args = parser.parse_args()
 
-print(args)
+printComment(str(args))
 if(args.random_instructions):
     mode = 0
 elif(args.bytes_file):
@@ -270,45 +167,10 @@ elif(args.bytes_file):
 elif(args.instructions_file):
     mode = 2
 else:
-    print("Must specify an instruction source")
+    printError("Must specify an instruction source")
     quit()
 
 if(args.seed):
     runModel(args.architecture, mode, args.iterations, args.name, args.output_model, args.instructions_file, args.random_instructions, args.verbose, args.threshold, args.seed)
 else:
     runModel(args.architecture, mode, args.iterations, args.name, args.output_model, args.instructions_file, args.random_instructions, args.verbose, args.threshold)
-
-# if len(sys.argv) > 1:
-#     if sys.argv[1] == "-c":
-#         # arguments list
-#         arguments = []
-
-#         # Read file
-#         fname = "debug.cfg"
-#         debug_file = os.path.join(module_dir, fname)
-#         with open(debug_file) as f:
-#             lines = f.readlines()
-
-#         # Parse file
-#         for line in lines:
-#             # Ignore comments and blank lines
-#             if (line[0] == '#') or (len(line.rstrip('\n')) < 1):
-#                 continue;
-
-#             arguments.append(line.rstrip('\n'))
-#         print(len(arguments))
-#         print("Read instruction arguments: \nArchitecture:", arguments[0], 
-#             "\nInstruction Mode:", arguments[1], 
-#             "\nInstruction Iterations:", arguments[2], 
-#             "\nOutput File Name:", arguments[3],
-#             "\nOutput Mode: ", arguments[4],
-#             "\nOutput Threshold: ", arguments[5],  
-#             "\nInstructions File:", arguments[6], 
-#             "\nNumber of Instructions to Generate:", arguments[7],
-#             "\nVerbose:", arguments[8]
-#             )
-
-#         runModel(arguments[0], int(arguments[1]), int(arguments[2]), arguments[3], int(arguments[4]), arguments[6], int(arguments[7]), int(arguments[8]), float(arguments[5]))
-# else:
-#     runInputAndModel()
-
