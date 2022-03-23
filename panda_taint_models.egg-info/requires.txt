@@ -1,3 +1,0 @@
-pandare
-capstone
-keystone-engine
