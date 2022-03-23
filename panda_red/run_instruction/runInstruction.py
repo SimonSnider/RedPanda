@@ -14,7 +14,7 @@ from panda_red.create_output.intermediateJsonOutput import *
 #first = True
 skippedRegs = []
 
-def loadInstructions(panda: Panda, cpu, instructions, address=0, md=None):
+def loadInstructions(panda: Panda, cpu, instructions, address=0, md=None, pc=0):
     """
     Arguments:
         panda -- the instance of panda the instruction will be loaded into
@@ -31,10 +31,6 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0, md=None):
     jump_instr = b""
     adr = address
     for instruction in instructions:
-        # Display the instruction that is about to be executed
-#        for i in md.disasm(instruction, 0):
-#            printSubsystemFunction("Loading instruction: \t%s\t%s" % (i.mnemonic, i.op_str))
-#            break
         panda.physical_memory_write(adr, bytes(instruction))
         adr += len(bytes(instruction))
     if (panda.arch_name == "mips"):
@@ -48,6 +44,10 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0, md=None):
     
     panda.physical_memory_write(adr, bytes(jump_instr))
     panda.arch.set_pc(cpu, address)
+
+    code = panda.virtual_memory_read(cpu, address, len(instruction))
+    for i in md.disasm(code, address):
+        printSubsystemFunction("Loading instruction: \t%s\t%s" % (i.mnemonic, i.op_str))
     return adr
 
 def getNextValidReg(panda: Panda, regNum):
