@@ -243,6 +243,9 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         comparison = TC.compare(pandaModel, calcdCorrelations)
         print(comparison)
 
+        from panda_red.create_output import comparisonOutput as compOutput
+        compOutput.generateOutput(instructionData.instructionNames[i], [calcdCorrelations, pandaModel], outputFilename)
+
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
 
 parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
