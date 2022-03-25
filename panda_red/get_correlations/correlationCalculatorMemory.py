@@ -6,6 +6,7 @@ likely to be related given a particular threshold. For more details, see our mat
 
 from panda_red.models.stateData import *
 from panda_red.models.correlations import *
+from panda_red.utilities.printOptions import *
 import math
 
 n = 24 #number of registers about which we care
@@ -13,6 +14,7 @@ iterPerRegister = 100 # iterations run per set of registers randomized
 I = n*iterPerRegister # total number of iterations run
 Bs = -1 #B_i
 thresh = 0.5 # minimum correlation coefficient required for two elements to be considered correlated
+verbose = False
 # later, users will have the option to compute the threshold given a p-value
 
 regs = IntermediateData()
@@ -43,7 +45,7 @@ def setArch(archType, testV=0):
         n = testV
 
 
-def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5, pValue: bool = True):
+def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5, pValue: bool = True, verbose=False):
 
     """ Initializes the correlation calculator with the data from running an instruction multiple times
 
@@ -54,8 +56,9 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
 
     """
     global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
+    if(verbose): printStandard("Initializing correlation run")
     thresh = threshold
-#    print("length of afterStates: " +str(len(data.afterStates[0])))
+    # printComment("length of afterStates: " +str(len(data.afterStates[0])))
     n = len(data.afterStates[0])
     if pValue:
         thresh = computeThreshold(threshold)
@@ -259,6 +262,8 @@ def computeRegToRegCorrelations():
                     m[i][j] = 1
             else:
                 m[i][j] = num/denom
+                
+    if(verbose): printStandard("Computed register to register correlations: " + str(m))
     
     return m
     
@@ -283,6 +288,8 @@ def computeRegToReadAddrCorrelations():
                 m[i][j] = 0
             else:
                 m[i][j] = num/denom
+            
+    if(verbose): printStandard("Computed register to memory read address correlations: " + str(m))
     
     return m
     
@@ -307,6 +314,8 @@ def computeRegToWriteAddrCorrelations():
                 m[i][j] = 0
             else:
                 m[i][j] = num/denom
+                
+    if(verbose): printStandard("Computed register to memory write address correlations: " + str(m))
     
     return m
     
@@ -331,6 +340,8 @@ def computeRegToReadValCorrelations():
                 m[i][j] = 0
             else:
                 m[i][j] = num/denom
+                
+    if(verbose): printStandard("Computed register to memory read correlations: " + str(m))
     
     return m
     
@@ -356,15 +367,18 @@ def computeRegToWriteValCorrelations():
             else:
                 m[i][j] = num/denom
     
+    if(verbose): printStandard("Computed register to memory write correlations: " + str(m))
+
     return m
 
         
-def computeCorrelations():
+def computeCorrelations(v = False):
     """Calculates the correlation value for each pair of registers. Must call initialize before this.
     Return Value:
     M -- n x m list where M[i][j] represents the correlation of register i on register/memory access j
     """
-    global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh
+    global iterPerRegister, Bs, n, I, regList, regs, memReadVals, memReadAddrs, memWriteVals, memWriteAddrs, thresh, verbose
+    verbose = v
     M = Correlations()
     
     M.regToReg = computeRegToRegCorrelations()

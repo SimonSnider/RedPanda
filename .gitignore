@@ -1,2 +1,6 @@
 **/__pycache__/
 *.py~
+.csv
+.egg-info
+.txt
+.json
