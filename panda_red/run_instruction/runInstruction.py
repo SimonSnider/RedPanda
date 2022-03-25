@@ -1,3 +1,4 @@
+from time import sleep
 from pandare import Panda
 from pytest import skip
 from panda_red.run_instruction.stateManager import *
@@ -208,8 +209,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     if (instIndex < len(instructions)-1):
                         if (verbose): print("switching instructions")
                         instIndex += 1
-                        panda.flush_tb()
                         stateData.registerStateLists.append(copy.copy(registerStateList))
+                        panda.flush_tb()
+
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
                         stateData.instructions.append(instructions[instIndex])
                         code = panda.virtual_memory_read(cpu, ADDRESS, 4)
@@ -242,8 +244,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         panda.delete_callback("managewrite")
 
                         instIndex = 0
+                        panda.flush_tb()
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
-
                         return 0
             
                 # Update the bitmask to randomize the next valid register
@@ -343,7 +345,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
     @panda.cb_insn_exec
     def randomRegStateTaint(cpu, pc):
-        print("randomize register state")
         # Check if the panda is about to execute the instruction that is being tested. 
         # The register state only needs randomized before that instruction
         if (pc == ADDRESS):
@@ -364,7 +365,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_after_insn_exec 
     def getInstValuesTaint(cpu, pc):
         nonlocal regBoundsCount, iters, model, instIndex, modelList
-        print(iters)
         if (pc == stopaddress):
             for (regname, reg) in panda.arch.registers.items():
                 result = panda.taint_get_reg(reg)[0]
@@ -378,7 +378,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     # Instruction Finished collecting iterations
                     # Switching to next instruction
                     instIndex += 1
-                    iters = -1
+                    iters = 0
                     modelList.append(model)
                     model = [[0] * size for _ in range(size)]
                     panda.flush_tb()
