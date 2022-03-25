@@ -1,3 +1,4 @@
+from time import sleep
 from pandare import Panda
 from pytest import skip
 from panda_red.run_instruction.stateManager import *
@@ -212,9 +213,11 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     if (instIndex < len(instructions)-1):
                         if (verbose): printStandard("Switching instructions")
                         instIndex += 1
-                        panda.flush_tb()
                         stateData.registerStateLists.append(copy.copy(registerStateList))
+            
+                        panda.flush_tb()
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS, md=md)
+                
                         stateData.instructions.append(instructions[instIndex])
                         code = panda.virtual_memory_read(cpu, ADDRESS, 4)
                         for i in md.disasm(code, ADDRESS):
@@ -240,13 +243,15 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         panda.enable_callback("bheTaint")
                         
                         #remove stateData gathering callbacks
-                        panda.delete_callback("randomRegState")
-                        panda.delete_callback("getInstValues")
-                        panda.delete_callback("bhe")
-                        panda.delete_callback("manageread")
-                        panda.delete_callback("managewrite")
+                        panda.disable_callback("randomRegState")
+                        panda.disable_callback("getInstValues")
+                        panda.disable_callback("bhe")
+                        panda.disable_callback("manageread")
+                        panda.disable_callback("managewrite")
 
                         instIndex = 0
+                        
+                        panda.flush_tb()
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS, md=md)
 
                         return 0
@@ -383,7 +388,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     # Instruction Finished collecting iterations
                     # Switching to next instruction
                     instIndex += 1
-                    iters = -1
+                    iters = 0
                     modelList.append(model)
                     model = [[0] * size for _ in range(size)]
                     panda.flush_tb()
