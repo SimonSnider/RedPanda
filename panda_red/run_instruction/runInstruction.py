@@ -237,11 +237,11 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         panda.enable_callback("bheTaint")
                         
                         #remove stateData gathering callbacks
-                        panda.delete_callback("randomRegState")
-                        panda.delete_callback("getInstValues")
-                        panda.delete_callback("bhe")
-                        panda.delete_callback("manageread")
-                        panda.delete_callback("managewrite")
+                        panda.disable_callback("randomRegState")
+                        panda.disable_callback("getInstValues")
+                        panda.disable_callback("bhe")
+                        panda.disable_callback("manageread")
+                        panda.disable_callback("managewrite")
 
                         instIndex = 0
                         panda.flush_tb()
