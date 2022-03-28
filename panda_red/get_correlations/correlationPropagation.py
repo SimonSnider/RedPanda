@@ -22,6 +22,14 @@ def matrix_multiply(a, b):
     return product
 
 
+def transpose(matr):
+    output = np.zeros((len(matr[0]), len(matr)))
+    for i in range(len(matr)):
+        for j in range(len(matr[0])):
+            output[j][i] = matr[i][j]
+    return output
+
+
 def propagate(corr):
     numInstructions = len(corr)
     triangle = np.zeros((numInstructions, numInstructions, 3))
@@ -33,11 +41,25 @@ def propagate(corr):
     for i in range(numInstructions):
         for j in range(i+1, numInstructions):
             t = TriangleEntry()
-            t.readValToReadAddress = matrix_multiply(corr[i].readDataToReg, corr[j].regToReadAddress)
-            t.readValToWriteVal = matrix_multiply(corr[i].readDataToReg, corr[j].regToWriteData)
-            t.readValToWriteAddress = matrix_multiply(corr[i].readDataToReg, corr[j].regToWriteAddress)
+            t.readDataToReadAddress = matrix_multiply(corr[i].readDataToReg, transpose(corr[j].regToReadAddress))
+            t.readDataToWriteData = matrix_multiply(corr[i].readDataToReg, transpose(corr[j].regToWriteData))
+            t.readDataToWriteAddress = matrix_multiply(corr[i].readDataToReg, transpose(corr[j].regToWriteAddress))
             triangle[i][j] = t
-
+    readDataToReg = []
+    regToReadAddress = []
+    regToWriteData = []
+    regToWriteAddress = []
+    for i in range(len(corr)):
+        readDataToReg.append(corr[i].readDataToReg)
+        regToReadAddress.append(corr[i].regToReadAddress)
+        regToWriteData.append(corr[i].regToWriteData)
+        regToWriteAddress.append(corr[i].regToWriteAddress)
     output = NonRectangularPseudoMatrix()
     output.regToReg = finalRegToReg
     output.triangle = triangle
+    output.readDataToReg = readDataToReg
+    output.regToReadAddress = regToReadAddress
+    output.regToWriteData = regToWriteData
+    output.regToWriteAddress = regToWriteAddress
+
+    return output
