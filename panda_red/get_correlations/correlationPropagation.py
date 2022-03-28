@@ -23,6 +23,8 @@ def matrix_multiply(a, b):
 
 
 def transpose(matr):
+    if(len(matr) == 0):
+        return []
     output = [[0]*len(matr[0]) for _ in range(len(matr))]
     for i in range(len(matr)):
         for j in range(len(matr[0])):

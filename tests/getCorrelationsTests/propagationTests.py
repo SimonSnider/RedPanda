@@ -1,11 +1,64 @@
 from panda_red.get_correlations import correlationPropagation as prop
 from panda_red.models.correlations import *
 
-#def testNoMem():
+def testNoMem():
+    #1 R1 = R2 + R3
+    #2 R4 = R1 + (-1)
+    
+    inst1 = Correlations()
+    inst1.regToReg = [[1,0,0,0,0],[0,0,0,0,0],[0,1,1,0,0],[0,1,0,1,0],[0,0,0,0,1]]
+    inst1.regToReadAddress = [[],[],[],[],[]]
+    inst1.readDataToReg = [[],[],[],[],[]]
+    inst1.regToWriteAddress = [[],[],[],[],[]]
+    inst1.regToWriteData = [[],[],[],[],[]]
+    
+    inst2 = Correlations()
+    inst2.regToReg = [[1,0,0,0,0],[0,1,0,0,1],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,0]]
+    inst2.regToReadAddress = [[],[],[],[],[]]
+    inst2.readDataToReg = [[],[],[],[],[]]
+    inst2.regToWriteAddress = [[],[],[],[],[]]
+    inst2.regToWriteData = [[],[],[],[],[]]
+    
+    actual = prop.propagate([inst1, inst2])
+    
+    print(actual)
 
 
-#def smallScaleTest():
-
+def smallScaleTest():
+    #1 R1 = R2 + R3
+    #2 R2 = M(R3)
+    #3 M(R2) = r1
+    #4 R4 = R2 + 4
+    
+    inst1 = Correlations()
+    inst1.regToReg = [[1,0,0,0,0],[0,0,0,0,0],[0,1,1,0,0],[0,1,0,1,0],[0,0,0,0,1]]
+    inst1.regToReadAddress = [[],[],[],[],[]]
+    inst1.readDataToReg = [[],[],[],[],[]]
+    inst1.regToWriteAddress = [[],[],[],[],[]]
+    inst1.regToWriteData = [[],[],[],[],[]]
+    
+    inst2 = Correlations()
+    inst2.regToReg = [[1,0,0,0,0],[0,1,0,0,0],[0,0,0,0,0],[0,0,0,1,0],[0,0,0,0,1]]
+    inst2.regToReadAddress = [[0],[0],[0],[1],[0]]
+    inst2.readDataToReg = [[0],[0],[1],[0],[0]]
+    inst2.regToWriteAddress = [[],[],[],[],[]]
+    inst2.regToWriteData = [[],[],[],[],[]]
+    
+    inst3 = Correlations()
+    inst3.regToReg = [[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1]]
+    inst3.regToReadAddress = [[],[],[],[],[]]
+    inst3.readDataToReg = [[],[],[],[],[]]
+    inst3.regToWriteAddress = [[0],[0],[1],[0],[0]]
+    inst3.regToWriteData = [[0],[1],[0],[0],[0]]
+    
+    inst4 = Correlations()
+    inst4.regToReg = [[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,1],[0,0,0,1,0],[0,0,0,0,0]]
+    inst4.regToReadAddress = [[],[],[],[],[]]
+    inst4.readDataToReg = [[],[],[],[],[]]
+    inst4.regToWriteAddress = [[],[],[],[],[]]
+    inst4.regToWriteData = [[],[],[],[],[]]
+    
+    actual = prop.propagate([inst1, inst2, inst3, inst4])
 
 def largeScaleTest():
     #1  R1 = M(R2)
@@ -96,4 +149,4 @@ def largeScaleTest():
     actual = prop.propagate([inst1,inst2,inst3,inst4,inst5,inst6,inst7,inst8,inst9,inst10])
     print(actual)
     
-largeScaleTest()
+testNoMem()
