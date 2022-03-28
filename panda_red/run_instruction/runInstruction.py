@@ -199,10 +199,12 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
  
                 # Find the next valid register to randomize. If nextReg = -1, then it's time to switch the instruction or terminate
                 nextReg = getNextValidReg(panda, math.floor(regStateIndex / n))
+#                print(nextReg, ": Next register ------------------------------------------------------------")
                 if (nextReg == -1):
                     
                     # If there are remaining instructions, save the current register state list to the state data and 
                     # switch to the next instruction.
+#                    print(instIndex, ": instIndex --------------------------------------------------------------")
                     if (instIndex < len(instructions)-1):
                         if (verbose): print("switching instructions")
                         instIndex += 1
@@ -378,12 +380,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         print(iters)
         if (pc == stopaddress):
             for (regname, reg) in panda.arch.registers.items():
-                print("Checking taint of register " + regname)
                 result = panda.taint_get_reg(reg)[0]
-                print("results " + str(result))
                 if(result is not None):
                     labels = panda.taint_get_reg(reg)[0].get_labels()
-                    print(panda.taint_get_reg(reg)[0].get_labels())
                     for label in labels:
                         model[label][reg] += 1
 
