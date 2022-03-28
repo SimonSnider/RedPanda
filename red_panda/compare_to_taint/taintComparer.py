@@ -1,5 +1,5 @@
-from panda_red.models.correlations import *
-from panda_red.utilities.printOptions import printComment
+from red_panda.models.correlations import *
+from red_panda.utilities.printOptions import printComment
 
 def convertMatrixToDict(matrix, threshold):
     newModel = {}

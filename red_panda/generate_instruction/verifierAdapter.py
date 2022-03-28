@@ -1,8 +1,8 @@
-from panda_red.utilities.printOptions import printStandard
+from red_panda.utilities.printOptions import printStandard
 from capstone import *
 from capstone.mips import *
 from dataclasses import dataclass
-from panda_red.models.verifier import Verifier
+from red_panda.models.verifier import Verifier
 
 
 # instantiate the Capstone object (disassembler)

@@ -21,11 +21,11 @@ Arguments:
 import math
 import random
 import os
-from panda_red.run_instruction.instructionRunner import generateInstructionData
-from panda_red.get_correlations import correlationCalculatorMemory as MC
-from panda_red.generate_instruction import instructionGenerator as instructionGen
-from panda_red.compare_to_taint import taintComparer as TC
-from panda_red.utilities.printOptions import *
+from red_panda.run_instruction.instructionRunner import generateInstructionData
+from red_panda.get_correlations import correlationCalculatorMemory as MC
+from red_panda.generate_instruction import instructionGenerator as instructionGen
+from red_panda.compare_to_taint import taintComparer as TC
+from red_panda.utilities.printOptions import *
 from keystone.keystone import *
 import argparse
 
@@ -44,9 +44,9 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     # Generate instructions or load them from a file
     #
     if outputModel == 0:
-        from panda_red.create_output import matrixOutput as output
+        from red_panda.create_output import matrixOutput as output
     elif outputModel == 1:
-        from panda_red.create_output import thresholdOutput as output
+        from red_panda.create_output import thresholdOutput as output
     #else:
         #from modules.createOutput import matrixOutput as output
 
@@ -55,9 +55,9 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         instructionList = []
         instructionGenerator = instructionGen.initialize(arch)
         if arch == "mips32":
-            from panda_red.generate_instruction.filterer import filtererBasicMIPS as filter
+            from red_panda.generate_instruction.filterer import filtererBasicMIPS as filter
         elif arch == "x86_64":
-            from panda_red.generate_instruction.filterer import filtererBasicX86 as filter
+            from red_panda.generate_instruction.filterer import filtererBasicX86 as filter
         else:
             printError("Specified architecture: " + arch + " not valid")
             return

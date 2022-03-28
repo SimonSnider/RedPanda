@@ -1,6 +1,6 @@
 # filterer Module
 # Purpose: reject instructions not functional for current model implementation
-from panda_red.utilities.printOptions import printStandard
+from red_panda.utilities.printOptions import printStandard
 from capstone import *
 from capstone.mips import *
 

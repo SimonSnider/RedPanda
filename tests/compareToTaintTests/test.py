@@ -1,14 +1,14 @@
-from panda_red.models.correlations import *
-from panda_red.compare_to_taint.taintComparer import *
+from red_panda.models.correlations import *
+from red_panda.compare_to_taint.taintComparer import *
 from capstone import *
-from panda_red.run_instruction.runInstruction import *
-from panda_red.run_instruction.stateManager import *
+from red_panda.run_instruction.runInstruction import *
+from red_panda.run_instruction.stateManager import *
 from keystone.keystone import *
-from panda_red.generate_instruction import instructionGenerator
+from red_panda.generate_instruction import instructionGenerator
 import math
-from panda_red.models.stateData import *
-from panda_red.run_instruction.stateManager import *
-from panda_red.get_correlations import correlationCalculatorMemory as calc
+from red_panda.models.stateData import *
+from red_panda.run_instruction.stateManager import *
+from red_panda.get_correlations import correlationCalculatorMemory as calc
 
 def test1():
     """

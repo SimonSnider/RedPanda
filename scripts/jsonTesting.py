@@ -1,6 +1,6 @@
 import json
-from panda_red.models.stateData import *
-from panda_red.run_instruction import instructionRunner as IR
+from red_panda.models.stateData import *
+from red_panda.run_instruction import instructionRunner as IR
 from keystone.keystone import *
 
 instruction = "add $t1, $t2, $t3"

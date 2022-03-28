@@ -27,7 +27,7 @@ docker run -it image bash
 
 Then you should be able to successfully run:
 ```
-python3 panda_red/PANDARED.py <arguments>
+python3 red_panda/REDPANDA.py <arguments>
 ```
 
 ### Non-Dockerfile Requirements (Note: This method is currently not recommended and is missing complete installation instructions)
@@ -47,7 +47,7 @@ To run RED PANDA in the default mode use the following command:
 <b>
   
 ```
-python3 panda_red/PANDARED.py <arguments>
+python3 red_panda/REDPANDA.py <arguments>
 ```
   
 </b>
@@ -64,7 +64,7 @@ The following arguments must be specified on the command line:
 Sometimes it is useful to leverage the same settings over the course of multiple runs of RED without needing to input the same settings on command line each time. When this functionality is desired, you can use the RED configurable mode to accomplish it. Said mode is initialized as follows:
 <b>
 ```
-python3 modules/PANDARED.py -f
+python3 modules/REDPANDA.py -f
 ```
 </b>
 To use config mode simply open <a>modules/debug.cfg</a> and edit the interior settings to match your desired settings.
@@ -196,7 +196,7 @@ Argument configuration files can be a useful tool for storing complex sets of sy
   Now that the file is complete we can execute it using the following command:
   
 
-    python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_config_run @my_config.txt
+    python3 /red_panda/REDPANDA.py -random_instructions=10 -name=my_config_run @my_config.txt
   Notice that the two required arguments of instruction source and execution name are still specified. If we wanted to keep either of these consistent between runs we could move them to the configurable file much like the others.
   </li>
 </ol>
@@ -219,10 +219,10 @@ Argument configuration files can be a useful tool for storing complex sets of sy
   <li>
   Once the instructions are written it is time to run Red Panda. In order to run the system using the instruction list you must use the -instructions_file argument in place of the -random_instructions argument. The usage of which can be found as follows:
     
-  Random Instructions: `` python3 /panda_red/PANDARED.py -random_instructions=10 -name=my_instructions_run ... `` Becomes
+  Random Instructions: `` python3 /red_panda/REDPANDA.py -random_instructions=10 -name=my_instructions_run ... `` Becomes
     
   ```
-  python3 /panda_red/PANDARED.py -instructions_file=my_instructions.txt -name=my_instructions_run ...
+  python3 /red_panda/REDPANDA.py -instructions_file=my_instructions.txt -name=my_instructions_run ...
   ```
   </li>
 </ol>

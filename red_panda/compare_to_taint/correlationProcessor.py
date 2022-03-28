@@ -4,7 +4,7 @@ from capstone import *
 from capstone.mips import *
 import math
 import copy
-from panda_red.run_instruction.stateManager import *
+from red_panda.run_instruction.stateManager import *
 import keystone
 model = {}
 first = True
