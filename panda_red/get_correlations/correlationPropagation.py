@@ -12,7 +12,7 @@ def matrix_multiply(a, b):
     """
     if len(a[0]) != len(b):
         return None
-    product = np.zeros((len(a), len(b[0])))
+    product = [[0]*len(a) for _ in range(len(b[0]))]
     for x in range(len(a)):
         for y in range(len(b[0])):
             sum = 0
@@ -23,7 +23,7 @@ def matrix_multiply(a, b):
 
 
 def transpose(matr):
-    output = np.zeros((len(matr[0]), len(matr)))
+    output = [[0]*len(matr[0]) for _ in range(len(matr))]
     for i in range(len(matr)):
         for j in range(len(matr[0])):
             output[j][i] = matr[i][j]
@@ -32,7 +32,7 @@ def transpose(matr):
 
 def propagate(corr):
     numInstructions = len(corr)
-    triangle = np.zeros((numInstructions, numInstructions, 3))
+    triangle = [[None]*numInstructions for _ in range(numInstructions)]
     finalRegToReg = corr[0].regToReg
     for i in range(len(corr) - 1):
         finalRegToReg = matrix_multiply(finalRegToReg, corr[i+1].regToReg)

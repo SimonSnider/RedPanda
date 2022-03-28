@@ -11,9 +11,9 @@ class Correlations:
 
 @dataclass
 class TriangleEntry:
-	readDataToReadAddress: "list[list[float]]" = field(default_factory=float)
-	readDataToWriteAddress: "list[list[float]]" = field(default_factory=float)
-	readDataToWriteData: "list[list[float]]" = field(default_factory=float)
+	readDataToReadAddress: "list[list[float]]" = field(default_factory=list)
+	readDataToWriteAddress: "list[list[float]]" = field(default_factory=list)
+	readDataToWriteData: "list[list[float]]" = field(default_factory=list)
 
 @dataclass
 class NonRectangularPseudoMatrix:
