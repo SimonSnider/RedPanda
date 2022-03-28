@@ -1,4 +1,5 @@
 from panda_red.models.correlations import *
+from panda_red.utilities.printOptions import printComment
 
 def convertMatrixToDict(matrix, threshold):
     newModel = {}
@@ -9,7 +10,7 @@ def convertMatrixToDict(matrix, threshold):
             if ls[index2] >= threshold:
                 labelSet.append(index2)
         newModel[index1] = labelSet
-#        print(str(index1) + " " + str(labelSet))
+#        printComment(str(index1) + " " + str(labelSet))
     return newModel
 
 def extractNewModel(corr: Correlations):
