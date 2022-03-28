@@ -11,18 +11,24 @@ class Correlations:
 
 @dataclass
 class TriangleEntry:
-	readDataToReadAddress: "list[list[float]]" = field(default_factory=list)
-	readDataToWriteAddress: "list[list[float]]" = field(default_factory=list)
-	readDataToWriteData: "list[list[float]]" = field(default_factory=list)
+	readDataToReadAddress: "Matrix" = field(default_factory=Matrix)
+	readDataToWriteAddress: "Matrix" = field(default_factory=Matrix)
+	readDataToWriteData: "Matrix" = field(default_factory=Matrix)
+	
+@dataclass
+class Matrix:
+	numRows: "int" = field(default_factory=int)
+	numCols: "int" = field(default_factory=int)
+	matrix: "list[list[float]]" = field(default_factory=list)
 
 @dataclass
 class NonRectangularPseudoMatrix:
-	regToReg: "list[list[float]]" = field(default_factory=list)
-	readDataToReg: "list[list[float]]" = field(default_factory=list)
-	regToReadAddress: "list[list[float]]" = field(default_factory=list)
-	regToWriteData: "list[list[float]]" = field(default_factory=list)
-	regToWriteAddress: "list[list[float]]" = field(default_factory=list)
-	triangle: "list[list[TriangleEntry]]" = field(default_factory=list)
+	regToReg: "Matrix" = field(default_factory=Matrix)
+	readDataToReg: "Matrix" = field(default_factory=Matrix)
+	regToReadAddress: "Matrix" = field(default_factory=Matrix)
+	regToWriteData: "Matrix" = field(default_factory=Matrix)
+	regToWriteAddress: "Matrix" = field(default_factory=Matrix)
+	triangle: "Matrix" = field(default_factory=Matrix)
 
 @dataclass
 class IntermediateData:
