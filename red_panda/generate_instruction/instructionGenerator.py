@@ -1,7 +1,7 @@
-from panda_red.utilities.printOptions import printStandard, printSubsystemFunction
-from panda_red.generate_instruction import verifierAdapter as verAdapt
-from panda_red.generate_instruction import bitGenerator as bitGen
-from panda_red.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
+from red_panda.utilities.printOptions import printStandard, printSubsystemFunction
+from red_panda.generate_instruction import verifierAdapter as verAdapt
+from red_panda.generate_instruction import bitGenerator as bitGen
+from red_panda.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
 from keystone import *
 
 

@@ -1,4 +1,4 @@
-from panda_red.models.stateData import *
+from red_panda.models.stateData import *
 from dataclasses import asdict
 import json
 

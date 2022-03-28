@@ -1,5 +1,5 @@
-from panda_red.models.stateData import *
-from panda_red.models.correlations import *
+from red_panda.models.stateData import *
+from red_panda.models.correlations import *
 
 n = 24 #number of registers about which we care
 iterPerRegister = 100 #CHANGE THIS NUMBER. STAT MATH HERE

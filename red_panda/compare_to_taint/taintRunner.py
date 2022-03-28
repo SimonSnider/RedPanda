@@ -1,6 +1,6 @@
-from panda_red.compare_to_taint.taintComparer import *
-from panda_red.compare_to_taint.correlationProcessor import *
-from panda_red.models.correlations import *
+from red_panda.compare_to_taint.taintComparer import *
+from red_panda.compare_to_taint.correlationProcessor import *
+from red_panda.models.correlations import *
 
 def function(instruction, architecture, ourCorrelations: Correlations, panda: Panda):
     CODE = instruction.encode('UTF-8')

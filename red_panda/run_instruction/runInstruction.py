@@ -1,17 +1,17 @@
 from time import sleep
 from pandare import Panda
 from pytest import skip
-from panda_red.run_instruction.stateManager import *
-from panda_red.run_instruction.runInstruction import *
+from red_panda.run_instruction.stateManager import *
+from red_panda.run_instruction.runInstruction import *
 from capstone import *
 from capstone.mips import *
 import math
-from panda_red.generate_instruction.bitGenerator import *
-from panda_red.utilities.printOptions import *
-from panda_red.models.stateData import *
+from red_panda.generate_instruction.bitGenerator import *
+from red_panda.utilities.printOptions import *
+from red_panda.models.stateData import *
 import keystone.keystone
 import copy
-from panda_red.create_output.intermediateJsonOutput import *
+from red_panda.create_output.intermediateJsonOutput import *
 #first = True
 skippedRegs = []
 

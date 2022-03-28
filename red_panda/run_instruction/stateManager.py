@@ -4,7 +4,7 @@
 from random import randint, seed
 from pandare.arch import PandaArch
 from pandare.panda import Panda
-from panda_red.generate_instruction.bitGenerator import *
+from red_panda.generate_instruction.bitGenerator import *
 import math
 
 skippedMipsRegs = ['ZERO', 'SP', 'K0', 'K1', 'AT', 'GP', 'FP', 'RA']

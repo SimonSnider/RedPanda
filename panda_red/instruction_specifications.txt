@@ -1,7 +1,0 @@
-# This file contains instructions that will be run
-# Starting a line with a '#' character will ensure the line is not read. No other '#' locations than the first character will ensure proper functioning.
-# Below are some instructions to be replaced
-
-add $t0, $t1, $zero
-add $t5, $t7, $t6
-and $t2, $t2, $zero
