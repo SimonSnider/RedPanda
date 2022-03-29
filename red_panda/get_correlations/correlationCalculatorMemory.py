@@ -4,9 +4,9 @@ reads and writes before and after each instruction is run. It outputs which valu
 likely to be related given a particular threshold. For more details, see our mathematical model.
 """
 
-from panda_red.models.stateData import *
-from panda_red.models.correlations import *
-from panda_red.utilities.printOptions import *
+from red_panda.models.stateData import *
+from red_panda.models.correlations import *
+from red_panda.utilities.printOptions import *
 import math
 
 n = 24 #number of registers about which we care

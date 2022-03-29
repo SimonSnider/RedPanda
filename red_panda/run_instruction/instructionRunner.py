@@ -1,5 +1,5 @@
-from panda_red.run_instruction.stateManager import initializePanda
-from panda_red.run_instruction import runInstruction as S
+from red_panda.run_instruction.stateManager import initializePanda
+from red_panda.run_instruction import runInstruction as S
 
 def generateInstructionData(arch, instructionList, instructionIterations=10, verbose=False):
     """Generates a structure of data pertaining to randomly generated instructions in a set ISA.

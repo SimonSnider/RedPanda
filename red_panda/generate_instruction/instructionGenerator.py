@@ -1,7 +1,8 @@
-from panda_red.utilities.printOptions import printStandard, printSubsystemFunction
-from panda_red.generate_instruction import verifierAdapter as verAdapt
-from panda_red.generate_instruction import bitGenerator as bitGen
-from panda_red.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
+from red_panda.utilities.printOptions import printStandard, printSubsystemFunction
+from red_panda.generate_instruction import verifierAdapter as verAdapt
+from red_panda.generate_instruction import bitGenerator as bitGen
+from red_panda.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
+from keystone import *
 
 
 
@@ -17,6 +18,19 @@ def initialize(arch="mips32", littleEndian=False):
         x86_64 -- Use the x86_64 architecture
     """
     return verAdapt.initialize(arch, littleEndian)
+
+def translateInstruction(inst: str, arch = "mips"):
+    if (arch == "mips"):
+        ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
+    elif (arch == "x86_64"):
+        ks = keystone.Ks(keystone.KS_ARCH_X86, keystone.KS_MODE_64)
+    else:
+        print("invalid architecture")
+        return
+    CODE = inst.encode('UTF-8')
+    ADDRESS = 0x0000
+    encoding, count = ks.asm(CODE, ADDRESS)
+    return encoding
 
 def generateInstruction(instructionGenerator, filterer, verbose=False):
     """Generates a single instruction in the currently selected ISA

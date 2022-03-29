@@ -1,16 +1,17 @@
+from time import sleep
 from pandare import Panda
 from pytest import skip
-from panda_red.run_instruction.stateManager import *
-from panda_red.run_instruction.runInstruction import *
+from red_panda.run_instruction.stateManager import *
+from red_panda.run_instruction.runInstruction import *
 from capstone import *
 from capstone.mips import *
 import math
-from panda_red.generate_instruction.bitGenerator import *
-from panda_red.utilities.printOptions import *
-from panda_red.models.stateData import *
+from red_panda.generate_instruction.bitGenerator import *
+from red_panda.utilities.printOptions import *
+from red_panda.models.stateData import *
 import keystone.keystone
 import copy
-from panda_red.create_output.intermediateJsonOutput import *
+from red_panda.create_output.intermediateJsonOutput import *
 #first = True
 skippedRegs = []
 
@@ -212,9 +213,11 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     if (instIndex < len(instructions)-1):
                         if (verbose): printStandard("Switching instructions")
                         instIndex += 1
-                        panda.flush_tb()
                         stateData.registerStateLists.append(copy.copy(registerStateList))
+            
+                        panda.flush_tb()
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS, md=md)
+                
                         stateData.instructions.append(instructions[instIndex])
                         code = panda.virtual_memory_read(cpu, ADDRESS, 4)
                         for i in md.disasm(code, ADDRESS):
@@ -240,13 +243,15 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         panda.enable_callback("bheTaint")
                         
                         #remove stateData gathering callbacks
-                        panda.delete_callback("randomRegState")
-                        panda.delete_callback("getInstValues")
-                        panda.delete_callback("bhe")
-                        panda.delete_callback("manageread")
-                        panda.delete_callback("managewrite")
+                        panda.disable_callback("randomRegState")
+                        panda.disable_callback("getInstValues")
+                        panda.disable_callback("bhe")
+                        panda.disable_callback("manageread")
+                        panda.disable_callback("managewrite")
 
                         instIndex = 0
+                        
+                        panda.flush_tb()
                         loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS, md=md)
 
                         return 0
@@ -383,7 +388,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     # Instruction Finished collecting iterations
                     # Switching to next instruction
                     instIndex += 1
-                    iters = -1
+                    iters = 0
                     modelList.append(model)
                     model = [[0] * size for _ in range(size)]
                     panda.flush_tb()

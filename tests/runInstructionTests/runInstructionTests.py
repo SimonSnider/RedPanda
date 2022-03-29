@@ -1,16 +1,16 @@
 import unittest
 
 from capstone import *
-from panda_red.models import stateData
-from panda_red.run_instruction import runInstruction
-from panda_red.run_instruction.stateManager import *
+from red_panda.models import stateData
+from red_panda.run_instruction import runInstruction
+from red_panda.run_instruction.stateManager import *
 from keystone import *
-from panda_red.generate_instruction import instructionGenerator
+from red_panda.generate_instruction import instructionGenerator
 import math
-from panda_red.models.stateData import *
-from panda_red.generate_instruction.filterer import filtererBasicMIPS as mipsFilter
-from panda_red.generate_instruction.filterer import filtererBasicX86 as x86Filter
-from panda_red.create_output.intermediateJsonOutput import *
+from red_panda.models.stateData import *
+from red_panda.generate_instruction.filterer import filtererBasicMIPS as mipsFilter
+from red_panda.generate_instruction.filterer import filtererBasicX86 as x86Filter
+from red_panda.create_output.intermediateJsonOutput import *
 
 instGen = instructionGenerator.initialize()
 
@@ -47,7 +47,7 @@ class TestScript(unittest.TestCase):
     def testRunTwoMipsInstructions(self):
             panda = initializePanda("mips")
             instruction = "andi $t0, $t1, 0"
-            instruction2 = "addu $t5, $t6, $t7"
+            instruction2 = "andi $t5, $t6, 0"
             CODE = instruction.encode('UTF-8')
             CODE2 = instruction2.encode('UTF-8')
             ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
@@ -65,8 +65,8 @@ class TestScript(unittest.TestCase):
             self.assertEqual(len(states.afterStates), 1 * 24 + 1)
             for i in range(len(states.beforeStates)):
                 self.assertNotEqual(states.beforeStates[i].get("T0"), 0)
+                self.assertEqual(states.afterStates[i].get("T5"), states.beforeStates[i].get("T5"))
                 self.assertEqual(states.afterStates[i].get("T0"), 0)
-                self.assertNotEqual(states.afterStates[i].get("T5"), states.beforeStates[i].get("T6") + states.beforeStates[i].get("T7"))
             
             # determine the second regStateList contains data for the second instruction and not the first
             states = data.registerStateLists[1]
@@ -74,8 +74,11 @@ class TestScript(unittest.TestCase):
             self.assertEqual(len(states.beforeStates), 1 * 24 + 1)
             self.assertEqual(len(states.afterStates), 1 * 24 + 1)
             for i in range(len(states.beforeStates)):
+                self.assertNotEqual(states.beforeStates[i].get("T5"), 0)
                 self.assertEqual(states.beforeStates[i].get("T0"), states.afterStates[i].get("T0"))
-                self.assertEqual(states.afterStates[i].get("T5"), states.beforeStates[i].get("T6") + states.beforeStates[i].get("T7"))
+                self.assertEqual(states.afterStates[i].get("T5"), 0)
+
+            self.assertNotEqual(model[0], model[1], "model 0 and model 1 are identical")
 
     # def testRunX86InstructionOnce(self):
     #     panda = initializePanda("x86_64")

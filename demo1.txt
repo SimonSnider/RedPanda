@@ -1,5 +1,0 @@
-Instruction: add $t1, $t2, $t3
-Correlations with >= 0.25
-Register 9 is not correlated with itself: 0.0
-Register 10 is correlated with register 9: 1.0
-Register 11 is correlated with register 9: 1.0
