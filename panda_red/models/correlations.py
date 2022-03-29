@@ -11,9 +11,9 @@ class Correlations:
 
 @dataclass
 class TriangleEntry:
-	readDataToReadAddress: "Matrix" = field(default_factory=Matrix)
-	readDataToWriteAddress: "Matrix" = field(default_factory=Matrix)
-	readDataToWriteData: "Matrix" = field(default_factory=Matrix)
+	readDataToReadAddress: "Matrix" = field(default_factory=object)
+	readDataToWriteAddress: "Matrix" = field(default_factory=object)
+	readDataToWriteData: "Matrix" = field(default_factory=object)
 	
 @dataclass
 class Matrix:
