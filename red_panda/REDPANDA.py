@@ -138,6 +138,9 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         comparison = TC.compare(pandaModel, calcdCorrelations)
         printComment(comparison)
 
+        from panda_red.create_output import comparisonOutput as compOutput
+        compOutput.generateOutput(instructionData.instructionNames[i], [calcdCorrelations, pandaModel], outputFileName)
+
     printMainFunction("Analysis complete, generating output file")
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
     printMainFunction("Output complete, ending red panda execution")
