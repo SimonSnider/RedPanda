@@ -12,44 +12,45 @@ from red_panda.models.stateData import *
 import keystone.keystone
 import copy
 from red_panda.create_output.intermediateJsonOutput import *
-#first = True
-skippedRegs = []
 
-def loadInstructions(panda: Panda, cpu, instructions, address=0, md=None):
+def loadInstruction(panda: Panda, cpu, instruction, address=0, md=None):
     """
     Arguments:
         panda -- the instance of panda the instruction will be loaded into
         cpu -- the cpu instance obtained from a panda callback
         instruction -- the instruction in byte form
         address -- the address location to load the instruction into
+        md -- a dissasembler used to print the isntruction mnemonic
     Output:
         loads the instruction into panda's memory at the specified address,
         then loads a jump instruction immediately after it to loop through that instruction.
         Sets the program counter to address
+        returns the stop address
     """
-    #nonlocal skippedRegs
+
     # get the appropriate jump instruction encoding for the architecture
     jump_instr = b""
-    adr = address
-    for instruction in instructions:
-        # Display the instruction that is about to be executed
-        for i in md.disasm(instruction, 0):
-            printSubsystemFunction("Loading instruction: \t%s\t%s" % (i.mnemonic, i.op_str))
-            break
-        panda.physical_memory_write(adr, bytes(instruction))
-        adr += len(bytes(instruction))
+
+    # Display the instruction that is about to be executed
+    for i in md.disasm(bytes(instruction), 0):
+        printSubsystemFunction("Loading instruction: \t%s\t%s" % (i.mnemonic, i.op_str))
+        break
+
+    #load the instruction into memory
+    panda.physical_memory_write(address + len(instruction), bytes(instruction))
+
+    #determine what kind of jump instruction we need
     if (panda.arch_name == "mips"):
         jump_instr = b"\x08\x00\x00\x00"
-        #skippedRegs = skippedMipsRegs
     elif (panda.arch_name == "x86_64"):
         ks = keystone.Ks(keystone.KS_ARCH_X86, keystone.KS_MODE_64)
-        jmpInstr = "JMP -" + str(adr)
+        jmpInstr = "JMP -" + str(address)
         jump_instr, count = ks.asm(jmpInstr.encode("UTF-8"), address)
-        #skippedRegs = skippedX86Regs
     
-    panda.physical_memory_write(adr, bytes(jump_instr))
+    #load jump instruction into memory, initialize the pc value, and return the finish address
+    panda.physical_memory_write(address + len(instruction), bytes(jump_instr))
     panda.arch.set_pc(cpu, address)
-    return adr
+    return address + len(instruction)
 
 def getNextValidReg(panda: Panda, regNum):
     """
@@ -61,7 +62,6 @@ def getNextValidReg(panda: Panda, regNum):
         the "skipped regs" specifications from the stateManager module. returns -1 if there are no more
         valid registers
     """
-    global skippedRegs
     skippedRegs = []
     if (panda.arch_name == "mips"):
         skippedRegs = skippedMipsRegs
@@ -86,7 +86,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         verbose -- enables printing of step completions and instructions being run
     Outputs:
         stateData -- a StateData object containing the instructions run and the program state data for each
-        model -- TODO: get proper defenition here
+        modelList -- A list of matrix representations of panda's correlational models for each instruction
     """
     ADDRESS = 0
     stateData = StateData()
@@ -106,6 +106,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     modelList = []
     model = [[0] * size for _ in range(size)]
 
+    #initialize capstone for the architecture
     if (panda.arch_name == "mips"):
         md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
     elif (panda.arch_name == "x86_64"):
@@ -118,7 +119,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
        
         # Initialize memory and load the first instruction in to initialize the emulation loop
         initializeMemory(panda, "mymem", address=ADDRESS)
-        stopaddress = loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS, md=md)
+        stopaddress = loadInstruction(panda, cpu, instructions[instIndex], ADDRESS, md=md)
 
         panda.taint_enable()
 
@@ -142,6 +143,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         # initialize the model with zeros
         for (regname, reg) in panda.arch.registers.items():
             model[reg] = [0]*size #len(panda.arch.registers.items())
+
         printSubsystemFunction("Random instruction setup complete")
 
     # gather instruction data
@@ -171,12 +173,12 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             registerStateList.memoryReads.append([])
             registerStateList.memoryWrites.append([])
 
-        if (False):
-            # Display the instruction that is about to be executed
-            code = panda.virtual_memory_read(cpu, pc, 4)
-            for i in md.disasm(code, pc):
-                printStandard("0x%x:\t%s\t%s" % (i.address, i.mnemonic, i.op_str))
-                break
+        # if (False):
+        #     # Display the instruction that is about to be executed
+        #     code = panda.virtual_memory_read(cpu, pc, 4)
+        #     for i in md.disasm(code, pc):
+        #         printStandard("0x%x:\t%s\t%s" % (i.address, i.mnemonic, i.op_str))
+        #         break
         return 0
 
     # Tell panda to translate every instruction
@@ -185,7 +187,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         return True
 
     # This callback executes after each instruction execution. It handles saving the after register state and 
-    # handles instruction switching, bitmask updating, and emulation termination
+    # handles instruction switching, bitmask updating, and switching to taint model gathering
     @panda.cb_after_insn_exec 
     def getInstValues(cpu, pc):
         nonlocal regStateIndex, instIndex, bitmask, registerStateList, regBoundsCount
@@ -214,11 +216,14 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         if (verbose): printStandard("Switching instructions")
                         instIndex += 1
                         stateData.registerStateLists.append(copy.copy(registerStateList))
-            
+
+                        #flush the translation block cache to ensure retranslation of new instruction
                         panda.flush_tb()
-                        loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS, md=md)
+                        loadInstruction(panda, cpu, instructions[instIndex], ADDRESS, md=md)
                 
                         stateData.instructions.append(instructions[instIndex])
+
+                        #add the instruction mnemonic to stateData
                         code = panda.virtual_memory_read(cpu, ADDRESS, 4)
                         for i in md.disasm(code, ADDRESS):
                             instr = i.mnemonic + " " + i.op_str
@@ -251,9 +256,12 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
                         instIndex = 0
                         
+                        #flush the translation block cache and load in the first instruction
                         panda.flush_tb()
-                        loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS, md=md)
+                        loadInstruction(panda, cpu, instructions[instIndex], ADDRESS, md=md)
 
+                        # after this, the instruction data gathering should be finished and the system
+                        # should begin gathering panda's taint models
                         return 0
             
                 # Update the bitmask to randomize the next valid register
@@ -269,6 +277,61 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         pc = cpu.panda_guest_pc
         if (verbose): printStandard(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
+
+        # If regBoundsCount >= 31, then the instruction presumably cannot execute with any possible range of inputs that 
+        # doesn't require fine tuning. switch to the next instruction, if there are none left, set up the taint model gathering system
+        if (regBoundsCount >= 31):
+            printError("cannot execute instruction, switching to next instruction")
+            if (instIndex < len(instructions)-1):
+                if (verbose): printStandard("Switching instructions")
+                instIndex += 1
+                stateData.registerStateLists.append(copy.copy(registerStateList))
+
+                #flush the translation block cache to ensure retranslation of new instruction
+                panda.flush_tb()
+                loadInstruction(panda, cpu, instructions[instIndex], ADDRESS, md=md)
+        
+                stateData.instructions.append(instructions[instIndex])
+
+                # add the instruction mnemonic to the stateData
+                code = panda.virtual_memory_read(cpu, ADDRESS, 4)
+                for i in md.disasm(code, ADDRESS):
+                    instr = i.mnemonic + " " + i.op_str
+                    stateData.instructionNames.append(instr)
+                    break
+
+                # Reset nonlocal variables for beginning of next instruction emulation
+                registerStateList = RegisterStateList()
+                regStateIndex = 0
+                bitmask = b'\0'*(math.ceil(numRegs/8))
+            else:
+
+                # If there are no more instructions to run, switch to gathering taint data
+                if(verbose): printStandard("---");
+                printSubsystemFunction("Random data gathered, switching to taint gathering")
+                stateData.registerStateLists.append(copy.copy(registerStateList))
+                
+                # enable taint model gathering callbacks
+                panda.enable_callback("randomRegStateTaint")
+                panda.enable_callback("getInstValuesTaint")
+                panda.enable_callback("bheTaint")
+                
+                #remove stateData gathering callbacks
+                panda.disable_callback("randomRegState")
+                panda.disable_callback("getInstValues")
+                panda.disable_callback("bhe")
+                panda.disable_callback("manageread")
+                panda.disable_callback("managewrite")
+
+                instIndex = 0
+                
+                #flush the translation block cache and load in the first instruction
+                panda.flush_tb()
+                loadInstruction(panda, cpu, instructions[instIndex], ADDRESS, md=md)
+
+                # after this, the instruction data gathering should be finished and the system
+                # should begin gathering panda's taint models
+            return 0
 
         # If regStateIndex == 0, The initial state is invalid and needs updated.
         if (regStateIndex == 0):
@@ -286,12 +349,6 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             registerStateList.memoryReads = []
             return -1
 
-        # If regBoundsCount >= 31, then the instruction presumably cannot execute with any possible range of inputs that 
-        # doesn't require fine tuning. End the analysis. TODO: update to switch to the next instruction instead of terminating
-        if (regBoundsCount >= 31):
-            printError("Cannot run instruction")
-            panda.end_analysis()
-            return 0
         if (verbose): printStandard(f"re-randomizing register with reduced range")
         
         # If regStateIndex > 0, then a valid initial state has been found. Now the upper and lower bound are reduced by
@@ -351,6 +408,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     #Gather Taint Data
     #####################################################################################################################
 
+    # this callback is called before panda executes an instruction, it handles randomizing 
+    # the register state with tainting of registers enabled
     @panda.cb_insn_exec
     def randomRegStateTaint(cpu, pc):
         if(verbose): printStandard("Randomize register state")
@@ -369,8 +428,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                 break
         return 0
 
-    # This callback executes after each instruction execution. It handles saving the after register state and 
-    # handles instruction switching, bitmask updating, and emulation termination
+    # This callback executes after each instruction execution. It handles collecting taint information,
+    # switching instructions, and ending analysis
     @panda.cb_after_insn_exec 
     def getInstValuesTaint(cpu, pc):
         nonlocal regBoundsCount, iters, model, instIndex, modelList
@@ -393,25 +452,39 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     model = [[0] * size for _ in range(size)]
                     panda.flush_tb()
                     printComment(instIndex)
-                    loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS, md=md)
+                    loadInstruction(panda, cpu, instructions[instIndex], ADDRESS, md=md)
                 else:
+                    #no more instructions to run, end analysis
                     modelList.append(model)
                     panda.end_analysis()
             iters += 1
         return 0
 
     # This callback is executed when an instruction throws an exception. It handles finding a valid initial state,
-    # modifying the randomized register ranges, rolling back saved data, and terminating if an instruction cannot be executed
+    # modifying the randomized register ranges, and rolling back saved data.
     @panda.cb_before_handle_exception
     def bheTaint(cpu, index):
-        nonlocal regBoundsCount, upperBound, lowerBound
+        nonlocal regBoundsCount, upperBound, lowerBound, iters, instIndex
         pc = cpu.panda_guest_pc
         if (verbose): printStandard(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
         if (regBoundsCount >= 32):
-            printError("can't find valid register state")
-            panda.end_analysis()
+            if(instIndex < len(instructions) - 1):
+                # Instruction Finished collecting iterations
+                # Switching to next instruction
+                instIndex += 1
+                iters = 0
+                modelList.append(model)
+                model = [[0] * size for _ in range(size)]
+                panda.flush_tb()
+                printComment(instIndex)
+                loadInstruction(panda, cpu, instructions[instIndex], ADDRESS, md=md)
+            else:
+                #no more instructions left to run, end analysis
+                modelList.append(model)
+                panda.end_analysis()
             return 0
+        # update the register bounds and rerandomize the register state
         upperBound = 2**(31 - math.floor(regBoundsCount/6)) - 1
         lowerBound = -(2**(31 - math.floor(regBoundsCount/6)))
         randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound) # retaint registers???

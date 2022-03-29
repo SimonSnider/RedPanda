@@ -26,7 +26,6 @@ def generateRandomBytes(numBytes, byteorder='big', minValue = None, maxValue = N
         minValue = -(2 ** ((numBytes * 8) - 1))
     if (maxValue is None):
         maxValue = (2 ** ((numBytes * 8) - 1)) - 1
-    
     return randint(minValue, maxValue).to_bytes(numBytes, byteorder=byteorder, signed=True)
 
 def generateRandomBits(numBits, byteorder='big', minValue = None, maxValue = None):

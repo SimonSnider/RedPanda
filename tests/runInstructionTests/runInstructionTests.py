@@ -4,7 +4,7 @@ from capstone import *
 from red_panda.models import stateData
 from red_panda.run_instruction import runInstruction
 from red_panda.run_instruction.stateManager import *
-from keystone import *
+from keystone.keystone import *
 from red_panda.generate_instruction import instructionGenerator
 import math
 from red_panda.models.stateData import *
@@ -44,41 +44,6 @@ class TestScript(unittest.TestCase):
 #         self.assertNotEqual(regStateList.beforeStates[0].get("T0"), 0)
 #         self.assertEqual(regStateList.afterStates[0].get("T0"), 0)
 
-    def testRunTwoMipsInstructions(self):
-            panda = initializePanda("mips")
-            instruction = "andi $t0, $t1, 0"
-            instruction2 = "andi $t5, $t6, 0"
-            CODE = instruction.encode('UTF-8')
-            CODE2 = instruction2.encode('UTF-8')
-            ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
-
-            ADDRESS = 0x0000
-            encoding, count = ks.asm(CODE, ADDRESS)
-            encoding2, count = ks.asm(CODE2, ADDRESS)
-    #        data: StateData = None
-            data, model = runInstruction.runInstructions(panda, [encoding, encoding2], 1, verbose = True)
-            self.assertEqual(len(data.registerStateLists), 2)
-            # determine the first regStateList contains data for the first instruction and not the second
-            states = data.registerStateLists[0]
-            self.assertIsInstance(states, RegisterStateList)
-            self.assertEqual(len(states.beforeStates), 1 * 24 + 1)
-            self.assertEqual(len(states.afterStates), 1 * 24 + 1)
-            for i in range(len(states.beforeStates)):
-                self.assertNotEqual(states.beforeStates[i].get("T0"), 0)
-                self.assertEqual(states.afterStates[i].get("T5"), states.beforeStates[i].get("T5"))
-                self.assertEqual(states.afterStates[i].get("T0"), 0)
-            
-            # determine the second regStateList contains data for the second instruction and not the first
-            states = data.registerStateLists[1]
-            self.assertIsInstance(states, RegisterStateList)
-            self.assertEqual(len(states.beforeStates), 1 * 24 + 1)
-            self.assertEqual(len(states.afterStates), 1 * 24 + 1)
-            for i in range(len(states.beforeStates)):
-                self.assertNotEqual(states.beforeStates[i].get("T5"), 0)
-                self.assertEqual(states.beforeStates[i].get("T0"), states.afterStates[i].get("T0"))
-                self.assertEqual(states.afterStates[i].get("T5"), 0)
-
-            self.assertNotEqual(model[0], model[1], "model 0 and model 1 are identical")
 
     # def testRunX86InstructionOnce(self):
     #     panda = initializePanda("x86_64")
@@ -101,36 +66,106 @@ class TestScript(unittest.TestCase):
     #     self.assertNotEqual(regStateList.beforeStates[0].get("RAX"), 0)
     #     self.assertEqual(regStateList.afterStates[0].get("RAX"), 0)
 
+    # def testRunTwoMipsInstructions(self):
+    #         panda = initializePanda("mips")
+    #         instruction = "andi $t0, $t1, 0"
+    #         instruction2 = "andi $t5, $t6, 0"
+    #         CODE = instruction.encode('UTF-8')
+    #         CODE2 = instruction2.encode('UTF-8')
+    #         ks = Ks(KS_ARCH_MIPS,KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
 
-    # def testRunInstructionsMips(self):
-    #     panda = initializePanda("mips")
-    #     print("num_regs: " + str(len(panda.arch.registers)))
-    #     instructions = []
-    #     instGen = instructionGenerator.initialize("mips32")
-    #     inst = 3
-    #     n = 1
-    #     md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32 + CS_MODE_BIG_ENDIAN) # misp32
-    #     for i in range(inst):
-    #         instruction = instructionGenerator.generateInstruction(instGen, mipsFilter)
-    #         instructions.append(instruction)
-    #         for insn in md.disasm(instruction, 0x1000):
-    #             print("%s\t%s" %(insn.mnemonic, insn.op_str))
+    #         ADDRESS = 0x0000
+    #         encoding, count = ks.asm(CODE, ADDRESS)
+    #         encoding2, count = ks.asm(CODE2, ADDRESS)
+    # #        data: StateData = None
+    #         data, model = runInstruction.runInstructions(panda, [encoding, encoding2], 1, verbose = True)
+    #         self.assertEqual(len(data.registerStateLists), 2)
+    #         # determine the first regStateList contains data for the first instruction and not the second
+    #         states = data.registerStateLists[0]
+    #         self.assertIsInstance(states, RegisterStateList)
+    #         self.assertEqual(len(states.beforeStates), 1 * 24 + 1)
+    #         self.assertEqual(len(states.afterStates), 1 * 24 + 1)
+    #         for i in range(len(states.beforeStates)):
+    #             self.assertNotEqual(states.beforeStates[i].get("T0"), 0)
+    #             self.assertEqual(states.afterStates[i].get("T5"), states.beforeStates[i].get("T5"))
+    #             self.assertEqual(states.afterStates[i].get("T0"), 0)
+            
+    #         # determine the second regStateList contains data for the second instruction and not the first
+    #         states = data.registerStateLists[1]
+    #         self.assertIsInstance(states, RegisterStateList)
+    #         self.assertEqual(len(states.beforeStates), 1 * 24 + 1)
+    #         self.assertEqual(len(states.afterStates), 1 * 24 + 1)
+    #         for i in range(len(states.beforeStates)):
+    #             self.assertNotEqual(states.beforeStates[i].get("T5"), 0)
+    #             self.assertEqual(states.beforeStates[i].get("T0"), states.afterStates[i].get("T0"))
+    #             self.assertEqual(states.afterStates[i].get("T5"), 0)
 
-    #     data: StateData = None
-    #     data, model = runInstruction.runInstructions(panda, instructions, n, verbose=True)
-    #     self.assertEqual(len(data.registerStateLists), inst)
-    #     for regStateList in data.registerStateLists:
-    #         self.assertEqual(len(regStateList.bitmasks), n*24 + 1)
-    #         self.assertEqual(len(regStateList.afterStates), n*24 + 1)
-    #         self.assertEqual(len(regStateList.beforeStates), n*24 + 1)
-    #         self.assertEqual(regStateList.bitmasks[0], b'\x00\x00\x00\x00')
-    #         for i in range(len(regStateList.bitmasks)):
-    #             self.assertIsInstance(regStateList.bitmasks[i], bytes)
-    #             self.assertIsInstance(regStateList.beforeStates[i], dict)
-    #             self.assertIsInstance(regStateList.afterStates[i], dict)
-    #             self.assertTrue(isPowerOfTwo(int.from_bytes(regStateList.bitmasks[i], 'big', signed=False)))
+    #         self.assertNotEqual(model[0], model[1], "model 0 and model 1 are identical")
 
-    #     saveStateData(data, "intermediate")
+    # def testRunTwoX86Instructions(self):
+    #         panda = initializePanda("x86_64")
+    #         instruction = "INC RAX"
+    #         instruction2 = "INC RBX"
+    #         CODE = instruction.encode('UTF-8')
+    #         CODE2 = instruction2.encode('UTF-8')
+    #         ks = Ks(KS_ARCH_X86, KS_MODE_64)
+
+    #         ADDRESS = 0x0000
+    #         encoding, count = ks.asm(CODE, ADDRESS)
+    #         encoding2, count = ks.asm(CODE2, ADDRESS)
+    #         data: StateData = None
+    #         data, model = runInstruction.runInstructions(panda, [encoding, encoding2], 1, verbose = True)
+    #         # self.assertEqual(len(data.registerStateLists), 2)
+    #         # determine the first regStateList contains data for the first instruction and not the second
+    #         states = data.registerStateLists[0]
+    #         self.assertIsInstance(states, RegisterStateList)
+    #         self.assertEqual(len(states.beforeStates), 1 * 14 + 1)
+    #         self.assertEqual(len(states.afterStates), 1 * 14 + 1)
+    #         for i in range(len(states.beforeStates)):
+    #             self.assertEqual(states.afterStates[i].get("RAX"), states.beforeStates[i].get("RAX") + 1)
+    #             self.assertEqual(states.afterStates[i].get("RBX"), states.beforeStates[i].get("RBX"))
+            
+    #         # determine the second regStateList contains data for the second instruction and not the first
+    #         states = data.registerStateLists[1]
+    #         self.assertIsInstance(states, RegisterStateList)
+    #         self.assertEqual(len(states.beforeStates), 1 * 14 + 1)
+    #         self.assertEqual(len(states.afterStates), 1 * 14 + 1)
+    #         for i in range(len(states.beforeStates)):
+    #             self.assertEqual(states.beforeStates[i].get("RBX"), states.afterStates[i].get("RBX") + 1)
+    #             self.assertEqual(states.afterStates[i].get("RAX"), states.beforeStates[i].get("RAX"))
+
+    #         self.assertNotEqual(model[0], model[1], "model 0 and model 1 are identical")
+
+
+    def testRunInstructionsMips(self):
+        panda = initializePanda("mips")
+        print("num_regs: " + str(len(panda.arch.registers)))
+        instructions = []
+        instGen = instructionGenerator.initialize("mips32")
+        inst = 10
+        n = 10
+        md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32 + CS_MODE_BIG_ENDIAN) # misp32
+        for i in range(inst):
+            instruction = instructionGenerator.generateInstruction(instGen, mipsFilter)
+            instructions.append(instruction)
+            for insn in md.disasm(instruction, 0x1000):
+                print("%s\t%s" %(insn.mnemonic, insn.op_str))
+
+        data: StateData = None
+        data, model = runInstruction.runInstructions(panda, instructions, n, verbose=False)
+        self.assertEqual(len(data.registerStateLists), inst)
+        for regStateList in data.registerStateLists:
+            self.assertEqual(len(regStateList.bitmasks), n*24 + 1)
+            self.assertEqual(len(regStateList.afterStates), n*24 + 1)
+            self.assertEqual(len(regStateList.beforeStates), n*24 + 1)
+            self.assertEqual(regStateList.bitmasks[0], b'\x00\x00\x00\x00')
+            for i in range(len(regStateList.bitmasks)):
+                self.assertIsInstance(regStateList.bitmasks[i], bytes)
+                self.assertIsInstance(regStateList.beforeStates[i], dict)
+                self.assertIsInstance(regStateList.afterStates[i], dict)
+                self.assertTrue(isPowerOfTwo(int.from_bytes(regStateList.bitmasks[i], 'big', signed=False)))
+
+        # saveStateData(data, "intermediate")
 
     # def testRunInstructionsX86(self):
     #     panda = initializePanda("x86_64")
