@@ -1,4 +1,3 @@
-import numpy as np
 from panda_red.models.correlations import *
 
 def matrix_multiply(a: Matrix, b: Matrix):
@@ -24,6 +23,8 @@ def matrix_multiply(a: Matrix, b: Matrix):
             for i in range(b.numRows):
                 sum += (a.matrix[x][i])*(b.matrix[i][y])
             product[x][y] = sum
+    if a.numRows == 1:
+        product = [product]
     output = toMatrix(product)
     return output
 
@@ -34,53 +35,67 @@ def transpose(matr: Matrix):
         ret.numRows = matr.numCols
         ret.numCols = matr.numRows
         ret.matrix = None
-    output = [[0]*matr.numCols for _ in range(matr.numRows)]
+    output = [[0]*matr.numRows for _ in range(matr.numCols)]
     for i in range(matr.numRows):
         for j in range(matr.numCols):
-            output[j][i] = matr[i][j]
+            output[j][i] = matr.matrix[i][j]
     trans = toMatrix(output)
     return trans
 
 def toMatrix(matr):
-    if type(matr) is Matrix:
-        return matr
-
+    if type(matr) is Matrix: return matr
     m = Matrix()
     m.numRows = len(matr)
+    if m.numRows == 0:
+        m.numCols = 0
+        m.matrix = None
+        return m
     if type(matr[0]) is Matrix:
         m.numCols = matr[0].numRows
     else:
+        if matr[0] == None:
+            print(matr)
+            raise ImportError
         m.numCols = len(matr[0])
     m.matrix = matr
+    if m.numCols == 0: m.matrix = None
     return m
 
 
 def propagate(corr):
     numInstructions = len(corr)
     triangleMatr = [[None]*numInstructions for _ in range(numInstructions)]
-    finalRegToReg = corr[0].regToReg
+    regToRegs = [0]*numInstructions
+    regToRegs[0] = toMatrix(corr[0].regToReg)
     for i in range(len(corr) - 1):
-        finalRegToReg = matrix_multiply(toMatrix(finalRegToReg), toMatrix(corr[i+1].regToReg))
-    # finalRegToReg represents the correlations between registers over the course of the entire instruction sequence
+        regToRegs[i+1] = matrix_multiply(regToRegs[i], toMatrix(corr[i+1].regToReg))
 
     for i in range(numInstructions):
         for j in range(i+1, numInstructions):
             t = TriangleEntry()
-            t.readDataToReadAddress = matrix_multiply(toMatrix(corr[i].readDataToReg), transpose(toMatrix(corr[j].regToReadAddress)))
-            t.readDataToWriteData = matrix_multiply(toMatrix(corr[i].readDataToReg), transpose(toMatrix(corr[j].regToWriteData)))
-            t.readDataToWriteAddress = matrix_multiply(toMatrix(corr[i].readDataToReg), transpose(toMatrix(corr[j].regToWriteAddress)))
+            readTranspose = transpose(toMatrix(corr[i].readDataToReg))
+            t.readDataToReadAddress = matrix_multiply(readTranspose, toMatrix(corr[j].regToReadAddress))
+            t.readDataToWriteData = matrix_multiply(readTranspose, toMatrix(corr[j].regToWriteData))
+            t.readDataToWriteAddress = matrix_multiply(readTranspose, toMatrix(corr[j].regToWriteAddress))
             triangleMatr[i][j] = t
     readDataToReg = []
     regToReadAddress = []
     regToWriteData = []
     regToWriteAddress = []
     for i in range(len(corr)):
-        readDataToReg.append(toMatrix(corr[i].readDataToReg))
-        regToReadAddress.append(toMatrix(corr[i].regToReadAddress))
-        regToWriteData.append(toMatrix(corr[i].regToWriteData))
-        regToWriteAddress.append(toMatrix(corr[i].regToWriteAddress))
+        if i==9:
+            print(toMatrix(corr[i].readDataToReg))
+            print(regToRegs[i])
+        readDataToReg.append(matrix_multiply(toMatrix(corr[i].readDataToReg), regToRegs[i]))
+        regToReadAddress.append(matrix_multiply(regToRegs[i], transpose(toMatrix(corr[i].regToReadAddress))))
+        regToWriteData.append(matrix_multiply(regToRegs[i], transpose(toMatrix(corr[i].regToWriteData))))
+        regToWriteAddress.append(matrix_multiply(regToRegs[i], transpose(toMatrix(corr[i].regToWriteAddress))))
+    readDataToReg = [readDataToReg]
+    regToReadAddress = [regToReadAddress]
+    regToWriteData = [regToWriteData]
+    regToWriteAddress = [regToWriteAddress]
     output = NonRectangularPseudoMatrix()
-    output.regToReg = finalRegToReg
+    output.regToReg = regToRegs[-1]
     output.triangle = toMatrix(triangleMatr)
     output.readDataToReg = toMatrix(readDataToReg)
     output.regToReadAddress = toMatrix(regToReadAddress)
