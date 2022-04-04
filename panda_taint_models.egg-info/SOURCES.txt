@@ -3,10 +3,9 @@ setup.py
 panda_red/PANDARED.py
 panda_red/__init__.py
 panda_red/compare_to_taint/__init__.py
-panda_red/compare_to_taint/analysis.py
 panda_red/compare_to_taint/correlationProcessor.py
-panda_red/compare_to_taint/dataProcessor.py
 panda_red/compare_to_taint/taintComparer.py
+panda_red/compare_to_taint/taintRunner.py
 panda_red/create_output/__init__.py
 panda_red/create_output/intermediateJsonOutput.py
 panda_red/create_output/matrixOutput.py
@@ -18,12 +17,15 @@ panda_red/generate_instruction/verifierAdapter.py
 panda_red/generate_instruction/filterer/__init__.py
 panda_red/generate_instruction/filterer/filterer.py
 panda_red/generate_instruction/filterer/filtererBasicMIPS.py
+panda_red/generate_instruction/filterer/filtererBasicX86.py
 panda_red/get_correlations/__init__.py
 panda_red/get_correlations/correlationCalculator.py
 panda_red/get_correlations/correlationCalculatorMemory.py
+panda_red/get_correlations/correlationPropagation.py
 panda_red/models/__init__.py
 panda_red/models/correlations.py
 panda_red/models/stateData.py
+panda_red/models/verifier.py
 panda_red/run_instruction/__init__.py
 panda_red/run_instruction/instructionRunner.py
 panda_red/run_instruction/runInstruction.py
