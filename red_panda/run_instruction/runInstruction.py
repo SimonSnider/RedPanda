@@ -38,7 +38,7 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0, md=None):
         break
 
     #load the instruction into memory
-    panda.physical_memory_write(address + len(instruction), bytes(instruction))
+    panda.physical_memory_write(address, bytes(instruction))
 
     #determine what kind of jump instruction we need
     if (panda.arch_name == "mips"):
