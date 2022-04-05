@@ -14,6 +14,7 @@ import copy
 from red_panda.create_output.intermediateJsonOutput import *
 
 def loadInstruction(panda: Panda, cpu, instruction, address=0, md=None):
+
     """
     Arguments:
         panda -- the instance of panda the instruction will be loaded into
