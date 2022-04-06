@@ -82,7 +82,7 @@ Valid Options
 Usage Example: ``-name=default``
 
 #### Architecture (-architecture)
-Specifies the instructions set architecture RED PANDA is to run in. This also determines the ISA instructions are generated during run time.
+Specifies the instruction set architecture RED PANDA is to run in. This also determines the ISA instructions that are generated during run time.
 
 Valid Options
 * mips32 - The MIPS instruction set
