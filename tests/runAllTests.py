@@ -1,33 +1,40 @@
-import _thread as thread
+import threading as thread
 
 def ctt():
     numSuccess = 0
-    from compareToTaintTests.test import *
+    from compareToTaintTests import test
     try:
-        test1()
+        test.test1()
         numSuccess += 1
     except AssertionError:
         print("compareToTaintTests test1 failed!")
 
     try:
-        test2()
+        test.test2()
         numSuccess += 1
     except AssertionError:
         print("compareToTaintTests test2 failed!")
 
     try:
-        test3()
+        test.test3()
         numSuccess += 1
     except AssertionError:
         print("compareToTaintTests test3 failed!")
 
     try:
-        testModelCollection()
+        test.testModelCollection()
         numSuccess += 1
     except AssertionError:
         print("compareToTaintTests testModelCollection failed!")
 
     print(numSuccess, " tests passed in compareToTaintTests.")
         
-thread.start_new_thread(ctt,("",0,))
+if __name__ == "__main__":
+    t1 = t.Thread(target=ctt,args=())
+
+    t1.start()
+
+    t1.join()
+
+    print("All tests compete.")
 
