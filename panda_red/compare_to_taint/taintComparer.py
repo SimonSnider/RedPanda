@@ -18,6 +18,7 @@ def extractNewModel(corr: Correlations):
     This function formats the data in the correlations model into a dictionary similar to pandaModel in the compare function
     """
     return convertMatrixToDict(corr.regToReg, corr.threshold)
+    
 
 def compare(pandaModel, ourCorr: Correlations):
     """
@@ -26,10 +27,18 @@ def compare(pandaModel, ourCorr: Correlations):
     This function compares the two models and outputs the differences
     """
 
+    n = len(pandaModel[0][0])
+    pandaRegToWrites = pandaModel[1]
+    print(pandaRegToWrites)
+    pandaReadToReg = pandaModel[0][n:]
+    print(pandaReadToReg)
+    pandaModel = pandaModel[0][:n]
+
     newModel = extractNewModel(ourCorr)
     pandaModel = convertMatrixToDict(pandaModel, 0.5)
     pandaTainted = {}
     newTainted = {}
+    
     for reg in pandaModel.keys():
         pTainted = pandaModel[reg]
         nTainted = newModel[reg]
@@ -45,4 +54,5 @@ def compare(pandaModel, ourCorr: Correlations):
             pandaTainted[reg] = ls1
         if ls2 != []:
             newTainted[reg] = ls2
+            
     return [pandaTainted, newTainted]

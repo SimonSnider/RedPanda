@@ -99,6 +99,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     size = len(panda.arch.registers.items())
     modelList = []
     model = [[0] * size for _ in range(size)]
+    writtenAddrs = {}
+    regToAddrs = {}
 
     if (panda.arch_name == "mips"):
         md = Cs(CS_ARCH_MIPS, CS_MODE_MIPS32+ CS_MODE_BIG_ENDIAN)
@@ -233,6 +235,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                         panda.enable_callback("getTaint")
                         panda.enable_callback("getInstValuesTaint")
                         panda.enable_callback("bheTaint")
+                        panda.enable_callback("taintread")
+                        panda.enable_callback("taintwrite")
                         
                         #remove stateData gathering callbacks
                         panda.delete_callback("randomRegState")
@@ -376,7 +380,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
     def getInstValuesTaint(cpu, pc):
-        nonlocal regBoundsCount, iters, model, instIndex, modelList
+        nonlocal regBoundsCount, iters, model, instIndex, modelList, writtenAddrs, regToAddr
         print(iters)
         if (pc == stopaddress):
             for (regname, reg) in panda.arch.registers.items():
@@ -385,6 +389,13 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     labels = panda.taint_get_reg(reg)[0].get_labels()
                     for label in labels:
                         model[label][reg] += 1
+            for addr in writtenAddrs.keys():
+            	labels = panda.taint_get_ram(addr)[0]
+            	if(result is not None):
+	            labels = panda.taint_get_ram(addr)[0].get_labels()
+	            regToAddr[addr] = labels
+	            #for label in labels:
+	            #	model[label][addr] += 1	
 
             if (iters >= n):
                 if(instIndex < len(instructions) - 1):
@@ -392,11 +403,13 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     # Switching to next instruction
                     instIndex += 1
                     iters = -1
-                    modelList.append(model)
+                    modelList.append([model, regToAddr])
                     model = [[0] * size for _ in range(size)]
+                    writtenAddrs = {}
+                    regToAddr = {}
                     loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
                 else:
-                    modelList.append(model)
+                    modelList.append([model, regToAddr])
                     panda.end_analysis()
             iters += 1
         return 0
@@ -405,7 +418,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # modifying the randomized register ranges, rolling back saved data, and terminating if an instruction cannot be executed
     @panda.cb_before_handle_exception
     def bheTaint(cpu, index):
-        nonlocal regBoundsCount, upperBound, lowerBound
+        nonlocal regBoundsCount, upperBound, lowerBound, model
         pc = cpu.panda_guest_pc
         if (verbose): print(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
@@ -418,6 +431,38 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound) # retaint registers???
         panda.arch.set_pc(cpu, ADDRESS)
         return -1
+        
+        
+    # This callback executes before panda tries to read from memory. It handles intercepting the read
+    # address and saving that information in the registerStateList object.
+    @panda.cb_virt_mem_before_read
+    def taintread(cpu, pc, addr, size):
+        nonlocal memoryStructure, stateData, lowerBound, upperBound, model
+    
+        # if the memory location has never been accessed then randomly generate a value and store it in the fake memory structure
+        if not (addr in memoryStructure):
+            memoryStructure[addr] = generateRandomMemoryValues(lowerBound, upperBound)
+
+	model.append([0]*size)
+	panda.taint_label_ram(addr, len(model)-1)
+
+        if(verbose):
+            print("pc of read:", pc)
+            print("value read:", valueRead)
+            print("addr of read:", addr)
+            print("size of read:", size)
+
+    @panda.cb_virt_mem_before_write
+    def taintwrite(cpu, pc, addr, size, data):
+        nonlocal memoryStructure, stateData, registerStateList, model, writtenAddrs
+
+        writtenAddrs[addr] = -1
+
+        if(verbose):        
+            print("pc of write:", pc)
+            print("addr of write:", addr)
+            print("size of write:", size)
+            print("data of write:", data)
 
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
