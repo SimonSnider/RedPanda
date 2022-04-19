@@ -392,9 +392,13 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             for addr in writtenAddrs.keys():
             	labels = panda.taint_get_ram(addr)[0]
             	if(result is not None):
-			phys_addr = panda.virt_to_phys(addr)
-			labels = panda.taint_get_ram(phys_addr)[0].get_labels()
-			regToAddrs[addr] = labels
+                    phys_addr = panda.virt_to_phys(addr)
+                    
+                    print(panda.virtual_memory_read(cpu, addr, 4))
+                    print(panda.taint_check_ram(phys_addr))
+                    
+                    labels = panda.taint_get_ram(phys_addr)[0].get_labels()
+                    regToAddrs[addr] = labels
 	            #for label in labels:
 	            #	model[label][addr] += 1	
 
@@ -443,9 +447,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         # if the memory location has never been accessed then randomly generate a value and store it in the fake memory structure
         if not (addr in memoryStructure):
             memoryStructure[addr] = generateRandomMemoryValues(lowerBound, upperBound)
-
-	model.append([0]*size)
-	panda.taint_label_ram(addr, len(model)-1)
+        #
+        model.append([0]*size)
+        panda.taint_label_ram(addr, len(model)-1)
 
         if(verbose):
             print("pc of read:", pc)

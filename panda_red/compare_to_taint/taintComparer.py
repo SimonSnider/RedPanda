@@ -18,7 +18,6 @@ def extractNewModel(corr: Correlations):
     This function formats the data in the correlations model into a dictionary similar to pandaModel in the compare function
     """
     return convertMatrixToDict(corr.regToReg, corr.threshold)
-    
 
 def compare(pandaModel, ourCorr: Correlations):
     """
@@ -36,8 +35,8 @@ def compare(pandaModel, ourCorr: Correlations):
 
     newModel = extractNewModel(ourCorr)
     pandaModel = convertMatrixToDict(pandaModel, 0.5)
-    pandaTainted = {}
-    newTainted = {}
+    pandaTaintedRegs = {}
+    newTaintedRegs = {}
     
     for reg in pandaModel.keys():
         pTainted = pandaModel[reg]
@@ -51,8 +50,36 @@ def compare(pandaModel, ourCorr: Correlations):
             if i not in pTainted:
                 ls2.append(i)
         if ls1 != []:
-            pandaTainted[reg] = ls1
+            pandaTaintedRegs[reg] = ls1
         if ls2 != []:
-            newTainted[reg] = ls2
+            newTaintedRegs[reg] = ls2
+
+    newModelReads = convertMatrixToDict(corr.readDataToReg, corr.threshold)
+    pandaModelReads = convertMatrixToDict(pandaReadToReg, 0.5)
+    pandaTaintedReads = {}
+    newTaintedReads = {}
+
+    for read in pandaModelReads.keys():
+        pTainted = pandaModel[read]
+        nTainted = newModel[read]
+        ls1 = []
+        ls2 = []
+        for i in pTainted:
+            if i not in nTainted:
+                ls1.append(i)
+        for i in nTainted:
+            if i not in pTainted:
+                ls2.append(i)
+        if ls1 != []:
+            pandaTaintedReads[read] = ls1
+        if ls2 != []:
+            newTaintedReads[read] = ls2
             
+
+    pandaTaintedWrites = {}
+    newTaintedWrites = {}
+            
+
+    pandaTainted = {'reg to reg': pandaTaintedRegs, 'reads to reg': pandaTaintedReads, 'reg to writes': pandaTaintedWrites}
+    newTainted = {'reg to reg': newTaintedRegs, 'reads to reg': newTaintedReads, 'reg to writes': newTaintedWrites}
     return [pandaTainted, newTainted]
