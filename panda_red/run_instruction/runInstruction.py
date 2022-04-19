@@ -380,7 +380,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # handles instruction switching, bitmask updating, and emulation termination
     @panda.cb_after_insn_exec 
     def getInstValuesTaint(cpu, pc):
-        nonlocal regBoundsCount, iters, model, instIndex, modelList, writtenAddrs, regToAddr
+        nonlocal regBoundsCount, iters, model, instIndex, modelList, writtenAddrs, regToAddrs
         print(iters)
         if (pc == stopaddress):
             for (regname, reg) in panda.arch.registers.items():
@@ -392,8 +392,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             for addr in writtenAddrs.keys():
             	labels = panda.taint_get_ram(addr)[0]
             	if(result is not None):
-	            labels = panda.taint_get_ram(addr)[0].get_labels()
-	            regToAddr[addr] = labels
+			phys_addr = panda.virt_to_phys(addr)
+			labels = panda.taint_get_ram(phys_addr)[0].get_labels()
+			regToAddrs[addr] = labels
 	            #for label in labels:
 	            #	model[label][addr] += 1	
 
@@ -403,13 +404,13 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     # Switching to next instruction
                     instIndex += 1
                     iters = -1
-                    modelList.append([model, regToAddr])
+                    modelList.append([model, regToAddrs])
                     model = [[0] * size for _ in range(size)]
                     writtenAddrs = {}
-                    regToAddr = {}
+                    regToAddrs = {}
                     loadInstructions(panda, cpu, [instructions[instIndex]], ADDRESS)
                 else:
-                    modelList.append([model, regToAddr])
+                    modelList.append([model, regToAddrs])
                     panda.end_analysis()
             iters += 1
         return 0
