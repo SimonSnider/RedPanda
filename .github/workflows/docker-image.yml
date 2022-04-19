@@ -16,6 +16,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker run -it $(date +%s) bash
       
     - name: Run tests
       run: python3 tests/runInstructionTests/stateManagerMipsTests.py
