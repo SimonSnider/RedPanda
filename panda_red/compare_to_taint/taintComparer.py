@@ -54,7 +54,7 @@ def compare(pandaModel, ourCorr: Correlations):
         if ls2 != []:
             newTaintedRegs[reg] = ls2
 
-    newModelReads = convertMatrixToDict(corr.readDataToReg, corr.threshold)
+    newModelReads = convertMatrixToDict(ourCorr.readDataToReg, ourCorr.threshold)
     pandaModelReads = convertMatrixToDict(pandaReadToReg, 0.5)
     pandaTaintedReads = {}
     newTaintedReads = {}

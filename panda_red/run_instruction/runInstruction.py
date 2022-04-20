@@ -390,10 +390,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     for label in labels:
                         model[label][reg] += 1
             for addr in writtenAddrs.keys():
-            	labels = panda.taint_get_ram(addr)[0]
-            	if(result is not None):
-                    phys_addr = panda.virt_to_phys(addr)
-                    
+                phys_addr = panda.virt_to_phys(cpu, addr)
+            	labels = panda.taint_get_ram(phys_addr)[0]
+            	if(result is not None): 
                     print(panda.virtual_memory_read(cpu, addr, 4))
                     print(panda.taint_check_ram(phys_addr))
                     
@@ -449,7 +448,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             memoryStructure[addr] = generateRandomMemoryValues(lowerBound, upperBound)
         #
         model.append([0]*size)
-        panda.taint_label_ram(addr, len(model)-1)
+        physAddr = panda.virt_to_phys(cpu, addr)
+        panda.taint_label_ram(physAddr, len(model)-1)
 
         if(verbose):
             print("pc of read:", pc)
