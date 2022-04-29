@@ -232,6 +232,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     # MC.setArch(arch)
     analyzedData = []
 
+    print(numInstructions, len(instructionData.registerStateLists), len(pandaModels))
     for i in range(numInstructions):
         dat = instructionData.registerStateLists[i]
         pandaModel = pandaModels[i]
@@ -241,6 +242,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         analyzedData.append(calcdCorrelations)
 
         comparison = TC.compare(pandaModel, calcdCorrelations)
+        print("Taint2 model vs empirical model")
         print(comparison)
 
     output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)

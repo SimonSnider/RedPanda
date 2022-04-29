@@ -12,6 +12,17 @@ def convertMatrixToDict(matrix, threshold):
 #        print(str(index1) + " " + str(labelSet))
     return newModel
 
+def transposeDictOfLists(ogDict):
+    newDict = {}
+    for key in ogDict.keys():
+        for v in ogDict[key]:
+            if(v in newDict.keys()):
+                newDict[v].append(key)
+            else:
+                newDict[v] = [key]
+
+    return newDict
+
 def extractNewModel(corr: Correlations):
     """
     corr - the Correlations object that describes the new model
@@ -54,14 +65,14 @@ def compare(pandaModel, ourCorr: Correlations):
         if ls2 != []:
             newTaintedRegs[reg] = ls2
 
-    newModelReads = convertMatrixToDict(corr.readDataToReg, corr.threshold)
+    newModelReads = convertMatrixToDict(ourCorr.readDataToReg, ourCorr.threshold)
     pandaModelReads = convertMatrixToDict(pandaReadToReg, 0.5)
     pandaTaintedReads = {}
     newTaintedReads = {}
 
     for read in pandaModelReads.keys():
-        pTainted = pandaModel[read]
-        nTainted = newModel[read]
+        pTainted = pandaModelReads[read]
+        nTainted = newModelReads[read]
         ls1 = []
         ls2 = []
         for i in pTainted:
@@ -76,8 +87,27 @@ def compare(pandaModel, ourCorr: Correlations):
             newTaintedReads[read] = ls2
             
 
+    newModelWrites = convertMatrixToDict(ourCorr.regToWriteData, ourCorr.threshold)
+    print(pandaRegToWrites)
+    pandaModelWrites = transposeDictOfLists(pandaRegToWrites)
+    print(pandaModelWrites)
     pandaTaintedWrites = {}
     newTaintedWrites = {}
+    for reg in newModelWrites.keys():
+       pTainted = pandaModelWrites[reg]
+       nTainted = newModelWrites[reg]
+       ls1 = []
+       ls2 = []
+       for i in pTainted:
+           if i not in nTainted:
+               ls1.append(i)
+       for i in nTainted:
+           if i not in pTainted:
+               ls2.append(i)
+       if ls1 != []:
+           pandaTaintedWrites[reg] = ls1
+       if ls2 != []:
+           newTaintedWrites[reg] = ls2
             
 
     pandaTainted = {'reg to reg': pandaTaintedRegs, 'reads to reg': pandaTaintedReads, 'reg to writes': pandaTaintedWrites}

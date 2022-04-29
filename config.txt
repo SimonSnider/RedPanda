@@ -9,6 +9,6 @@ inst.txt
 -name
 o
 -iterations
-10
+1
 -threshold
 0.5
