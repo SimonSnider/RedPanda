@@ -74,7 +74,7 @@ def testMemWrite():
     curWrite = MemoryTransaction("write", 2, 1, size)
     memoryWrites.append([curWrite])
 
-    bitmasks.append(b"\x01\x00\x00")
+    bitmasks.append(b"\x00\x00\x01")
     beforeStates.append({"r1": 4, "r2": 2, "r3": 3})
     afterStates.append({"r1": 4, "r2": 2, "r3": 3})
     memoryReads.append([])
@@ -88,7 +88,7 @@ def testMemWrite():
     curWrite = MemoryTransaction("write", 4, 1, size)
     memoryWrites.append([curWrite])
 
-    bitmasks.append(b"\x00\x00\x01")
+    bitmasks.append(b"\x01\x00\x00")
     beforeStates.append({"r1": 1, "r2": 2, "r3": 4})
     afterStates.append({"r1": 1, "r2": 2, "r3": 4})
     memoryReads.append([])
