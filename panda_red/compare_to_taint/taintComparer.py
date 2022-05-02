@@ -1,5 +1,25 @@
 from panda_red.models.correlations import *
 
+def union(list1, list2):
+    """
+    This function unions together two lists so that we can treat write addresses and
+    write values equally for the purpose of model comparison because the original panda
+    model does not discriminate
+    """
+    out = []
+    for a in list1: out.append(a)
+    for b in list2: out.append(b)
+    return out
+
+def unionWriteAddressesAndVals(addressMatrix, valMatrix):
+    """
+    This function combines registers address value lists together to treat the models symmetrically
+    """
+    out = {}
+    for reg in range(len(addressMatrix)):
+        out[reg] = union(addressMatrix[reg], valMatrix[reg])
+    return out
+
 def convertMatrixToDict(matrix, threshold):
     newModel = {}
     for index1 in range(len(matrix)):
@@ -33,9 +53,10 @@ def extractNewModel(corr: Correlations):
 def compare(pandaModel, ourCorr: Correlations):
     """
     pandaModel - the correlation model from PANDA
-    corr - the Correlations object that describes the new model
+    ourCorr - the Correlations object that describes the new model
     This function compares the two models and outputs the differences
     """
+
 
     n = len(pandaModel[0][0])
     pandaRegToWrites = pandaModel[1]
@@ -85,29 +106,31 @@ def compare(pandaModel, ourCorr: Correlations):
             pandaTaintedReads[read] = ls1
         if ls2 != []:
             newTaintedReads[read] = ls2
-            
 
-    newModelWrites = convertMatrixToDict(ourCorr.regToWriteData, ourCorr.threshold)
-    print(pandaRegToWrites)
+    newModelWriteVals = convertMatrixToDict(ourCorr.regToWriteData, ourCorr.threshold)
+    newModelWriteAddresses = convertMatrixToDict(ourCorr.regToWriteAddress, ourCorr.threshold)
+    newModelWrites = unionWriteAddressesAndVals(newModelWriteAddresses, newModelWriteVals)
     pandaModelWrites = transposeDictOfLists(pandaRegToWrites)
-    print(pandaModelWrites)
+    #print(pandaModelWrites)
     pandaTaintedWrites = {}
     newTaintedWrites = {}
     for reg in newModelWrites.keys():
-       pTainted = pandaModelWrites[reg]
-       nTainted = newModelWrites[reg]
-       ls1 = []
-       ls2 = []
-       for i in pTainted:
-           if i not in nTainted:
-               ls1.append(i)
-       for i in nTainted:
-           if i not in pTainted:
-               ls2.append(i)
-       if ls1 != []:
-           pandaTaintedWrites[reg] = ls1
-       if ls2 != []:
-           newTaintedWrites[reg] = ls2
+        pTainted = []
+        if reg in pandaModelWrites:
+            pTainted = pandaModelWrites[reg]
+        nTainted = newModelWrites[reg]
+        ls1 = []
+        ls2 = []
+        for i in pTainted:
+            if i not in nTainted:
+                ls1.append(i)
+        for i in nTainted:
+            if i not in pTainted:
+                ls2.append(i)
+        if ls1 != []:
+            pandaTaintedWrites[reg] = ls1
+        if ls2 != []:
+            newTaintedWrites[reg] = ls2
             
 
     pandaTainted = {'reg to reg': pandaTaintedRegs, 'reads to reg': pandaTaintedReads, 'reg to writes': pandaTaintedWrites}

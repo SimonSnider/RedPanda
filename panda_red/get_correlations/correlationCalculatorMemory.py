@@ -347,7 +347,10 @@ def computeRegToWriteValCorrelations():
     are correlated with the values written into memory.
     """
     global memWriteVals, n, I, Bs
+    
     computeMemPs(len(memWriteVals.initialOutput), memWriteVals.initialOutput, memWriteVals.outputs, memWriteVals.ps)
+    print("ps-------------------------------")
+    print(memWriteVals.ps)
     
     m = [[0]*len(memWriteVals.initialOutput) for _ in range(n)]
     for i in range(n):
@@ -380,4 +383,7 @@ def computeCorrelations():
     M.regToWriteData = computeRegToWriteValCorrelations()
     M.readDataToReg = computeRegToReadValCorrelations()
     M.threshold = thresh
+    print("corrs*******************************")
+    print(M.regToReg)
+    print(M.regToWriteData)
     return M

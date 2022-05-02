@@ -9,7 +9,6 @@ from panda_red.generate_instruction.bitGenerator import *
 from panda_red.models.stateData import *
 import keystone.keystone
 import copy
-#first = True
 skippedRegs = []
 
 def loadInstructions(panda: Panda, cpu, instructions, address=0):
@@ -411,6 +410,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                     print(panda.taint_check_ram(phys_addr))
                     
                     labels = panda.taint_get_ram(phys_addr).get_labels()
+                    print("-------------------------------------labels: ")
+                    print(labels)
                     regToAddrs[a] = labels
 	            #for label in labels:
 	            #	model[label][addr] += 1	
