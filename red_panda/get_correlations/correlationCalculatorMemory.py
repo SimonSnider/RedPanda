@@ -138,7 +138,7 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     for ls in memReadVals.inputs:
         lengthen(ls, maxLengthReads)
 
-def binomialSum(q, c):
+def binSum(q, c):
     """
     q -- 1-p, where p is the p-value chosen by the user
     c -- a correlation coefficient
@@ -147,31 +147,38 @@ def binomialSum(q, c):
     """
     sum = 0.0
     n = iterPerRegister
-    for x in range(math.floor(n*q),n):
-        sum += math.comb(n, x*n)*((1-c)**x)*(c**(n-x))
+    for x in range(math.floor(n*c), n):
+        sum += math.comb(n, x)*((1-q)**x)*(q**(n-x))
     return sum
 
 
 
-def computeThreshold(p):
+def computeThreshold(q):
     """
     p -- desired p-value
-    This function interpolates the minimum threshold for a correlation 
+    This function interpolates the minimum threshold for a correlation
     coefficient given a desired p-value
     """
-    q = 1 - p
-    allowance = p*p # TODO: generalize?
+    if q <= 0:
+        return 0.0
+    p = 1 - q
+    if p <= 0:
+        return 1
     up = 1
     low = 0
     c = (up + low) / 2
-    sum = binomialSum(q, c)
-    while(abs(sum - c) > allowance):
-        if sum > q:
-            low = c
-        else:
+    sum = binSum(q, c)
+    while math.floor(low*n) < math.floor(up*n):
+        sum = binSum(q, c)
+        if low > q: # if the sum is too large, we reduce the upper bound
             up = c
+        else:       # if the sum is too small, we increase the lower bound
+            low = c
         c = (up + low) / 2
+    if sum < q:
+        c = math.ceil(c*n) / n
     return c
+
 
 
 
@@ -351,7 +358,10 @@ def computeRegToWriteValCorrelations():
     are correlated with the values written into memory.
     """
     global memWriteVals, n, I, Bs
+    
     computeMemPs(len(memWriteVals.initialOutput), memWriteVals.initialOutput, memWriteVals.outputs, memWriteVals.ps)
+    print("ps-------------------------------")
+    print(memWriteVals.ps)
     
     m = [[0]*len(memWriteVals.initialOutput) for _ in range(n)]
     for i in range(n):
@@ -387,4 +397,7 @@ def computeCorrelations(v = False):
     M.regToWriteData = computeRegToWriteValCorrelations()
     M.readDataToReg = computeRegToReadValCorrelations()
     M.threshold = thresh
+    print("corrs*******************************")
+    print(M.regToReg)
+    print(M.regToWriteData)
     return M
