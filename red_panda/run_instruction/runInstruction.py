@@ -48,7 +48,7 @@ def loadInstruction(panda: Panda, cpu, instruction, address=0, md=None):
         jump_instr = b"\x08\x00\x00\x00"
     elif (panda.arch_name == "x86_64"):
         ks = keystone.Ks(keystone.KS_ARCH_X86, keystone.KS_MODE_64)
-        jmpInstr = "JMP -" + str(address)
+        jmpInstr = "JMP -" + str(len(instruction))
         jump_instr, count = ks.asm(jmpInstr.encode("UTF-8"), address)
     
     #load jump instruction into memory, initialize the pc value, and return the finish address
@@ -99,9 +99,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     instIndex = 0
     regBoundsCount = 0
     #upperBound = 2**(31) - 1
-	upperBound = 2**10 - 1
+    upperBound = 2**10 - 1
     #lowerBound = -(2**31)
-	lowerBound = 0
+    lowerBound = 0
     numRegs = len(panda.arch.registers)
     bitmask = b'\0'*(math.ceil(numRegs/8))
     initialState = {}
@@ -183,7 +183,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             registerStateList.memoryReads.append([])
             registerStateList.memoryWrites.append([])
 
-        # if (False):
+        # if (True):
         #     # Display the instruction that is about to be executed
         #     code = panda.virtual_memory_read(cpu, pc, 4)
         #     for i in md.disasm(code, pc):
@@ -292,7 +292,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
         # If regBoundsCount >= 31, then the instruction presumably cannot execute with any possible range of inputs that 
         # doesn't require fine tuning. switch to the next instruction, if there are none left, set up the taint model gathering system
-        if (regBoundsCount >= 31):
+        if (regBoundsCount >= 10):
             printError("cannot execute instruction, switching to next instruction")
             if (instIndex < len(instructions)-1):
                 if (verbose): printStandard("Switching instructions")
@@ -358,9 +358,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             
             # Reduces the upper and lower bounds by a factor of 2 every 6 exceptions until a valid initial state is found
             #upperBound = 2**(31 - math.floor(regBoundsCount / 6)) - 1
-			upperBound = 2**(10 - math.floor(regBoundsCount / 6)) - 1
+            upperBound = 2**(10 - math.floor(regBoundsCount / 6)) - 1
             #lowerBound = -(2**(31 - math.floor(regBoundsCount/6)))
-			lowerBound = 0
+            lowerBound = 0
             randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound)
             initialState = getRegisterState(panda, cpu)
             registerStateList.beforeStates = []
@@ -376,9 +376,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         # a factor of 2 every exception and the data saved before the exception occured (before state, bitmask, and mem 
         # reads and writes) is removed
         #upperBound = 2**(31 - regBoundsCount) - 1
-		upperBound = 2**(10 - regBoundsCount) - 1
+        upperBound = 2**(10 - regBoundsCount) - 1
         #lowerBound = -(2**(31 - regBoundsCount))
-		lowerBound = 0
+        lowerBound = 0
         registerStateList.beforeStates.pop()
         registerStateList.bitmasks.pop()
         registerStateList.memoryReads.pop()
@@ -517,7 +517,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         pc = cpu.panda_guest_pc
         if (verbose): printStandard(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
-        if (regBoundsCount >= 32):
+        if (regBoundsCount >= 10):
             if(instIndex < len(instructions) - 1):
                 # Instruction Finished collecting iterations
                 # Switching to next instruction
@@ -537,9 +537,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             return 0
         # update the register bounds and rerandomize the register state
         #upperBound = 2**(31 - math.floor(regBoundsCount/6)) - 1
-		upperBound = 2**(10 - math.floor(regBoundsCount/6)) - 1
+        upperBound = 2**(10 - math.floor(regBoundsCount/6)) - 1
         #lowerBound = -(2**(31 - math.floor(regBoundsCount/6)))
-		lowerBound = 0
+        lowerBound = 0
         randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound) # retaint registers???
         panda.arch.set_pc(cpu, ADDRESS)
         return -1
