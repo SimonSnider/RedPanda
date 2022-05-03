@@ -295,7 +295,12 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             if (instIndex < len(instructions)-1):
                 if (verbose): printStandard("Switching instructions")
                 instIndex += 1
-                stateData.registerStateLists.append(copy.copy(registerStateList))
+
+                # delete the erroring instruction's data from stateData and tell the taint collection system to
+                # ignore said instruction
+                ### set the registerStateList to NONE, the upper module will need to check if it is none and skip it
+
+                stateData.registerStateLists.append(None)
 
                 #flush the translation block cache to ensure retranslation of new instruction
                 panda.flush_tb()

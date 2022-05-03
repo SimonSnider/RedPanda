@@ -132,6 +132,10 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         dat = instructionData.registerStateLists[i]
         pandaModel = pandaModels[i]
 
+        if(dat is None):
+            #instruction could not be run fully, ignore it
+            analyzedData.append[None]
+            continue
         MC.initialize(dat, instructionIterations, threshold)
         calcdCorrelations = MC.computeCorrelations(verbose)
         analyzedData.append(calcdCorrelations)
