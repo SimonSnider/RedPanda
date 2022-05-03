@@ -14,7 +14,7 @@ def generateOutput(instructionNames, data, filename):
     filename = filename + "Comparison.txt"
     with open(filename, 'w') as f:
         ourModel = extractNewModel(data[0])
-        pandaModel = convertMatrixToDict(data[1], 0.5)
+        pandaModel = convertMatrixToDict(data[1][0], 0.5)
 
         f.write("Taint based on random testing:\n")
         printAllCorrelations(ourModel, f)
