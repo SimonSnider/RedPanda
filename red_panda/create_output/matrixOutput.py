@@ -21,6 +21,7 @@ def generateOutput(instructionNames, data, filename):
 
             if(singleInstructionData is None):
                 writer.writerow(["Could not gather data for instruction"])
+                continue
 
             writer.writerow(["Reg to Reg Correlations"])
             writer.writerows(singleInstructionData.regToReg)

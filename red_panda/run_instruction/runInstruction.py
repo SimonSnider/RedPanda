@@ -283,7 +283,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # modifying the randomized register ranges, rolling back saved data, and terminating if an instruction cannot be executed
     @panda.cb_before_handle_exception
     def bhe(cpu, index):
-        nonlocal regBoundsCount, bitmask, stateData, regStateIndex, initialState, registerStateList, upperBound, lowerBound
+        nonlocal regBoundsCount, bitmask, stateData, regStateIndex, initialState, registerStateList, upperBound, lowerBound, instIndex
         pc = cpu.panda_guest_pc
         if (verbose): printStandard(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
@@ -319,12 +319,13 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                 registerStateList = RegisterStateList()
                 regStateIndex = 0
                 bitmask = b'\0'*(math.ceil(numRegs/8))
+                regBoundsCount = 0
             else:
 
                 # If there are no more instructions to run, switch to gathering taint data
                 if(verbose): printStandard("---");
                 printSubsystemFunction("Random data gathered, switching to taint gathering")
-                stateData.registerStateLists.append(copy.copy(registerStateList))
+                stateData.registerStateLists.append(None)
                 
                 # enable taint model gathering callbacks
                 panda.enable_callback("randomRegStateTaint")
@@ -339,7 +340,8 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                 panda.disable_callback("managewrite")
 
                 instIndex = 0
-                
+                regBoundsCount = 0
+
                 #flush the translation block cache and load in the first instruction
                 panda.flush_tb()
                 loadInstruction(panda, cpu, instructions[instIndex], ADDRESS, md=md)
@@ -505,7 +507,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # modifying the randomized register ranges, and rolling back saved data.
     @panda.cb_before_handle_exception
     def bheTaint(cpu, index):
-        nonlocal regBoundsCount, upperBound, lowerBound, iters, instIndex, model
+        nonlocal regBoundsCount, upperBound, lowerBound, iters, instIndex, model, writtenAddrs, regToAddrs
         pc = cpu.panda_guest_pc
         if (verbose): printStandard(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
@@ -515,14 +517,16 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                 # Switching to next instruction
                 instIndex += 1
                 iters = 0
-                modelList.append(model)
+                modelList.append([model, regToAddrs])
                 model = [[0] * size for _ in range(size)]
+                writtenAddrs = []
+                regToAddrs = {}
                 panda.flush_tb()
                 printComment(instIndex)
                 loadInstruction(panda, cpu, instructions[instIndex], ADDRESS, md=md)
             else:
                 #no more instructions left to run, end analysis
-                modelList.append(model)
+                modelList.append([model, regToAddrs])
                 panda.end_analysis()
             return 0
         # update the register bounds and rerandomize the register state

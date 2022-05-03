@@ -1,0 +1,3 @@
+add $t1, $t2, $t3
+SYSCALL
+add $t2, $t3, $t4
