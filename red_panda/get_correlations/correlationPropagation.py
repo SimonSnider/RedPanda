@@ -1,4 +1,4 @@
-from panda_red.models.correlations import *
+from red_panda.models.correlations import *
 
 def matrix_multiply(a: Matrix, b: Matrix):
     """
