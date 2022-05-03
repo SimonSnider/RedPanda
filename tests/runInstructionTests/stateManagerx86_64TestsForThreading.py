@@ -5,11 +5,9 @@ from capstone.mips import *
 from keystone import *
 from enum import Enum
 from random import choice, randint
-import os
-import unittest
 
 ADDRESS = 0
-panda = Panda("mips",
+panda = Panda("x86_64",
         extra_args=["-M", "configurable", "-nographic"],
         raw_monitor=False)
 
@@ -29,21 +27,17 @@ def setup(cpu):
     panda.map_memory("mymem", 2 * 1024 * 1024, ADDRESS)
     global regState1, regState2, regState3, regState4
     regState1 = getRegisterState(panda, cpu)
-    # print("randomizing register state")
     randomizeRegisters(panda, cpu)
-    # panda.arch.dump_regs(cpu)
     regState2 = getRegisterState(panda, cpu)
-    # print(regState2)
-    bitmask = b'\x00\x00\x05\x00'
+    bitmask = b'\x00\x00\x05'
     randomizeRegisters(panda, cpu, bitmask)
     regState3 = getRegisterState(panda, cpu)
     setRegisters(panda, cpu, regState2)
     regState4 = getRegisterState(panda, cpu)
-    # print(regState3)
     # Set starting_pc
-    cpu.env_ptr.active_tc.PC = ADDRESS
+    panda.arch.set_pc(cpu, ADDRESS)
     panda.end_analysis()
-    
+ 
 def runPanda():
     panda.run()
 
@@ -52,14 +46,14 @@ def testRandomizeRegisterState():
     Check that the randomized register state is different from the original register state.
     """
     global regState1, regState2
-    assert compareRegStates(regState1, regState2), "register state not randomized properly"
+    assert compareRegStates(regState1, regState2)
 
 def testOffLimitsRegs():
     """
     check that the skipped registers in mips are still 0 after randomization
     """
     global regState2
-    for key in skippedMipsRegs:
+    for key in skippedX86Regs:
         assert regState2.get(key) == 0, 'key: {0} not skipped properly during randomization'.format(key)
 
 def testGetBitTrue():
@@ -96,16 +90,13 @@ def testRandomizeRegisterWithBitmask():
     T0 and T2, should be randomized. Check that T0 and T2 changed but T1 and T3 remained the same
     """
     assert compareRegStates(regState2, regState3)
-    assert regState2['T0'] != regState3['T0']
-    assert regState2['T1'] == regState3['T1']
-    assert regState2['T2'] != regState3['T2']
-    assert regState2['T3'] == regState3['T3']
+    assert regState2['RCX'] == regState3['RCX']
+    assert regState2['RAX'] != regState3['RAX']
+    assert regState2['RBX'] == regState3['RBX']
+    assert regState2['RDX'] != regState3['RDX']
 
 def testSetRegisters():
     """
     after testing randomize registers with bitmask, set the registers back to regState2 and check if regState4 and regState2 are the same
     """
     assert not compareRegStates(regState2, regState4)
-    
-
-
