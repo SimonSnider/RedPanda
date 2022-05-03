@@ -283,7 +283,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     # modifying the randomized register ranges, rolling back saved data, and terminating if an instruction cannot be executed
     @panda.cb_before_handle_exception
     def bhe(cpu, index):
-        nonlocal regBoundsCount, bitmask, stateData, regStateIndex, initialState, registerStateList, upperBound, lowerBound
+        nonlocal regBoundsCount, bitmask, stateData, regStateIndex, initialState, registerStateList, upperBound, lowerBound, instIndex
         pc = cpu.panda_guest_pc
         if (verbose): printStandard(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1

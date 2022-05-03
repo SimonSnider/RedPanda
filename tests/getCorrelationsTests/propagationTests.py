@@ -1,4 +1,4 @@
-from panda_red.get_correlations import correlationPropagation as prop
+from red_panda.get_correlations import correlationPropagation as prop
 from red_panda.models.correlations import *
 
 def testNoMem():

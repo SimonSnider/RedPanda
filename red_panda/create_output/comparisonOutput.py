@@ -1,5 +1,5 @@
 from red_panda.models.correlations import *
-from panda_red.compare_to_taint.taintComparer import *
+from red_panda.compare_to_taint.taintComparer import *
 
 def printAllCorrelations(corrDict, writeFile):
     for reg in corrDict.keys():

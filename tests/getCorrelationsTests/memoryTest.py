@@ -1,6 +1,6 @@
-from panda_red.models.stateData import *
-from panda_red.get_correlations import correlationCalculatorMemory as mem
-from panda_red.models import *
+from red_panda.models.stateData import *
+from red_panda.get_correlations import correlationCalculatorMemory as mem
+from red_panda.models import *
 
 n = 3
 iterPerReg = 3
