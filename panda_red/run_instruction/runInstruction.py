@@ -9,6 +9,7 @@ from panda_red.generate_instruction.bitGenerator import *
 from panda_red.models.stateData import *
 import keystone.keystone
 import copy
+from ctypes import *
 skippedRegs = []
 
 def loadInstructions(panda: Panda, cpu, instructions, address=0):
@@ -330,7 +331,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_virt_mem_before_write
     def managewrite(cpu, pc, addr, size, data):
         nonlocal memoryStructure, stateData, registerStateList
-
+		data = data[0]
         # set the fake memory structure to hold the newly written data
         memoryStructure[addr] = data
 
