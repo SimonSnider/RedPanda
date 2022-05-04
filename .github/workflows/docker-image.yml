@@ -4,7 +4,7 @@ on:
   push:
     branches: [ github_actions_test ]
   pull_request:
-    branches: [ github_actions_test ]
+    branches: [ github_actions_test, main]
 
 jobs:
 
@@ -17,8 +17,36 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
       
-    - name: run the docker image
-      run: docker run -it $(date +%s) bash
+  run_panda_tests:
+    
+    runs-on: ubuntu-latest
+    needs: [build]
+    
+    strategy:
+      matrix:
+        test_script: [runInstructionTests_testRunInstructionsMemoryMips]
+    
+    steps:
+    - name: run the tests inside the docker image
+      run: >-
+        docker run $(date +%s);
+        cd ./gitHubActionRunners;
+        python3 ${{ matrix.test_script }}.py
+  
+  run_nonpanda_tests:
+    
+    runs-on: ubuntu-latest
+    needs: [build]
+    
+    strategy:
+      matrix:
+        test_script: [bitGeneratorTests, filtererBasicMIPSTests, instructionGeneratorTests, verifierAdapterTests]
+    
+    steps:
+    - name: run the tests inside the docker image
+      run: >-
+        docker run $(date +%s);
+        cd ./gitHubActionRunners;
+        python3 ${{ matrix.test_script }}.py
       
-    - name: Run tests
-      run: python3 tests/runInstructionTests/stateManagerMipsTests.py
+    
