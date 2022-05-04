@@ -47,8 +47,6 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         from red_panda.create_output import matrixOutput as output
     elif outputModel == 1:
         from red_panda.create_output import thresholdOutput as output
-    #else:
-        #from modules.createOutput import matrixOutput as output
 
     if mode == 0:
         # Instructions are generated randomly using the generateInstruction module

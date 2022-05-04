@@ -1,6 +1,6 @@
 from os import error
 import pytest
-from modules import intermediateRunner as intRun
+from red_panda import intermediateRunner as intRun
 from tests.utilities import setConsoleInputs
 
 def test_enterValidSettings(monkeypatch):

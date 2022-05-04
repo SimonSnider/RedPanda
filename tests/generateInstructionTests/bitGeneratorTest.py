@@ -1,4 +1,4 @@
-from modules.generateInstruction.bitGenerator import *
+from red_panda.generate_instruction.bitGenerator import *
 import pytest
 
 @pytest.mark.parametrize("bytes", [
