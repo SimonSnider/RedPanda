@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain --target developer -t panda_local_${{ github.sha }} .
+      run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local_${{ github.sha }} .
       
   run_panda_tests:
     
