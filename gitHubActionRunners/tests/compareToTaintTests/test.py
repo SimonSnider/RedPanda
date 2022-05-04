@@ -27,7 +27,7 @@ def test1():
     corr.regToWriteData = []
     corr.readDataToReg = []
     corr.threshold = 0.5
-    # assert compare(pandaModel, corr) == [{}, {}]
+    assert(compare(pandaModel, corr) == [{}, {}])
 
 
 def test2():
@@ -48,7 +48,7 @@ def test2():
     corr.regToWriteData = []
     corr.readDataToReg = []
     corr.threshold = 0.5
-    assert compare(pandaModel, corr) == [{}, {0: [2]}]
+    assert(compare(pandaModel, corr) == [{}, {0: [2]}])
 
 
 def test3():
@@ -68,7 +68,7 @@ def test3():
     corr.regToWriteData = []
     corr.readDataToReg = []
     corr.threshold = 0.5
-    assert compare(pandaModel, corr) == [{("r0", 0): [2]}, {}]
+    assert(compare(pandaModel, corr) == [{("r0", 0): [2]}, {}])
 
 
 
@@ -103,7 +103,7 @@ def testModelCollection():
     output = compare(pandaModel, corr)
 
     print(output)
-    assert output == [{}, {}]
+    assert(output == [{}, {}])
 
     
 
