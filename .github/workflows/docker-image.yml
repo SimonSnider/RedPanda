@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file Dockerfile --tag my-image-name:panda_local_${{ github.sha }}
       
   run_panda_tests:
     
@@ -29,7 +29,7 @@ jobs:
     steps:
     - name: run the tests inside the docker image
       run: >-
-        docker run $(date +%s);
+        docker run panda_local_${{ github.sha }};
         cd ./gitHubActionRunners;
         python3 ${{ matrix.test_script }}.py
   
