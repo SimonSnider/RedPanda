@@ -99,9 +99,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     instIndex = 0
     regBoundsCount = 0
     #upperBound = 2**(31) - 1
-	upperBound = 2**10 - 1
+    upperBound = 2**10 - 1
     #lowerBound = -(2**31)
-	lowerBound = 0
+    lowerBound = 0
     numRegs = len(panda.arch.registers)
     bitmask = b'\0'*(math.ceil(numRegs/8))
     initialState = {}
@@ -358,9 +358,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             
             # Reduces the upper and lower bounds by a factor of 2 every 6 exceptions until a valid initial state is found
             #upperBound = 2**(31 - math.floor(regBoundsCount / 6)) - 1
-			upperBound = 2**(10 - math.floor(regBoundsCount / 6)) - 1
+            upperBound = 2**(10 - math.floor(regBoundsCount / 6)) - 1
             #lowerBound = -(2**(31 - math.floor(regBoundsCount/6)))
-			lowerBound = 0
+            lowerBound = 0
             randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound)
             initialState = getRegisterState(panda, cpu)
             registerStateList.beforeStates = []
@@ -376,9 +376,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         # a factor of 2 every exception and the data saved before the exception occured (before state, bitmask, and mem 
         # reads and writes) is removed
         #upperBound = 2**(31 - regBoundsCount) - 1
-		upperBound = 2**(10 - regBoundsCount) - 1
+        upperBound = 2**(10 - regBoundsCount) - 1
         #lowerBound = -(2**(31 - regBoundsCount))
-		lowerBound = 0
+        lowerBound = 0
         registerStateList.beforeStates.pop()
         registerStateList.bitmasks.pop()
         registerStateList.memoryReads.pop()
@@ -537,9 +537,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
             return 0
         # update the register bounds and rerandomize the register state
         #upperBound = 2**(31 - math.floor(regBoundsCount/6)) - 1
-		upperBound = 2**(10 - math.floor(regBoundsCount/6)) - 1
+        upperBound = 2**(10 - math.floor(regBoundsCount/6)) - 1
         #lowerBound = -(2**(31 - math.floor(regBoundsCount/6)))
-		lowerBound = 0
+        lowerBound = 0
         randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound) # retaint registers???
         panda.arch.set_pc(cpu, ADDRESS)
         return -1
