@@ -566,7 +566,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         #print(len(model),len(model[-1]))
         
         if(verbose):
-            #printStandard("pc of read:", pc)
+            printStandard("pc of read:%d" % pc)
             #printStandard("value read:", valueRead)
             #printStandard("addr of read:", addr)
             #printStandard("size of read:", size)

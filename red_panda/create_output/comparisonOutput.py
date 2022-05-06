@@ -34,8 +34,3 @@ def generateOutput(instructionNames, data, filename):
             for corr in randomTainted.keys():
                 for reg in randomTainted[corr]:
                     f.write(f"Random testing found that register {corr} affects register {reg}, while PANDA did not.\n")
-
-        
-        
-        
-        
