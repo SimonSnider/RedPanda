@@ -22,14 +22,10 @@ jobs:
     - name: Build the Docker image
       run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local_${{ github.sha }} .
       
-    - name: debugging
-      run: docker image ls
-      
     - name: run the tests inside the docker image
       run: >-
         docker run panda_local_${{ github.sha }};
-        cd ./gitHubActionRunners;
-        python3 ${{ matrix.test_script }}.py
+        python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
   
   run_nonpanda_tests:
     
@@ -44,15 +40,10 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local_${{ github.sha }} .
-    
-    - name: debugging
-      run: docker image ls
-    
+        
     - name: run the tests inside the docker image
       run: >-
-        docker run --name panda_test_${{ matrix.target }}_${GITHUB_RUN_ID}
-        --rm -t "panda_local_${{ github.sha }}" bash -c
-        cd ./gitHubActionRunners;
-        python3 ${{ matrix.test_script }}.py
+        docker run --name panda_test_${{ github.sha }};
+        python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
       
     
