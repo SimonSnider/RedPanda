@@ -23,7 +23,7 @@ def filterInstruction(instruction, verbose=False):
     for insn in md.disasm(instruction, 0x1000):
         if(verbose):
             printStandard("%s\t%s" % (insn.mnemonic, insn.op_str))
-            printStandard("Groups:", insn.groups)
+            printStandard("Groups:%s" % (str(insn.groups)))
 
         mnemonic = insn.mnemonic
 

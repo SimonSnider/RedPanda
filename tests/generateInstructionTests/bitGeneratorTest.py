@@ -1,9 +1,4 @@
-from modules.generateInstruction.bitGenerator import *
-import pytest
-
-@pytest.mark.parametrize("bytes", [
-    1, 2, 4
-])
+from red_panda.generate_instruction.bitGenerator import *
 
 def testGenerateRandomBytes(bytes):
     """
@@ -15,9 +10,9 @@ def testGenerateRandomBytes(bytes):
         num = int.from_bytes(byteData, "big", signed=True)
         assert num >= -(2 ** ((bytes * 8) - 1)) and num <= (2 ** ((bytes * 8) - 1)) - 1
 
-@pytest.mark.parametrize("bytes, min, max", [
-    (1, -50, 50), (2, -130, 130), (4, -2**16, 2**16)
-])
+testGenerateRandomBytes(1)
+testGenerateRandomBytes(2)
+testGenerateRandomBytes(4)
 
 def testGenerateRandomBytesWithConstraints(bytes, min, max):
     """
@@ -29,9 +24,9 @@ def testGenerateRandomBytesWithConstraints(bytes, min, max):
         num = int.from_bytes(byteData, "big", signed=True)
         assert num >= min and num <= max
 
-@pytest.mark.parametrize("bytes", [
-    1, 2, 4
-])
+testGenerateRandomBytesWithConstraints(1, -50, 50)
+testGenerateRandomBytesWithConstraints(2, -130, 130)
+testGenerateRandomBytesWithConstraints(4, -2**16, 2**16)
 
 def testByteBinaryString(bytes):
     """
@@ -43,3 +38,7 @@ def testByteBinaryString(bytes):
         byteData = generateRandomBytes(bytes)
         string = byteBinaryString(byteData)
         assert all([characters in ["1", "0"] for characters in string])
+
+testByteBinaryString(1)
+testByteBinaryString(2)
+testByteBinaryString(4)

@@ -64,10 +64,10 @@ The following arguments must be specified on the command line:
 Sometimes it is useful to leverage the same settings over the course of multiple runs of RED without needing to input the same settings on command line each time. When this functionality is desired, you can use the RED configurable mode to accomplish it. Said mode is initialized as follows:
 <b>
 ```
-python3 modules/REDPANDA.py -f
+python3 red_panda/REDPANDA.py @config.cfg
 ```
 </b>
-To use config mode simply open <a>modules/debug.cfg</a> and edit the interior settings to match your desired settings.
+To use config mode simply open <a>config.cfg</a> and edit the interior settings to match your desired settings.
 <br></br>
 
 ### System Arguments
@@ -186,7 +186,7 @@ Argument configuration files can be a useful tool for storing complex sets of sy
   -analysis_model
   1
   -output_model
-  threshold
+  1
   -threshold
   .5
   ```

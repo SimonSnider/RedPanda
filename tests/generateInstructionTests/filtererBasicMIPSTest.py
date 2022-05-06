@@ -1,5 +1,5 @@
 import pytest
-from modules.generateInstruction.filterer.filtererBasicMIPS import filterInstruction
+from red_panda.generate_instruction.filterer.filtererBasicMIPS import filterInstruction
 
 def test_filterValidRTypeInstructions():
     """Test that valid R-Type instructions are not filtered out. On inputs of register to register R-Type instructions in MIPS32, the filtererBasicMIPS.py module should not filter any instructions.
