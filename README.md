@@ -186,7 +186,7 @@ Argument configuration files can be a useful tool for storing complex sets of sy
   -analysis_model
   1
   -output_model
-  threshold
+  1
   -threshold
   .5
   ```
@@ -219,10 +219,10 @@ Argument configuration files can be a useful tool for storing complex sets of sy
   <li>
   Once the instructions are written it is time to run Red Panda. In order to run the system using the instruction list you must use the -instructions_file argument in place of the -random_instructions argument. The usage of which can be found as follows:
     
-  Random Instructions: `` python3 /red_panda/REDPANDA.py -random_instructions=10 -name=my_instructions_run ... `` Becomes
+  Random Instructions: `` python3 /red_panda/REDPANDA.py -random_instructions=10 -name=my_instructions_run @my_config.txt `` Becomes
     
   ```
-  python3 /red_panda/REDPANDA.py -instructions_file=my_instructions.txt -name=my_instructions_run ...
+  python3 /red_panda/REDPANDA.py -instructions_file=my_instructions.txt -name=my_instructions_run @my_config.txt
   ```
   </li>
 </ol>
