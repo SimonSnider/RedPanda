@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     
     strategy:
+      fail-fast: false
       matrix:
         test_script: [runInstructionTests_testRunInstructionsMemoryMips]
     
@@ -35,6 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     
     strategy:
+      fail-fast: false
       matrix:
         test_script: [bitGeneratorTests, filtererBasicMIPSTests, instructionGeneratorTests, verifierAdapterTests]
     
