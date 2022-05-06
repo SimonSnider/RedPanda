@@ -5,10 +5,10 @@ def printAllCorrelations(corrDict, writeFile, registerNames):
     for reg in corrDict.keys():
         tainted = corrDict[reg]
         if(len(tainted) == 0):
-            writeFile.write(f"Register {reg} does not affect anything.\n")
+            writeFile.write(f"Register {registerNames[reg]} does not affect anything.\n")
         else:
             for reg2 in tainted:
-                writeFile.write(f"Register {reg} affects register {reg2}.\n")
+                writeFile.write(f"Register {registerNames[reg]} affects register {registerNames[reg2]}.\n")
 
 def generateOutput(instructionNames, data, filename, registerNames):
     filename = filename + "Comparison.txt"

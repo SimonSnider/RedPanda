@@ -2,7 +2,7 @@ from pickle import NONE
 from red_panda.models.correlations import *
 import csv
 
-def generateOutput(instructionNames, data, filename):
+def generateOutput(instructionNames, data, filename, registerNames):
     """
     Generates output for a Correlation Data Object in the form of a matrix printed in csv format.
 
