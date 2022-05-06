@@ -186,7 +186,7 @@ Argument configuration files can be a useful tool for storing complex sets of sy
   -analysis_model
   1
   -output_model
-  threshold
+  1
   -threshold
   .5
   ```
