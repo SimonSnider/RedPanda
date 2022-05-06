@@ -124,7 +124,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     printMainFunction("Running instructions complete, beginning to analyze correlations")
     analyzedData = []
 
-    print(numInstructions, len(instructionData.registerStateLists), len(pandaModels))
+    #print(numInstructions, len(instructionData.registerStateLists), len(pandaModels))
     for i in range(numInstructions):
         if(verbose): printStandard("Generating correlations for: " + str(instructionList[i]))
         dat = instructionData.registerStateLists[i]

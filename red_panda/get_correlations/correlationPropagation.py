@@ -31,11 +31,11 @@ def matrix_multiply(a: Matrix, b: Matrix):
             try:
                 product[x][y] = sum
             except:
-                print("x: "+str(x))
-                print("y: "+str(y))
-                print(len(product))
-                print("a: "+str(a))
-                print("b: "+str(b))
+                #print("x: "+str(x))
+                #print("y: "+str(y))
+                #print(len(product))
+                #print("a: "+str(a))
+                #print("b: "+str(b))
     # if a.numRows == 1:
     #     product = [product]
     output = toMatrix(product)
@@ -71,7 +71,7 @@ def toMatrix(matr):
             return m
     else:
         if matr[0] == None:
-            print(matr)
+            #print(matr)
             raise ImportError
         m.numCols = len(matr[0])
     m.matrix = matr

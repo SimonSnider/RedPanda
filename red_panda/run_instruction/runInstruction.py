@@ -460,31 +460,31 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         nonlocal regBoundsCount, iters, model, instIndex, modelList, writtenAddrs, regToAddrs
         printComment(iters)
         if (pc == stopaddress):
-            print("stopped in tainting")
+            printComment("stopped in tainting")
             for (regname, reg) in panda.arch.registers.items():
                 result = panda.taint_get_reg(reg)[0]
                 if(result is not None):
                     labels = panda.taint_get_reg(reg)[0].get_labels()
                     for label in labels:
-                        print("mark",label,reg,len(model))
+                        printComment("mark",label,reg,len(model))
                         model[label][reg] += 1
                             
             for a in range(len(writtenAddrs)):
                 addr = writtenAddrs[a]
-                print("getting physical address from", addr)
+                printComment("getting physical address from", addr)
                 phys_addr = panda.virt_to_phys(cpu, addr)
-                print("checking ram at ", phys_addr)
-                print(panda.taint_check_ram(phys_addr))
-                print("getting labels from ", phys_addr)
-                print(panda.taint_get_ram(phys_addr))
+                printComment("checking ram at ", phys_addr)
+                printComment(panda.taint_check_ram(phys_addr))
+                printComment("getting labels from ", phys_addr)
+                printComment(panda.taint_get_ram(phys_addr))
                 labels = panda.taint_get_ram(phys_addr)
                 if(result is not None):
-                    print(panda.virtual_memory_read(cpu, addr, 4))
-                    print(panda.taint_check_ram(phys_addr))
+                    printComment(panda.virtual_memory_read(cpu, addr, 4))
+                    printComment(panda.taint_check_ram(phys_addr))
                     
                     labels = panda.taint_get_ram(phys_addr).get_labels()
-                    print("-------------------------------------labels: ")
-                    print(labels)
+                    printComment("-------------------------------------labels: ")
+                    printComment(labels)
                     regToAddrs[a] = labels
 	            #for label in labels:
 	            #	model[label][addr] += 1	
@@ -558,31 +558,31 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         valueRead = memoryStructure[addr]
         #
 
-        print("trying to taint memory with ", len(model), " at addr ", addr)
+        #print("trying to taint memory with ", len(model), " at addr ", addr)
         physAddr = panda.virt_to_phys(cpu, addr)
         panda.taint_label_ram(physAddr, len(model))
 
         model.append([0]*len(model[0]))
-        print(len(model),len(model[-1]))
+        #print(len(model),len(model[-1]))
         
         if(verbose):
-            print("pc of read:", pc)
-            print("value read:", valueRead)
-            print("addr of read:", addr)
-            print("size of read:", size)
+            printStandard("pc of read:", pc)
+            printStandard("value read:", valueRead)
+            printStandard("addr of read:", addr)
+            printStandard("size of read:", size)
 
     @panda.cb_virt_mem_before_write
     def taintwrite(cpu, pc, addr, size, data):
         nonlocal memoryStructure, stateData, registerStateList, model, writtenAddrs
 
         writtenAddrs.append(addr)
-        print("in mem write !!!!!!!!!!!!!!", addr)
+        printComment("in mem write !!!!!!!!!!!!!!", addr)
 
         if(verbose):        
-            print("pc of write:", pc)
-            print("addr of write:", addr)
-            print("size of write:", size)
-            print("data of write:", data)
+            printStandard("pc of write:", pc)
+            printStandard("addr of write:", addr)
+            printStandard("size of write:", size)
+            printStandard("data of write:", data)
 
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)

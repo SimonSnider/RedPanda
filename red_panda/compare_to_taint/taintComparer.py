@@ -61,9 +61,9 @@ def compare(pandaModel, ourCorr: Correlations):
 
     n = len(pandaModel[0][0])
     pandaRegToWrites = pandaModel[1]
-    print(pandaRegToWrites)
+    #print(pandaRegToWrites)
     pandaReadToReg = pandaModel[0][n:]
-    print(pandaReadToReg)
+    #print(pandaReadToReg)
     pandaModel = pandaModel[0][:n]
 
     newModel = extractNewModel(ourCorr)

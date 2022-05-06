@@ -102,9 +102,9 @@ def computeTestCorrelation(i, j):
     num = 0
     computePs()
     global Ps, regList, Bs, n, I
-    print(I, n)
+   #print(I, n)
     for k in range(I):
-        print(Bs[k], hex(Ps[k].get(regList[j])))
+        #print(Bs[k], hex(Ps[k].get(regList[j])))
         if(int.from_bytes(Bs[k], 'big')&(1<<(n-i-1)) == 0):
             bitMaskV = 0
         else:
