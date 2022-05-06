@@ -466,17 +466,17 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
                 if(result is not None):
                     labels = panda.taint_get_reg(reg)[0].get_labels()
                     for label in labels:
-                        printComment("mark",label,reg,len(model))
+                        #print("mark",label,reg,len(model))
                         model[label][reg] += 1
                             
             for a in range(len(writtenAddrs)):
                 addr = writtenAddrs[a]
-                printComment("getting physical address from", addr)
+                #printComment("getting physical address from", addr)
                 phys_addr = panda.virt_to_phys(cpu, addr)
-                printComment("checking ram at ", phys_addr)
-                printComment(panda.taint_check_ram(phys_addr))
-                printComment("getting labels from ", phys_addr)
-                printComment(panda.taint_get_ram(phys_addr))
+                #printComment("checking ram at ", phys_addr)
+                #printComment(panda.taint_check_ram(phys_addr))
+                #printComment("getting labels from ", phys_addr)
+                #printComment(panda.taint_get_ram(phys_addr))
                 labels = panda.taint_get_ram(phys_addr)
                 if(result is not None):
                     printComment(panda.virtual_memory_read(cpu, addr, 4))
@@ -566,23 +566,23 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         #print(len(model),len(model[-1]))
         
         if(verbose):
-            printStandard("pc of read:", pc)
-            printStandard("value read:", valueRead)
-            printStandard("addr of read:", addr)
-            printStandard("size of read:", size)
+            #printStandard("pc of read:", pc)
+            #printStandard("value read:", valueRead)
+            #printStandard("addr of read:", addr)
+            #printStandard("size of read:", size)
 
     @panda.cb_virt_mem_before_write
     def taintwrite(cpu, pc, addr, size, data):
         nonlocal memoryStructure, stateData, registerStateList, model, writtenAddrs
 
         writtenAddrs.append(addr)
-        printComment("in mem write !!!!!!!!!!!!!!", addr)
+        printComment("in mem write !!!!!!!!!!!!!!")
 
         if(verbose):        
-            printStandard("pc of write:", pc)
-            printStandard("addr of write:", addr)
-            printStandard("size of write:", size)
-            printStandard("data of write:", data)
+            #printStandard("pc of write:", pc)
+            #printStandard("addr of write:", addr)
+            #printStandard("size of write:", size)
+            print("data of write:", data)
 
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
