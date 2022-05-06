@@ -1,15 +1,15 @@
 import unittest
 
 from capstone import *
-from panda_red.models import stateData
-from panda_red.run_instruction import runInstruction
-from panda_red.run_instruction.stateManager import *
+from red_panda.models import stateData
+from red_panda.run_instruction import runInstruction
+from red_panda.run_instruction.stateManager import *
 from keystone import *
-from panda_red.generate_instruction import instructionGenerator
+from red_panda.generate_instruction import instructionGenerator
 import math
-from panda_red.models.stateData import *
-from panda_red.generate_instruction.filterer import filtererBasicMIPS as mipsFilter
-from panda_red.generate_instruction.filterer import filtererBasicX86 as x86Filter
+from red_panda.models.stateData import *
+from red_panda.generate_instruction.filterer import filtererBasicMIPS as mipsFilter
+from red_panda.generate_instruction.filterer import filtererBasicX86 as x86Filter
 
 instGen = instructionGenerator.initialize()
 
