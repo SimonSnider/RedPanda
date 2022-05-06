@@ -7,26 +7,20 @@ on:
     branches: [ github_actions_test, main]
 
 jobs:
-
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local_${{ github.sha }} .
       
   run_panda_tests:
     
     runs-on: ubuntu-latest
-    needs: [build]
     
     strategy:
       matrix:
         test_script: [runInstructionTests_testRunInstructionsMemoryMips]
     
     steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local_${{ github.sha }} .
+      
     - name: run the tests inside the docker image
       run: >-
         docker run panda_local_${{ github.sha }};
@@ -36,13 +30,16 @@ jobs:
   run_nonpanda_tests:
     
     runs-on: ubuntu-latest
-    needs: [build]
     
     strategy:
       matrix:
         test_script: [bitGeneratorTests, filtererBasicMIPSTests, instructionGeneratorTests, verifierAdapterTests]
     
     steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local_${{ github.sha }} .
+    
     - name: run the tests inside the docker image
       run: >-
         docker run --name panda_test_${{ matrix.target }}_${GITHUB_RUN_ID}
