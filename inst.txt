@@ -1,1 +1,2 @@
-ADD RAX, 1
+add $t1, $t2, $t3
+xor $t4, $t6, $t2
