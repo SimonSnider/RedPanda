@@ -116,7 +116,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     # Run the instructions through the Panda.re engine
     #
     printMainFunction("Instruction retrieval complete, beginning to run instructions")
-    instructionData, pandaModels = generateInstructionData(arch, instructionList, instructionIterations, verbose)
+    instructionData, pandaModels, reg_names = generateInstructionData(arch, instructionList, instructionIterations, verbose)
     #
     # Generate coorelation data from the instruction results
     #
@@ -141,10 +141,10 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         printComment(comparison)
 
         from red_panda.create_output import comparisonOutput as compOutput
-        compOutput.generateOutput(instructionData.instructionNames[i], [calcdCorrelations, pandaModel], outputFileName)
+        compOutput.generateOutput(instructionData.instructionNames[i], [calcdCorrelations, pandaModel], outputFileName, reg_names)
 
     printMainFunction("Analysis complete, generating output file")
-    output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
+    output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName, reg_names)
     printMainFunction("Output complete, ending red panda execution")
 
 parser = argparse.ArgumentParser(fromfile_prefix_chars='@')

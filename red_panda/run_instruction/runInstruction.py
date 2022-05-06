@@ -566,7 +566,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         #print(len(model),len(model[-1]))
         
         if(verbose):
-            #printStandard("pc of read:", pc)
+            printStandard("pc of read:%d" % pc)
             #printStandard("value read:", valueRead)
             #printStandard("addr of read:", addr)
             #printStandard("size of read:", size)
@@ -587,4 +587,4 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.enable_precise_pc()
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
-    return [stateData, modelList]
+    return [stateData, modelList, panda.arch.registers.keys()]
