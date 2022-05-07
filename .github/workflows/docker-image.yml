@@ -16,6 +16,8 @@ jobs:
      - name: Build the Docker image
        run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local_${{ github.sha }} .
   
+     - name: debugging
+       run: docker image ls
       
   run_panda_tests:
     
@@ -29,6 +31,9 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
+
+    - name: debugging
+      run: docker image ls
       
     - name: run the tests inside the docker image
       run: >-
