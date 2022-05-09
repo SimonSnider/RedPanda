@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_script: [bitGeneratorTests]
+        test_script: [bitGeneratorTests, filtererBasicMIPSTests, instructionGeneratorTests, verifierAdapterTests]
     
     steps:
     - uses: actions/checkout@v3
