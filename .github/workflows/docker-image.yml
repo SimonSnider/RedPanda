@@ -28,4 +28,24 @@ jobs:
     - name: run the tests inside the docker image
       run: docker run -t panda_local python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
       
+  run_panda_tests:
+    
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        test_script: [runInstructionTests_testRunInstructionsMemoryMips]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build the Docker image
+      run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local .
+    
+    - name: debugging
+      run: docker image ls
+    
+    - name: run the tests inside the docker image
+      run: docker run -t panda_local python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
     
