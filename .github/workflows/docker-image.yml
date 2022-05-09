@@ -26,6 +26,6 @@ jobs:
       run: docker image ls
     
     - name: run the tests inside the docker image
-      run: docker run -it python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
+      run: docker run python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
       
     
