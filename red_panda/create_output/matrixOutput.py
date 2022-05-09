@@ -1,7 +1,8 @@
+from pickle import NONE
 from red_panda.models.correlations import *
 import csv
 
-def generateOutput(instructionNames, data, filename):
+def generateOutput(instructionNames, data, filename, registerNames):
     """
     Generates output for a Correlation Data Object in the form of a matrix printed in csv format.
 
@@ -17,6 +18,10 @@ def generateOutput(instructionNames, data, filename):
         # writer.writerow(fields)
         for index, singleInstructionData in enumerate(data):
             writer.writerow(["Instruction:", instructionNames[index]])
+
+            if(singleInstructionData is None):
+                writer.writerow(["Could not gather data for instruction"])
+                continue
 
             writer.writerow(["Reg to Reg Correlations"])
             writer.writerows(singleInstructionData.regToReg)

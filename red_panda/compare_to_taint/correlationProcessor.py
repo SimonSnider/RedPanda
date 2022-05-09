@@ -5,6 +5,7 @@ from capstone.mips import *
 import math
 import copy
 from red_panda.run_instruction.stateManager import *
+from red_panda.utilities.printOptions import *
 import keystone
 model = {}
 first = True
@@ -28,7 +29,7 @@ def loadInstructions(panda: Panda, cpu, instructions, address=0):
     jump_instr = b""
     adr = address
     for instruction in instructions:
-        print(instruction)
+        #print(instruction)
         panda.physical_memory_write(adr, bytes(instruction))
         adr += len(bytes(instruction))
     if (panda.arch_name == "mips"):
@@ -94,18 +95,18 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
 
 
         # Generate the initial state before instruction execution
-        if (verbose): print("setup done")
+        if (verbose): printStandard("setup done")
 
 
 
     # This callback executes before each instruction is executed, it handles randomizing the registers and saving the before states
     @panda.cb_insn_exec
     def randomRegState(cpu, pc):
-        print("randomize register state")
+        #print("randomize register state")
         # Check if the panda is about to execute the instruction that is being tested. 
         # The register state only needs randomized before that instruction
         if (pc == ADDRESS):
-            if (verbose): print("tainting registers before execution")
+            if (verbose): printStandard("tainting registers before execution")
             global first
             # Randomize the registers to a value between lowerBound and upperBound
             randomizeRegisters(panda, cpu, minValue=lowerBound, maxValue=upperBound, taintRegs=first)
@@ -128,7 +129,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     @panda.cb_after_block_exec
     def getTaint(arg1, arg2, exitCode):
         for (regname, reg) in panda.arch.registers.items():
-            print(panda.taint_get_reg(reg))
+            #print(panda.taint_get_reg(reg))
     
     # This callback executes after each instruction execution. It handles saving the after register state and 
     # handles instruction switching, bitmask updating, and emulation termination
@@ -152,7 +153,7 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     def bhe(cpu, index):
         nonlocal regBoundsCount, upperBound, lowerBound
         pc = cpu.panda_guest_pc
-        if (verbose): print(f"handled exception index {index:#x} at pc: {pc:#x}")
+        if (verbose): printStandard(f"handled exception index {index:#x} at pc: {pc:#x}")
         regBoundsCount += 1
         if (regBoundsCount >= 32):
             print("can't find valid register state")

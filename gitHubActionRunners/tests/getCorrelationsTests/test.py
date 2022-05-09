@@ -1,5 +1,5 @@
-from modules.getCorrelations.correlationCalculator import *
-from modules.models.stateData import *
+from red_panda.get_correlations.correlationCalculator import *
+from red_panda.models.stateData import *
 
 def test_noCorrelations():
     """

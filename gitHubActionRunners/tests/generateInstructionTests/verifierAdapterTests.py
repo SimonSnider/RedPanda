@@ -1,4 +1,4 @@
-from modules.generateInstruction.verifierAdapter import *
+from red_panda.generate_instruction.verifierAdapter import *
 import pytest
 
 """

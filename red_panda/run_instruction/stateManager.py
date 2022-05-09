@@ -39,7 +39,7 @@ def setRandomSeed(random_seed):
     """
     seed(random_seed)
 
-def initializeMemory(panda: Panda, memName, memSize=2 * 1024 * 1024, address=0):
+def initializeMemory(panda: Panda, memName, memSize=4 * 1024, address=0):
     """
     Arguments:
         panda -- the instance of panda that will have its memory initialized
@@ -89,8 +89,11 @@ def randomizeRegisters(panda: Panda, cpu, regBitMask: bytes = b'\xff\xff\xff\xff
             panda.taint_label_reg(reg, reg)
         if (regname in skippedRegs or not getBit(regBitMask, reg)): continue
         num = generateRandomBytes(regSize, minValue=minValue, maxValue=maxValue)
-        panda.arch.set_reg(cpu, regname, int.from_bytes(num, 'big', signed=False))
 
+        num = int.from_bytes(num, 'big', signed=False)
+        num = (num >> 2) << 2
+        
+        panda.arch.set_reg(cpu, regname, num)
     return
 
 def setRegisters(panda: Panda, cpu, registerSate: dict):

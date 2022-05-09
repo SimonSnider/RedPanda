@@ -1,7 +1,7 @@
 import pytest
-from modules.generateInstruction import instructionGenerator as instGen
-from modules.generateInstruction.filterer import filtererBasicMIPS as filterer
-from modules.generateInstruction import verifierAdapter as veriAdpt
+from red_panda.generate_instruction import instructionGenerator as instGen
+from red_panda.generate_instruction.filterer import filtererBasicMIPS as filterer
+from red_panda.generate_instruction import verifierAdapter as veriAdpt
 
 def test_instructionGenerate():
     """Test that the instructions generated from the generateInstruction function are both valid and not filtered out.
