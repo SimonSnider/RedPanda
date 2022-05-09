@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_script: [bitGeneratorTests]
+        test_script: [runInstructionTests_testRunInstructionsMemoryMips]
     
     steps:
     - uses: actions/checkout@v3
