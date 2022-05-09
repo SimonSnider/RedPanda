@@ -31,6 +31,6 @@ jobs:
     - name: run the tests inside the docker image
       run: >-
         docker run --name panda_local_${{ github.sha }}_rnpt 
-        python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
+        python ./gitHubActionRunners/${{ matrix.test_script }}.py
       
     
