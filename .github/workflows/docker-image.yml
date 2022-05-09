@@ -24,9 +24,8 @@ jobs:
     
     - name: debugging
       run: docker image ls
-        
-    - uses: docker://panda_local
+    
     - name: run the tests inside the docker image
-      run: python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
+      run: docker run -it python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
       
     
