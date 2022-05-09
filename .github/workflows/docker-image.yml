@@ -12,8 +12,9 @@ jobs:
     runs-on: ubuntu-latest
   
     steps:
+     - uses: actions/checkout@v3
      - name: Build the Docker image
-       run: cd $GITHUB_WORKSPACE && docker build --progress=plain -t panda_local_${{ github.sha }} .
+       run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local_${{ github.sha }} .
   
      - name: debugging
        run: docker image ls
@@ -21,6 +22,7 @@ jobs:
   run_nonpanda_tests:
     
     runs-on: ubuntu-latest
+    needs: build_docker
     container:
       image: panda_local_${{ github.sha }}:latest
     
