@@ -2,6 +2,7 @@ from red_panda.utilities.printOptions import printStandard, printSubsystemFuncti
 from red_panda.generate_instruction import verifierAdapter as verAdapt
 from red_panda.generate_instruction import bitGenerator as bitGen
 from red_panda.generate_instruction.filterer import filtererBasicMIPS as fBMIPS
+from red_panda.utilities.printOptions import *
 from keystone import *
 
 
@@ -25,7 +26,7 @@ def translateInstruction(inst: str, arch = "mips"):
     elif (arch == "x86_64"):
         ks = keystone.Ks(keystone.KS_ARCH_X86, keystone.KS_MODE_64)
     else:
-        print("invalid architecture")
+        printError("invalid architecture")
         return
     CODE = inst.encode('UTF-8')
     ADDRESS = 0x0000

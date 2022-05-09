@@ -1,6 +1,6 @@
 from red_panda.models.correlations import *
 
-def generateOutput(instructionNames, data, filename):
+def generateOutput(instructionNames, data, filename, registerNames):
     filename = filename + ".txt"
     with open(filename, 'w') as f:
         for index, datai in enumerate(data):

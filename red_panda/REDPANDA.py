@@ -47,8 +47,6 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         from red_panda.create_output import matrixOutput as output
     elif outputModel == 1:
         from red_panda.create_output import thresholdOutput as output
-    #else:
-        #from modules.createOutput import matrixOutput as output
 
     if mode == 0:
         # Instructions are generated randomly using the generateInstruction module
@@ -118,7 +116,7 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     # Run the instructions through the Panda.re engine
     #
     printMainFunction("Instruction retrieval complete, beginning to run instructions")
-    instructionData, pandaModels = generateInstructionData(arch, instructionList, instructionIterations, verbose)
+    instructionData, pandaModels, reg_names = generateInstructionData(arch, instructionList, instructionIterations, verbose)
     #
     # Generate coorelation data from the instruction results
     #
@@ -126,11 +124,15 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
     printMainFunction("Running instructions complete, beginning to analyze correlations")
     analyzedData = []
 
+    #print(numInstructions, len(instructionData.registerStateLists), len(pandaModels))
     for i in range(numInstructions):
         if(verbose): printStandard("Generating correlations for: " + str(instructionList[i]))
         dat = instructionData.registerStateLists[i]
         pandaModel = pandaModels[i]
-
+        if(dat is None):
+            #instruction could not be run fully, ignore it
+            analyzedData.append(None)
+            continue
         MC.initialize(dat, instructionIterations, threshold)
         calcdCorrelations = MC.computeCorrelations(verbose)
         analyzedData.append(calcdCorrelations)
@@ -138,11 +140,11 @@ def runModel(arch, mode, instructionIterations, outputFileName, outputModel=0, i
         comparison = TC.compare(pandaModel, calcdCorrelations)
         printComment(comparison)
 
-        from panda_red.create_output import comparisonOutput as compOutput
-        compOutput.generateOutput(instructionData.instructionNames[i], [calcdCorrelations, pandaModel], outputFileName)
+        from red_panda.create_output import comparisonOutput as compOutput
+        compOutput.generateOutput(instructionData.instructionNames[i], [calcdCorrelations, pandaModel], outputFileName, reg_names)
 
     printMainFunction("Analysis complete, generating output file")
-    output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName)
+    output.generateOutput(instructionData.instructionNames, analyzedData, outputFileName, reg_names)
     printMainFunction("Output complete, ending red panda execution")
 
 parser = argparse.ArgumentParser(fromfile_prefix_chars='@')

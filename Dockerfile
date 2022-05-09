@@ -8,5 +8,4 @@ RUN pip install pytest
 RUN pip install numpy
 
 COPY . .
-
 RUN pip install .
