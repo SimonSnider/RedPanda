@@ -17,13 +17,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_script: [runInstructionTests_testRunInstructionsMemoryMips]
+        test_script: [bitGeneratorTests]
     
     steps:
     - uses: actions/checkout@v3
     
     - name: Build the Docker image
-      run: cd $GITHUB_WORKSPACE && DOCKER_BUILDKIT=1 docker build --progress=plain -t panda_local_${{ github.sha }}_rnpt .
+      run: cd $GITHUB_WORKSPACE && docker build --progress=plain -t panda_local_${{ github.sha }}_rnpt .
   
     - name: debugging
       run: docker image ls
