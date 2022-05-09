@@ -116,4 +116,5 @@ class TestScript(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    panda.run()
     unittest.main()

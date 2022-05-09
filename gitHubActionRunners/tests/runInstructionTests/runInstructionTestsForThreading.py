@@ -41,7 +41,7 @@ def testRunMipsInstructionOnce():
 
     # gather the instruction data by executing it in panda
     data: StateData = None
-    data, model = runInstruction.runInstructions(
+    data, model, _ = runInstruction.runInstructions(
         panda, [encoding], 1)
 
     # make sure the data contains the correct information
@@ -66,7 +66,7 @@ def testRunX86InstructionOnce():
     encoding, count = ks.asm(CODE, ADDRESS)
     print(encoding)
     data: StateData = None
-    data, model = runInstruction.runInstructions(
+    data, model, _ = runInstruction.runInstructions(
         panda, [encoding], 1)
     assert len(data.registerStateLists) == 1
     regStateList = data.registerStateLists[0]
@@ -90,7 +90,7 @@ def testRunTwoMipsInstructions():
     encoding, count = ks.asm(CODE, ADDRESS)
     encoding2, count = ks.asm(CODE2, ADDRESS)
 #        data: StateData = None
-    data, model = runInstruction.runInstructions(
+    data, model, _ = runInstruction.runInstructions(
         panda, [encoding, encoding2], 1)
     assert len(data.registerStateLists) == 2
     # determine the first regStateList contains data for the first instruction and not the second
@@ -130,7 +130,7 @@ def testRunTwoX86Instructions():
     encoding, count = ks.asm(CODE, ADDRESS)
     encoding2, count = ks.asm(CODE2, ADDRESS)
     data: StateData = None
-    data, model = runInstruction.runInstructions(
+    data, model, _ = runInstruction.runInstructions(
         panda, [encoding, encoding2], 1)
     # assert len(data.registerStateLists), 2)
     # determine the first regStateList contains data for the first instruction and not the second
@@ -174,7 +174,7 @@ def testRunInstructionsMips():
             print("%s\t%s" % (insn.mnemonic, insn.op_str))
 
     data: StateData = None
-    data, model = runInstruction.runInstructions(
+    data, model, _ = runInstruction.runInstructions(
         panda, instructions, n)
     assert len(data.registerStateLists) == inst
     for regStateList in data.registerStateLists:
@@ -206,7 +206,7 @@ def testRunInstructionsX86():
             print("%s\t%s" % (insn.mnemonic, insn.op_str))
 
     data: StateData = None
-    data, model = runInstruction.runInstructions(
+    data, model, _ = runInstruction.runInstructions(
         panda, instructions, n)
     assert len(data.registerStateLists) == inst
     for regStateList in data.registerStateLists:
@@ -237,7 +237,7 @@ def testRunInstructionsMemoryMips():
     inst = 2
     n = 5
 
-    data, model = runInstruction.runInstructions(panda, instructions, n, True)
+    data, model, _ = runInstruction.runInstructions(panda, instructions, n, True)
     assert isinstance(data, StateData)
     assert len(data.instructions) == inst
     assert len(data.registerStateLists) == inst
