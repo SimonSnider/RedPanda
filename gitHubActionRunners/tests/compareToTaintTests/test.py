@@ -72,9 +72,9 @@ def test3():
 
 
 
-panda = initializePanda()
-
 def testModelCollection():
+    panda = initializePanda()
+
     instruction = "add $t1, $t2, $zero"
     # instruction2 = "sw $t2, 0($t4)"
     CODE = instruction.encode('UTF-8')
