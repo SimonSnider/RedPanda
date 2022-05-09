@@ -13,10 +13,6 @@ def matrix_multiply(a: Matrix, b: Matrix):
         return None
     if a.matrix == None or b.matrix == None:
         return None
-    # if a.numCols != b.numRows:
-    #     print("a: "+str(a))
-    #     print("b: "+str(b))
-    #     return None
     if a.numRows == 0 or b.numCols == 0:
         ret = Matrix()
         ret.numRows = a.numRows
@@ -28,16 +24,7 @@ def matrix_multiply(a: Matrix, b: Matrix):
             sum = 0
             for i in range(b.numRows):
                 sum += (a.matrix[x][i])*(b.matrix[i][y])
-            try:
-                product[x][y] = sum
-            except:
-                #print("x: "+str(x))
-                #print("y: "+str(y))
-                #print(len(product))
-                #print("a: "+str(a))
-                #print("b: "+str(b))
-    # if a.numRows == 1:
-    #     product = [product]
+            product[x][y] = sum
     output = toMatrix(product)
     return output
 
