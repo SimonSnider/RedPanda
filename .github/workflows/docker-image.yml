@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_script: [runInstructionTests_testRunInstructionsMemoryMips, runInstructionTests_testRunInstructionsMips, runInstructionTests_testRunInstructionsX86, runInstructionTests_testRunMipsInstructionOnce, runInstructionTests_testRunTwoMipsInstructions, runInstructionTests_testRunTwoX86Instructions, runInstructionTests_testRunX86InstructionOnce]
+        test_script: [runInstructionTests_testRunInstructionsMemoryMips, runInstructionTests_testRunInstructionsMips, runInstructionTests_testRunInstructionsX86, runInstructionTests_testRunMipsInstructionOnce, runInstructionTests_testRunTwoMipsInstructions, runInstructionTests_testRunTwoX86Instructions, runInstructionTests_testRunX86InstructionOnce, stateManagerMips_randomizeRegisterState, stateManagerMips_testGetBitFalse, stateManagerMips_testGetBitTrue, stateManagerMips_testOffLimitsRegs, stateManagerMips_testRandomizeRegisterWithBitmask, stateManagerMips_testSetRegisters, stateManagerx86_64_randomizeRegisterState, stateManagerx86_64_testGetBitFalse, stateManagerx86_64_testGetBitTrue, stateManagerx86_64_testOffLimitsRegs, stateManagerx86_64_testRandomizeRegisterWithBitmask, stateManagerx86_64_testSetRegisters]
     
     steps:
     - uses: actions/checkout@v3
