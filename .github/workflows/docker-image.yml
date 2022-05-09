@@ -8,11 +8,21 @@ on:
 
 jobs:
       
-
+  build_docker:
+    runs-on: ubuntu-latest
+  
+    steps:
+     - name: Build the Docker image
+       run: cd $GITHUB_WORKSPACE && docker build --progress=plain -t panda_local_${{ github.sha }} .
+  
+     - name: debugging
+       run: docker image ls
   
   run_nonpanda_tests:
     
     runs-on: ubuntu-latest
+    container:
+      image: panda_local_${{ github.sha }}:latest
     
     strategy:
       fail-fast: false
@@ -20,13 +30,6 @@ jobs:
         test_script: [bitGeneratorTests]
     
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Build the Docker image
-      run: cd $GITHUB_WORKSPACE && docker build --progress=plain -t panda_local_${{ github.sha }} .
-  
-    - name: debugging
-      run: docker image ls
         
     - name: run the tests inside the docker image
       run: >-
