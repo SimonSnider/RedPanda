@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ github_actions_test, main ]
+    branches: [ github_actions_test ]
   pull_request:
-    branches: [ github_actions_test, main ]
+    branches: [ github_actions_test, main]
 
 jobs:
   run_nonpanda_tests:
@@ -48,4 +48,3 @@ jobs:
     
     - name: run the tests inside the docker image
       run: docker run -t panda_local python3 ./gitHubActionRunners/${{ matrix.test_script }}.py
-    
