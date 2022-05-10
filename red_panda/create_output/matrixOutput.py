@@ -1,4 +1,3 @@
-from pickle import NONE
 from red_panda.models.correlations import *
 import csv
 

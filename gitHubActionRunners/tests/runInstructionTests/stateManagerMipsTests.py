@@ -48,8 +48,8 @@ def setup(cpu):
 #def runner():
 #    panda.end_analysis()
     
-
-panda.run()
+def runPanda():
+    panda.run()
 
 class TestScript(unittest.TestCase):
     def testRandomizeRegisterState(self):
