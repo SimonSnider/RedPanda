@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ github_actions_test ]
+    branches: [ github_actions_test, main ]
   pull_request:
-    branches: [ github_actions_test, main]
+    branches: [ github_actions_test, main ]
 
 jobs:
   run_nonpanda_tests:
