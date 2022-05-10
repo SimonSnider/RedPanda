@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_script: [runInstructionTests_testRunInstructionsMemoryMips, runInstructionTests_testRunInstructionsMips, runInstructionTests_testRunInstructionsX86, runInstructionTests_testRunMipsInstructionOnce, runInstructionTests_testRunTwoMipsInstructions, runInstructionTests_testRunTwoX86Instructions, runInstructionTests_testRunX86InstructionOnce, stateManagerx86_64Tests, stateManagerMipsTests compareToTaintPandaTest]
+        test_script: [runInstructionTests_testRunInstructionsMemoryMips, runInstructionTests_testRunInstructionsMips, runInstructionTests_testRunInstructionsX86, runInstructionTests_testRunMipsInstructionOnce, runInstructionTests_testRunTwoMipsInstructions, runInstructionTests_testRunTwoX86Instructions, runInstructionTests_testRunX86InstructionOnce, stateManagerx86_64Tests, stateManagerMipsTests, compareToTaintPandaTest]
     
     steps:
     - uses: actions/checkout@v3
