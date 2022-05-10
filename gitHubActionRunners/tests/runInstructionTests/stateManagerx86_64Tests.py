@@ -44,13 +44,6 @@ def setup(cpu):
     panda.arch.set_pc(cpu, ADDRESS)
     panda.end_analysis()
 
-#@panda.queue_blocking
-#def runner():
-#    panda.end_analysis()
-    
-
-panda.run()
-
 class TestScript(unittest.TestCase):
     def testRandomizeRegisterState(self):
         """
@@ -116,4 +109,5 @@ class TestScript(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    panda.run()
     unittest.main()
