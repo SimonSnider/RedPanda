@@ -1,5 +1,7 @@
-from tests.getCorrelationsTests import propagationTests as test
+from tests.getCorrelationsTests import propagationTests
+
+test = propagationTests.TestPropagation()
 
 test.testNoMem()
-test.smallScaleTest()
-test.largeScaleTest()
+test.testSmallScale()
+test.testLargeScale()
