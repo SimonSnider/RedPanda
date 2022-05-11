@@ -25,7 +25,7 @@ def instructionNoMemIdentical():
 
     
     corr = Correlations()
-    corr.regToReg = [[0, 1, 1], [0, 0, 0], [0, 0, 0]]
+    corr.regToReg = [[0, 1, 1], [0, 1, 0], [0, 0, 1]]
     corr.regToReadAddress = []
     corr.regToWriteAddress = []
     corr.regToWriteData = []
@@ -51,7 +51,7 @@ def instructionNoMemPandaWrong():
 
 
     corr = Correlations()
-    corr.regToReg = [[0, 1, 1], [0, 0, 0], [0, 0, 0]]
+    corr.regToReg = [[0, 1, 1], [0, 1, 0], [0, 0, 1]]
     corr.regToReadAddress = []
     corr.regToWriteAddress = []
     corr.regToWriteData = []
@@ -74,7 +74,7 @@ def instructionNoMemNewWrong():
 
 
     corr = Correlations()
-    corr.regToReg = [[0, 1, 0], [0, 0, 0], [0, 0, 0]]
+    corr.regToReg = [[0, 1, 0], [0, 1, 0], [0, 0, 1]]
     corr.regToReadAddress = []
     corr.regToWriteAddress = []
     corr.regToWriteData = []
