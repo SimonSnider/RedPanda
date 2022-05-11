@@ -27,11 +27,8 @@ def instructionNoMemIdentical():
     corr.regToWriteData = []
     corr.readDataToReg = []
     corr.threshold = 0.5
-<<<<<<< HEAD:gitHubActionRunners/tests/compareToTaintTests/comparisonTests.py
+    
     assert compare(pandaModel, corr) == [{}, {}]
-=======
-    assert(compare(pandaModel, corr) == [{}, {}])
->>>>>>> main:gitHubActionRunners/tests/compareToTaintTests/test.py
 
 
 def instructionNoMemPandaWrong():
@@ -102,13 +99,7 @@ def testModelCollection():
     corr = calc.computeCorrelations()
     output = compare(pandaModel, corr)
 
-<<<<<<< HEAD:gitHubActionRunners/tests/compareToTaintTests/comparisonTests.py
     assert output == [{}, {}]
-=======
-    print(output)
-    assert(output == [{}, {}])
->>>>>>> main:gitHubActionRunners/tests/compareToTaintTests/test.py
-
     
 
 #testModelCollection()

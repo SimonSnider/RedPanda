@@ -1,4 +1,4 @@
-from tests.getCorrelationsTests import test
+from tests.getCorrelationsTests import regToRegTest as test
 
 test.test_noCorrelations()
 test.test_allCorrelated()
