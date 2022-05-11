@@ -28,7 +28,7 @@ def instructionNoMemIdentical():
     corr.readDataToReg = []
     corr.threshold = 0.5
     
-    assert compare(pandaModel, corr) == [{}, {}]
+    assert compare(pandaModel, corr) == [{'reg to reg': {}, 'reads to reg': {}, 'reg to writes': {}}, {'reg to reg': {}, 'reads to reg': {}, 'reg to writes': {}}]
 
 
 def instructionNoMemPandaWrong():
@@ -49,7 +49,7 @@ def instructionNoMemPandaWrong():
     corr.regToWriteData = []
     corr.readDataToReg = []
     corr.threshold = 0.5
-    assert(compare(pandaModel, corr) == [{}, {0: [2]}])
+    assert(compare(pandaModel, corr) == [{'reg to reg': {}, 'reads to reg': {}, 'reg to writes': {}}, {'reg to reg': {0:[2]}, 'reads to reg': {}, 'reg to writes': {}}])
 
 
 def instructionNoMemNewWrong():
@@ -69,7 +69,7 @@ def instructionNoMemNewWrong():
     corr.regToWriteData = []
     corr.readDataToReg = []
     corr.threshold = 0.5
-    assert(compare(pandaModel, corr) == [{("r0", 0): [2]}, {}])
+    assert(compare(pandaModel, corr) == [{'reg to reg': {0:[2]}, 'reads to reg': {}, 'reg to writes': {}}, {'reg to reg': {}, 'reads to reg': {}, 'reg to writes': {}}])
 
 
 
@@ -84,7 +84,7 @@ def testModelCollection():
     encoding, count = ks.asm(CODE, ADDRESS)
     instruction = [encoding]
     n = 5
-    [ourModel, pandaModel] = runInstructions(panda, instruction, n, True)
+    [ourModel, pandaModel, registerNames] = runInstructions(panda, instruction, n, True)
     calc.setArch("mips")
 
     states = RegisterStateList()
@@ -97,9 +97,9 @@ def testModelCollection():
     states.memoryWrites = last.memoryWrites
     calc.initialize(states, len(panda.arch.registers))
     corr = calc.computeCorrelations()
-    output = compare(pandaModel, corr)
+    output = compare(pandaModel[0], corr)
 
-    assert output == [{}, {}]
+    assert output == [{'reg to reg': {}, 'reads to reg': {}, 'reg to writes': {}}, {'reg to reg': {}, 'reads to reg': {}, 'reg to writes': {}}]
     
 
 #testModelCollection()
