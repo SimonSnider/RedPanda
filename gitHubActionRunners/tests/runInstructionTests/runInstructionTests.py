@@ -44,7 +44,7 @@ class TestScript(unittest.TestCase):
 
         #gather the instruction data by executing it in panda
         data: StateData = None
-        data, model = runInstruction.runInstructions(panda, [encoding], 1, verbose = True)
+        data, model, _ = runInstruction.runInstructions(panda, [encoding], 1, verbose = True)
 
         # make sure the data contains the correct information
         self.assertEqual(len(data.registerStateLists), 1)
@@ -69,7 +69,7 @@ class TestScript(unittest.TestCase):
     #     encoding, count = ks.asm(CODE, ADDRESS)
     #     print(encoding)
     #     data: StateData = None
-    #     data, model = runInstruction.runInstructions(panda, [encoding], 1, verbose = True)
+    #     data, model, _ = runInstruction.runInstructions(panda, [encoding], 1, verbose = True)
     #     self.assertEqual(len(data.registerStateLists), 1)
     #     regStateList = data.registerStateLists[0]
     #     self.assertIsInstance(regStateList, RegisterStateList)
@@ -91,7 +91,7 @@ class TestScript(unittest.TestCase):
     #         encoding, count = ks.asm(CODE, ADDRESS)
     #         encoding2, count = ks.asm(CODE2, ADDRESS)
     # #        data: StateData = None
-    #         data, model = runInstruction.runInstructions(panda, [encoding, encoding2], 1, verbose = True)
+    #         data, model, _ = runInstruction.runInstructions(panda, [encoding, encoding2], 1, verbose = True)
     #         self.assertEqual(len(data.registerStateLists), 2)
     #         # determine the first regStateList contains data for the first instruction and not the second
     #         states = data.registerStateLists[0]
@@ -127,7 +127,7 @@ class TestScript(unittest.TestCase):
     #         encoding, count = ks.asm(CODE, ADDRESS)
     #         encoding2, count = ks.asm(CODE2, ADDRESS)
     #         data: StateData = None
-    #         data, model = runInstruction.runInstructions(panda, [encoding, encoding2], 1, verbose = True)
+    #         data, model, _ = runInstruction.runInstructions(panda, [encoding, encoding2], 1, verbose = True)
     #         # self.assertEqual(len(data.registerStateLists), 2)
     #         # determine the first regStateList contains data for the first instruction and not the second
     #         states = data.registerStateLists[0]
@@ -165,7 +165,7 @@ class TestScript(unittest.TestCase):
     #             print("%s\t%s" %(insn.mnemonic, insn.op_str))
 
     #     data: StateData = None
-    #     data, model = runInstruction.runInstructions(panda, instructions, n, verbose=False)
+    #     data, model, _ = runInstruction.runInstructions(panda, instructions, n, verbose=False)
     #     self.assertEqual(len(data.registerStateLists), inst)
     #     for regStateList in data.registerStateLists:
     #         self.assertEqual(len(regStateList.bitmasks), n*24 + 1)
@@ -194,7 +194,7 @@ class TestScript(unittest.TestCase):
     #             print("%s\t%s" %(insn.mnemonic, insn.op_str))
 
     #     data: StateData = None
-    #     data, model = runInstruction.runInstructions(panda, instructions, n, verbose=True)
+    #     data, model, _ = runInstruction.runInstructions(panda, instructions, n, verbose=True)
     #     self.assertEqual(len(data.registerStateLists), inst)
     #     for regStateList in data.registerStateLists:
     #         self.assertEqual(len(regStateList.bitmasks), n*14 + 1)
@@ -223,7 +223,7 @@ class TestScript(unittest.TestCase):
     #     n = 5
 
 
-    #     data, model = runInstruction.runInstructions(panda, instructions, n, True)
+    #     data, model, _ = runInstruction.runInstructions(panda, instructions, n, True)
     #     self.assertIsInstance(data, StateData)
     #     self.assertEqual(len(data.instructions), inst)
     #     self.assertEqual(len(data.registerStateLists), inst)

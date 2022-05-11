@@ -163,8 +163,8 @@ def test_addCorrelatedWithExtra():
 
     
 
-test_noCorrelations()
-test_allCorrelated()
-test_addCorrelated()
-test_addCorrelatedWithExtra()
+#test_noCorrelations()
+#test_allCorrelated()
+#test_addCorrelated()
+#test_addCorrelatedWithExtra()
 

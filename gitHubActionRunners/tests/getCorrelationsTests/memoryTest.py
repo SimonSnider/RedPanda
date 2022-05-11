@@ -110,4 +110,4 @@ def testMemWrite():
 
 
 # testMemRead()
-testMemWrite()
+# testMemWrite()

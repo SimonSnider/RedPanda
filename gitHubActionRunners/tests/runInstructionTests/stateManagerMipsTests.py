@@ -9,7 +9,7 @@ import os
 import unittest
 
 ADDRESS = 0
-panda = Panda("x86_64",
+panda = Panda("mips",
         extra_args=["-M", "configurable", "-nographic"],
         raw_monitor=False)
 
@@ -34,22 +34,22 @@ def setup(cpu):
     panda.arch.dump_regs(cpu)
     regState2 = getRegisterState(panda, cpu)
     print(regState2)
-    bitmask = b'\x00\x00\x05'
+    bitmask = b'\x00\x00\x05\x00'
     randomizeRegisters(panda, cpu, bitmask)
     regState3 = getRegisterState(panda, cpu)
     setRegisters(panda, cpu, regState2)
     regState4 = getRegisterState(panda, cpu)
     print(regState3)
     # Set starting_pc
-    panda.arch.set_pc(cpu, ADDRESS)
+    cpu.env_ptr.active_tc.PC = ADDRESS
     panda.end_analysis()
 
 #@panda.queue_blocking
 #def runner():
 #    panda.end_analysis()
     
-
-panda.run()
+def runPanda():
+    panda.run()
 
 class TestScript(unittest.TestCase):
     def testRandomizeRegisterState(self):
@@ -64,7 +64,7 @@ class TestScript(unittest.TestCase):
         check that the skipped registers in mips are still 0 after randomization
         """
         global regState2
-        for key in skippedX86Regs:
+        for key in skippedMipsRegs:
             self.assertEqual(regState2.get(key), 0, msg='key: {0}'.format(key))
 
     def testGetBitTrue(self):
@@ -101,10 +101,10 @@ class TestScript(unittest.TestCase):
         T0 and T2, should be randomized. Check that T0 and T2 changed but T1 and T3 remained the same
         """
         self.assertTrue(compareRegStates(regState2, regState3))
-        self.assertEqual(regState2['RCX'], regState3['RCX'])
-        self.assertNotEqual(regState2['RAX'], regState3['RAX'])
-        self.assertEqual(regState2['RBX'], regState3['RBX'])
-        self.assertNotEqual(regState2['RDX'], regState3['RDX'])
+        self.assertNotEqual(regState2['T0'], regState3['T0'])
+        self.assertEqual(regState2['T1'], regState3['T1'])
+        self.assertNotEqual(regState2['T2'], regState3['T2'])
+        self.assertEqual(regState2['T3'], regState3['T3'])
 
     def testSetRegisters(self):
         """
@@ -116,4 +116,5 @@ class TestScript(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    panda.run()
     unittest.main()
