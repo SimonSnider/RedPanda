@@ -1,3 +1,4 @@
+from red_panda.models.correlations import *
 from red_panda.models.stateData import *
 from red_panda.get_correlations import correlationCalculatorMemory as mem
 from red_panda.models import *
@@ -5,10 +6,15 @@ from red_panda.models import *
 n = 3
 iterPerReg = 3
 data = -1  # RegisterStates
+size = 1
 
 
 def testMemRead():
-    global data
+    """
+    Here, we test the performance of the memory portion of the correlation module using the instruction
+    lw $r2, 0($r1)
+    """
+    global data, size
     bitmasks: "list[bytes]" = []
     beforeStates: "list[dict[str, int]]" = []
     afterStates: "list[dict[str, int]]" = []
@@ -17,26 +23,27 @@ def testMemRead():
     bitmasks.append(b"\x00\x00\x00")
     beforeStates.append({"r1": 1, "r2": 2, "r3": 3})
     afterStates.append({"r1": 1, "r2": 2, "r3": 3})
-    memoryReads.append([1])
-    # memoryWrites.append([0])
+    # MemoryTransaction(type, value, address, size
+    curRead = MemoryTransaction("read", 2, 1, size)
+    memoryReads.append([curRead])
 
-    bitmasks.append(b"\x01\x00\x00")
+    bitmasks.append(b"\x00\x00\x01")
     beforeStates.append({"r1": 4, "r2": 2, "r3": 3})
     afterStates.append({"r1": 4, "r2": 2, "r3": 3})
-    memoryReads.append([4])
-    # memoryWrites.append([0])
+    curRead = MemoryTransaction("read", 2, 4, size)
+    memoryReads.append([curRead])
 
     bitmasks.append(b"\x00\x01\x00")
     beforeStates.append({"r1": 1, "r2": 4, "r3": 3})
     afterStates.append({"r1": 1, "r2": 4, "r3": 3})
-    memoryReads.append([1])
-    # memoryWrites.append([0])
+    curRead = MemoryTransaction("read", 4, 1, size)
+    memoryReads.append([curRead])
 
-    bitmasks.append(b"\x00\x00\x01")
+    bitmasks.append(b"\x01\x00\x00")
     beforeStates.append({"r1": 1, "r2": 2, "r3": 4})
     afterStates.append({"r1": 1, "r2": 2, "r3": 4})
-    memoryReads.append([1])
-    # memoryWrites.append([0])
+    curRead = MemoryTransaction("read", 2, 1, size)
+    memoryReads.append([curRead])
 
     data = RegisterStateList()
     data.beforeStates = beforeStates
@@ -48,7 +55,10 @@ def testMemRead():
     mem.setArch("test", 3)
     mem.initialize(data, 3)
     M = mem.computeCorrelations()
-    print(M)
+    correct = False
+    assert True
+#    assert equalsCorrelations(M, correct)
+
 
 
 def testMemWrite():
@@ -57,8 +67,7 @@ def testMemWrite():
          sw $r2 0($r1)
     or:  mem[$r1] = $r2
     """
-    size = 1
-    global data
+    global data, size
     bitmasks: "list[bytes]" = []
     beforeStates: "list[dict[str, int]]" = []
     afterStates: "list[dict[str, int]]" = []
@@ -104,10 +113,10 @@ def testMemWrite():
 
     mem.setArch("test", 3)
     mem.initialize(data, 3)
-    print(data)
     M = mem.computeCorrelations()
     print(M)
+    correct = Correlations(regToReg=[[1,0,0],[0,1,0],[0,0,1]],regToReadAddress=[[], [], []], regToWriteAddress=[[1], [0], [0]], regToWriteData=[[0], [0], [0]], readDataToReg=[[], [], []], threshold=1.0)
+    
 
-
-# testMemRead()
+testMemRead()
 testMemWrite()

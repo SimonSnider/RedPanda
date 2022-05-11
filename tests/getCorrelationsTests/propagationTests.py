@@ -60,7 +60,7 @@ class TestPropagation(unittest.TestCase):
         inst4.regToWriteData = [[],[],[],[],[]]
     
         actual = prop.propagate([inst1, inst2, inst3, inst4])
-		correct = NonRectangularPseudoMatrix(regToReg=Matrix(numRows=5, numCols=5, matrix=[[1, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 0, 0, 0]]), readDataToReg=Matrix(numRows=1, numCols=4, matrix=[[None, Matrix(numRows=1, numCols=5, matrix=[[0, 0, 1, 0, 1]]), None, None]]), regToReadAddress=Matrix(numRows=1, numCols=4, matrix=[[None, Matrix(numRows=5, numCols=1, matrix=[[0], [0], [0], [1], [0]]), None, None]]), regToWriteData=Matrix(numRows=1, numCols=4, matrix=[[None, None, Matrix(numRows=5, numCols=1, matrix=[[0], [0], [1], [1], [0]]), None]]), regToWriteAddress=Matrix(numRows=1, numCols=4, matrix=[[None, None, Matrix(numRows=5, numCols=1, matrix=[[0], [0], [0], [0], [0]]), None]]), triangle=Matrix(numRows=4, numCols=4, matrix=[[None, TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None), TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None), TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None)], [None, None, TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=Matrix(numRows=1, numCols=1, matrix=[[1]]), readDataToWriteData=Matrix(numRows=1, numCols=1, matrix=[[0]])), TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None)], [None, None, None, TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None)], [None, None, None, None]]))
+        correct = NonRectangularPseudoMatrix(regToReg=Matrix(numRows=5, numCols=5, matrix=[[1, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 0, 0, 0]]), readDataToReg=Matrix(numRows=1, numCols=4, matrix=[[None, Matrix(numRows=1, numCols=5, matrix=[[0, 0, 1, 0, 1]]), None, None]]), regToReadAddress=Matrix(numRows=1, numCols=4, matrix=[[None, Matrix(numRows=5, numCols=1, matrix=[[0], [0], [0], [1], [0]]), None, None]]), regToWriteData=Matrix(numRows=1, numCols=4, matrix=[[None, None, Matrix(numRows=5, numCols=1, matrix=[[0], [0], [1], [1], [0]]), None]]), regToWriteAddress=Matrix(numRows=1, numCols=4, matrix=[[None, None, Matrix(numRows=5, numCols=1, matrix=[[0], [0], [0], [0], [0]]), None]]), triangle=Matrix(numRows=4, numCols=4, matrix=[[None, TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None), TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None), TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None)], [None, None, TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=Matrix(numRows=1, numCols=1, matrix=[[1]]), readDataToWriteData=Matrix(numRows=1, numCols=1, matrix=[[0]])), TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None)], [None, None, None, TriangleEntry(readDataToReadAddress=None, readDataToWriteAddress=None, readDataToWriteData=None)], [None, None, None, None]]))
         assert equalsNonRectangularPseudoMatrix(actual, correct)
 
     def testLargeScale(self):
@@ -150,7 +150,7 @@ class TestPropagation(unittest.TestCase):
         # expected.readDataToReg = []
     
         actual = prop.propagate([inst1,inst2,inst3,inst4,inst5,inst6,inst7,inst8,inst9,inst10])
-        print(actual.triangle)
+        print(actual)
         assert False
 
 # testNoMem()
