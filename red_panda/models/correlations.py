@@ -51,7 +51,7 @@ def equalsNonRectangularPseudoMatrix(m1: NonRectangularPseudoMatrix, m2: NonRect
 	r2 = equalsMatrix(m1.regToReadAddress, m2.regToReadAddress)
 	r3 = equalsMatrix(m1.regToWriteAddress, m2.regToWriteAddress)
 	r4 = equalsMatrix(m1.regToWriteData, m2.regToWriteData)
-	r5 = equalsMatrix(m1.readDataToReg, c2.readDataToReg)
+	r5 = equalsMatrix(m1.readDataToReg, m2.readDataToReg)
 	return r1 and r2 and r3 and r4 and r5
 
 def equalsMatrix(m1: Matrix, m2: Matrix):
