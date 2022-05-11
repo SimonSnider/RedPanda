@@ -27,19 +27,19 @@ def testMemRead():
     curRead = MemoryTransaction("read", 2, 1, size)
     memoryReads.append([curRead])
 
-    bitmasks.append(b"\x00\x00\x01")
+    bitmasks.append(b"\x01")
     beforeStates.append({"r1": 4, "r2": 2, "r3": 3})
     afterStates.append({"r1": 4, "r2": 2, "r3": 3})
     curRead = MemoryTransaction("read", 2, 4, size)
     memoryReads.append([curRead])
 
-    bitmasks.append(b"\x00\x01\x00")
+    bitmasks.append(b"\x02")
     beforeStates.append({"r1": 1, "r2": 4, "r3": 3})
     afterStates.append({"r1": 1, "r2": 4, "r3": 3})
     curRead = MemoryTransaction("read", 4, 1, size)
     memoryReads.append([curRead])
 
-    bitmasks.append(b"\x01\x00\x00")
+    bitmasks.append(b"\x04")
     beforeStates.append({"r1": 1, "r2": 2, "r3": 4})
     afterStates.append({"r1": 1, "r2": 2, "r3": 4})
     curRead = MemoryTransaction("read", 2, 1, size)
@@ -55,9 +55,8 @@ def testMemRead():
     mem.setArch("test", 3)
     mem.initialize(data, 3)
     M = mem.computeCorrelations()
-    correct = False
-    assert True
-#    assert equalsCorrelations(M, correct)
+    correct = Correlations(regToReg=[[1, 0, 0], [0, 1, 0], [0, 0, 1]], regToReadAddress=[[1], [0], [0]], regToWriteAddress=[[], [], []], regToWriteData = [[], [], []], readDataToReg=[[0], [1], [0]], threshold=1)
+    assert equalsCorrelations(M, correct)
 
 
 
@@ -83,21 +82,21 @@ def testMemWrite():
     curWrite = MemoryTransaction("write", 2, 1, size)
     memoryWrites.append([curWrite])
 
-    bitmasks.append(b"\x00\x00\x01")
+    bitmasks.append(b"\x01")
     beforeStates.append({"r1": 4, "r2": 2, "r3": 3})
     afterStates.append({"r1": 4, "r2": 2, "r3": 3})
     memoryReads.append([])
     curWrite = MemoryTransaction("write", 2, 4, size)
     memoryWrites.append([curWrite])
     
-    bitmasks.append(b"\x00\x01\x00")
+    bitmasks.append(b"\x02")
     beforeStates.append({"r1": 1, "r2": 4, "r3": 3})
     afterStates.append({"r1": 1, "r2": 4, "r3": 3})
     memoryReads.append([])
     curWrite = MemoryTransaction("write", 4, 1, size)
     memoryWrites.append([curWrite])
 
-    bitmasks.append(b"\x01\x00\x00")
+    bitmasks.append(b"\x04")
     beforeStates.append({"r1": 1, "r2": 2, "r3": 4})
     afterStates.append({"r1": 1, "r2": 2, "r3": 4})
     memoryReads.append([])
@@ -114,9 +113,7 @@ def testMemWrite():
     mem.setArch("test", 3)
     mem.initialize(data, 3)
     M = mem.computeCorrelations()
-    print(M)
-    correct = Correlations(regToReg=[[1,0,0],[0,1,0],[0,0,1]],regToReadAddress=[[], [], []], regToWriteAddress=[[1], [0], [0]], regToWriteData=[[0], [0], [0]], readDataToReg=[[], [], []], threshold=1.0)
+    correct = Correlations(regToReg=[[1,0,0],[0,1,0],[0,0,1]],regToReadAddress=[[], [], []], regToWriteAddress=[[1], [0], [0]], regToWriteData=[[0], [1], [0]], readDataToReg=[[], [], []], threshold=1.0)
+    assert equalsCorrelations(correct, M)
     
 
-testMemRead()
-testMemWrite()
