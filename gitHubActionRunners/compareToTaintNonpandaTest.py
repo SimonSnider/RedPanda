@@ -1,4 +1,4 @@
-from tests.compareToTaintTests import test
+from tests.compareToTaintTests import comparisonTests as test
 
 test.test1()
 test.test2()

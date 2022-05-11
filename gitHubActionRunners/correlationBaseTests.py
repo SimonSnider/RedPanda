@@ -1,4 +1,4 @@
-from tests.getCorrelationsTest import test
+from tests.getCorrelationsTests import test
 
 test.test_noCorrelations()
 test.test_allCorrelated()
