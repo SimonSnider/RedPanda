@@ -164,8 +164,19 @@ parser.add_argument("-seed", type=int, help="the seed to generate instructions w
 
 args = parser.parse_args()
 
+if(args.threshold < 0 or args.threshold > 1):
+    printError("Threshold must be between 0 and 1")
+    quit()
+
+if(args.iterations <= 0):
+    printError("Number of iterations must be a positive number")
+    quit()
+
 printComment(str(args))
 if(args.random_instructions):
+    if(args.random_instructions <= 0):
+        printError("Number of random instructions must be a positive number")
+        quit()
     mode = 0
 elif(args.bytes_file):
     mode = 1
@@ -174,6 +185,8 @@ elif(args.instructions_file):
 else:
     printError("Must specify an instruction source")
     quit()
+
+
 
 if(args.seed):
     runModel(args.architecture, mode, args.iterations, args.name, args.output_model, args.instructions_file, args.random_instructions, args.verbose, args.threshold, args.seed)
