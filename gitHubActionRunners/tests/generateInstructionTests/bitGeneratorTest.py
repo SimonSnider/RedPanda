@@ -1,5 +1,4 @@
 from red_panda.generate_instruction.bitGenerator import *
-
 def testGenerateRandomBytes(bytes):
     """
     call generateRandomBytes 100 times with 1, 2, and 4 bytes and check that
@@ -42,3 +41,4 @@ def testByteBinaryString(bytes):
 testByteBinaryString(1)
 testByteBinaryString(2)
 testByteBinaryString(4)
+

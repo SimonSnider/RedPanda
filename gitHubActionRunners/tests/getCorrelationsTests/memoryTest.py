@@ -116,4 +116,3 @@ def testMemWrite():
     correct = Correlations(regToReg=[[1,0,0],[0,1,0],[0,0,1]],regToReadAddress=[[], [], []], regToWriteAddress=[[1], [0], [0]], regToWriteData=[[0], [1], [0]], readDataToReg=[[], [], []], threshold=1.0)
     assert equalsCorrelations(correct, M)
     
-

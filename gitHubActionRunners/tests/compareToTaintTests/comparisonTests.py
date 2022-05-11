@@ -27,7 +27,11 @@ def instructionNoMemIdentical():
     corr.regToWriteData = []
     corr.readDataToReg = []
     corr.threshold = 0.5
+<<<<<<< HEAD:gitHubActionRunners/tests/compareToTaintTests/comparisonTests.py
     assert compare(pandaModel, corr) == [{}, {}]
+=======
+    assert(compare(pandaModel, corr) == [{}, {}])
+>>>>>>> main:gitHubActionRunners/tests/compareToTaintTests/test.py
 
 
 def instructionNoMemPandaWrong():
@@ -48,7 +52,7 @@ def instructionNoMemPandaWrong():
     corr.regToWriteData = []
     corr.readDataToReg = []
     corr.threshold = 0.5
-    assert compare(pandaModel, corr) == [{}, {0: [2]}]
+    assert(compare(pandaModel, corr) == [{}, {0: [2]}])
 
 
 def instructionNoMemNewWrong():
@@ -68,13 +72,13 @@ def instructionNoMemNewWrong():
     corr.regToWriteData = []
     corr.readDataToReg = []
     corr.threshold = 0.5
-    assert compare(pandaModel, corr) == [{("r0", 0): [2]}, {}]
+    assert(compare(pandaModel, corr) == [{("r0", 0): [2]}, {}])
 
 
-
-panda = initializePanda()
 
 def testModelCollection():
+    panda = initializePanda()
+
     instruction = "add $t1, $t2, $zero"
     CODE = instruction.encode('UTF-8')
     ks = Ks(KS_ARCH_MIPS, KS_MODE_MIPS32 + KS_MODE_BIG_ENDIAN)
@@ -98,8 +102,13 @@ def testModelCollection():
     corr = calc.computeCorrelations()
     output = compare(pandaModel, corr)
 
+<<<<<<< HEAD:gitHubActionRunners/tests/compareToTaintTests/comparisonTests.py
     assert output == [{}, {}]
+=======
+    print(output)
+    assert(output == [{}, {}])
+>>>>>>> main:gitHubActionRunners/tests/compareToTaintTests/test.py
 
     
 
-testModelCollection()
+#testModelCollection()
