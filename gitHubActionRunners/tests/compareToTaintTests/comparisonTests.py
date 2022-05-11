@@ -15,11 +15,15 @@ def instructionNoMemIdentical():
     This test simulates the comparison of two models which each correctly propagate taints for the instruction:
         r0 = r1 + r2
     """
-    pandaModel = {}
-    pandaModel[0] = [1, 2]
-    pandaModel[1] = []
-    pandaModel[2] = []
 
+    pandaModel = [[],[],[]]
+    pandaModel[0] = [0, 1, 1]
+    pandaModel[1] = [0, 1, 0]
+    pandaModel[2] = [0, 0, 1]
+    regToWrite = {}
+    pandaModel = [pandaModel, regToWrite]
+
+    
     corr = Correlations()
     corr.regToReg = [[0, 1, 1], [0, 0, 0], [0, 0, 0]]
     corr.regToReadAddress = []
@@ -37,10 +41,14 @@ def instructionNoMemPandaWrong():
     PANDA's, incorrectly concludes that r2 is not correlated with r0 in the execution of:
         r0 = r1 + r2
     """
-    pandaModel = {}
-    pandaModel[0] = [1]
-    pandaModel[1] = []
-    pandaModel[2] = []
+
+    pandaModel = [[],[],[]]
+    pandaModel[0] = [0, 1, 0]
+    pandaModel[1] = [0, 1, 0]
+    pandaModel[2] = [0, 0, 1]
+    regToWrite = {}
+    pandaModel = [pandaModel, regToWrite]
+
 
     corr = Correlations()
     corr.regToReg = [[0, 1, 1], [0, 0, 0], [0, 0, 0]]
@@ -57,10 +65,13 @@ def instructionNoMemNewWrong():
     In this test, the PANDA model is correct and the new model is incorrect in tracking the taint flow through:
         r0 = r1 + r2
     """
-    pandaModel = {}
-    pandaModel[0] = [1, 2]
-    pandaModel[1] = []
-    pandaModel[2] = []
+    pandaModel = [[],[],[]]
+    pandaModel[0] = [0, 1, 1]
+    pandaModel[1] = [0, 1, 0]
+    pandaModel[2] = [0, 0, 1]
+    regToWrite = {}
+    pandaModel = [pandaModel, regToWrite]
+
 
     corr = Correlations()
     corr.regToReg = [[0, 1, 0], [0, 0, 0], [0, 0, 0]]
