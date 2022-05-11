@@ -16,9 +16,9 @@ def instructionNoMemIdentical():
         r0 = r1 + r2
     """
     pandaModel = {}
-    pandaModel[("r0", 0)] = [1, 2]
-    pandaModel[("r1", 1)] = []
-    pandaModel[("r2", 2)] = []
+    pandaModel[0] = [1, 2]
+    pandaModel[1] = []
+    pandaModel[2] = []
 
     corr = Correlations()
     corr.regToReg = [[0, 1, 1], [0, 0, 0], [0, 0, 0]]
@@ -38,9 +38,9 @@ def instructionNoMemPandaWrong():
         r0 = r1 + r2
     """
     pandaModel = {}
-    pandaModel[("r0", 0)] = [1]
-    pandaModel[("r1", 1)] = []
-    pandaModel[("r2", 2)] = []
+    pandaModel[0] = [1]
+    pandaModel[1] = []
+    pandaModel[2] = []
 
     corr = Correlations()
     corr.regToReg = [[0, 1, 1], [0, 0, 0], [0, 0, 0]]
@@ -58,9 +58,9 @@ def instructionNoMemNewWrong():
         r0 = r1 + r2
     """
     pandaModel = {}
-    pandaModel[("r0", 0)] = [1, 2]
-    pandaModel[("r1", 1)] = []
-    pandaModel[("r2", 2)] = []
+    pandaModel[0] = [1, 2]
+    pandaModel[1] = []
+    pandaModel[2] = []
 
     corr = Correlations()
     corr.regToReg = [[0, 1, 0], [0, 0, 0], [0, 0, 0]]
