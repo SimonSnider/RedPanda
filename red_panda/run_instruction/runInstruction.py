@@ -423,10 +423,10 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         registerStateList.memoryWrites[-1].append(memoryTransaction)
 
         if(verbose):        
-            printStandard("pc of write:", str(pc))
-            printStandard("addr of write:", str(addr))
-            printStandard("size of write:", str(size))
-            printStandard("data of write:", str(data))
+            printStandard("pc of write: " + str(pc))
+            printStandard("addr of write: " + str(addr))
+            printStandard("size of write: " + str(size))
+            printStandard("data of write: " + str(data))
     
     #Gather Taint Data
     #####################################################################################################################
