@@ -567,9 +567,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         
         if(verbose):
             printStandard("pc of read:%d" % pc)
-            #printStandard("value read:", valueRead)
-            #printStandard("addr of read:", addr)
-            #printStandard("size of read:", size)
+            #printStandard("value read: " + valueRead)
+            #printStandard("addr of read: " + addr)
+            #printStandard("size of read: " + size)
 
     @panda.cb_virt_mem_before_write
     def taintwrite(cpu, pc, addr, size, data):
