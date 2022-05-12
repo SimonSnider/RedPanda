@@ -56,17 +56,18 @@ def test_filterValidITypeInstructions():
         andi
         ori
     """
+    # Note that MIPS has removed addi but that the instruction is still valid
     # Filter the addi instruction
     instruction = b"\x21\x28\x00\x05"
-    assert filterInstruction(instruction) == True
+    assert not filterInstruction(instruction)
 
     # Filter the andi instruction
     instruction = b"\x31\x28\x00\x05"
-    assert filterInstruction(instruction) == True
+    assert filterInstruction(instruction)
 
     # Filter the ori instruction
     instruction = b"\x35\x28\x00\x05"
-    assert filterInstruction(instruction) == True
+    assert filterInstruction(instruction)
 
 def test_filterInvalidITypeInstructions():
     """Test that invalid I-Type instructions are filtered out.

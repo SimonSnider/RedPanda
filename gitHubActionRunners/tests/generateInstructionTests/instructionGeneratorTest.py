@@ -8,12 +8,11 @@ def test_instructionGenerate():
     The following instructions are tested in the order given:
         10 randomly generated instructions
     """
-    instGen.initialize("mips32")
-    veriAdpt.setISA("mips32")
-    veriAdpt.initialize()
+    genEncoding = instGen.initialize("mips32")
+    verObject = veriAdpt.initialize("mips32")
 
     for _ in range(10):
-        instruction = instGen.generateInstruction()
+        instruction = instGen.generateInstruction(genEncoding, filterer)
         
-        assert veriAdpt.isValidInstruction(instruction) == 1
+        assert veriAdpt.isValidInstruction(verObject, instruction) == 1
         assert filterer.filterInstruction(instruction) == 1
