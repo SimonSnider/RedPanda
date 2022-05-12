@@ -150,10 +150,8 @@ def testRunTwoX86Instructions():
     assert len(states.beforeStates) == 1 * 14 + 1
     assert len(states.afterStates) == 1 * 14 + 1
     for i in range(len(states.beforeStates)):
-        assert states.beforeStates[i].get(
-            "RBX") == states.afterStates[i].get("RBX") + 1
-        assert states.afterStates[i].get(
-            "RAX") == states.beforeStates[i].get("RAX")
+        assert states.beforeStates[i].get("RBX") == states.afterStates[i].get("RBX") - 1
+        assert states.afterStates[i].get("RAX") == states.beforeStates[i].get("RAX")
 
     assert model[0] != model[1], "model 0 and model 1 are identical"
 
@@ -178,6 +176,8 @@ def testRunInstructionsMips():
         panda, instructions, n)
     assert len(data.registerStateLists) == inst
     for regStateList in data.registerStateLists:
+        if regStateList is None:
+            continue
         assert len(regStateList.bitmasks) == n*24 + 1
         assert len(regStateList.afterStates) == n*24 + 1
         assert len(regStateList.beforeStates) == n*24 + 1
@@ -195,20 +195,27 @@ def testRunInstructionsX86():
     panda = initializePanda("x86_64")
     instructions = []
     instGen = instructionGenerator.initialize("x86_64")
-    inst = 1
+#    inst = 1
     n = 100
     md = Cs(CS_ARCH_X86, CS_MODE_64)
-    for i in range(inst):
-        instruction = instructionGenerator.generateInstruction(
-            instGen, x86Filter)
-        instructions.append(instruction)
-        for insn in md.disasm(instruction, 0x1000):
-            print("%s\t%s" % (insn.mnemonic, insn.op_str))
+#    for i in range(inst):
+#        instruction = instructionGenerator.generateInstruction(
+#            instGen, x86Filter)
+#        instructions.append(instruction)
+#        for insn in md.disasm(instruction, 0x1000):
+#            print("%s\t%s" % (insn.mnemonic, insn.op_str))
+    insn1 = "add rax, rbx"
+    CODE = insn1.encode('UTF-8')
+    ks = Ks(keystone.KS_ARCH_X86, keystone.KS_MODE_64)
+    encoding, count = ks.asm(CODE, 0x1000)
+    instructions.append(encoding)
+    print("add rax, rbx")
+    
 
     data: StateData = None
     data, model, _ = runInstruction.runInstructions(
         panda, instructions, n)
-    assert len(data.registerStateLists) == inst
+    assert len(data.registerStateLists) == 1
     for regStateList in data.registerStateLists:
         assert len(regStateList.bitmasks) == n*14 + 1
         assert len(regStateList.afterStates) == n*14 + 1
