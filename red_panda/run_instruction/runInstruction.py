@@ -423,10 +423,10 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         registerStateList.memoryWrites[-1].append(memoryTransaction)
 
         if(verbose):        
-            printStandard("pc of write: " + str(pc))
-            printStandard("addr of write: " + str(addr))
-            printStandard("size of write: " + str(size))
-            printStandard("data of write: " + str(data))
+            printStandard("pc of write:" + str(pc))
+            printStandard("addr of write:" + str(addr))
+            printStandard("size of write:" + str(size))
+            printStandard("data of write:" + str(data))
     
     #Gather Taint Data
     #####################################################################################################################
@@ -567,9 +567,9 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
         
         if(verbose):
             printStandard("pc of read:%d" % pc)
-            #printStandard("value read:", valueRead)
-            #printStandard("addr of read:", addr)
-            #printStandard("size of read:", size)
+            #printStandard("value read: " + valueRead)
+            #printStandard("addr of read: " + addr)
+            #printStandard("size of read: " + size)
 
     @panda.cb_virt_mem_before_write
     def taintwrite(cpu, pc, addr, size, data):
@@ -588,3 +588,4 @@ def runInstructions(panda: Panda, instructions, n, verbose=False):
     panda.cb_insn_translate(lambda x, y: True)
     panda.run()
     return [stateData, modelList, list(panda.arch.registers)]
+

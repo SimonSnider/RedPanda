@@ -1,5 +1,5 @@
-from tests.compareToTaintTests import test
+from tests.compareToTaintTests import comparisonTests as test
 
-test.test1()
-test.test2()
-test.test3()
+test.instructionNoMemIdentical()
+test.instructionNoMemNewWrong()
+test.instructionNoMemPandaWrong()
