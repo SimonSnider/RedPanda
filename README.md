@@ -1,6 +1,8 @@
 <t> PANDA Taint Modeling </t>
 
 # Quick Start Guide
+For full guides please refer to our user documentation found in the main directory.
+
 The PANDA Instruction Taint Analysis System (RED PANDA) can be installed and run under default settings by following the instructions below.
 * <a href="#installationSection">Installation</a>
 * <a href="#runningSection">Running the System</a>
