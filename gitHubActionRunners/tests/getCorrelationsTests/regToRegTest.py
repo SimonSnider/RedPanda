@@ -1,5 +1,5 @@
 import unittest
-from red_panda.get_correlations.correlationCalculator import *
+from red_panda.get_correlations.correlationCalculatorMemory import *
 from red_panda.models.stateData import *
 
 class Tests(unittest.TestCase):
