@@ -28,6 +28,13 @@ def isPowerOfTwo(n):
 
 
 def testRunMipsInstructionOnce():
+    """
+    This test runs a single mips instruction with one randomization per register.
+    
+    Asserts that using the run_instruction module on a mips instruction returns the correct
+    number of outputs, that the instruction information is of the correct type and length,
+    and that the instruction executed properly
+    """
     # initialize an instance of panda with the mips32 architecture
     panda = initializePanda("mips")
     # create the instruction we want to run
@@ -56,6 +63,13 @@ def testRunMipsInstructionOnce():
     assert regStateList.afterStates[0].get("T0") == 0
 
 def testRunX86InstructionOnce():
+    """
+    This test runs a single x86_64 instruction with one randomization per register.
+    
+    Asserts that using the run_instruction module on an x86_64 instruction returns the correct
+    number of outputs, that the instruction information is of the correct type and length,
+    and that the instruction executed properly
+    """
     panda = initializePanda("x86_64")
     instruction = "AND RAX, 0"
     print(instruction)
@@ -68,17 +82,26 @@ def testRunX86InstructionOnce():
     data: StateData = None
     data, model, _ = runInstruction.runInstructions(
         panda, [encoding], 1)
+    # assert that the register state list is of the correct length (1) and type (class RegisterStateList)
     assert len(data.registerStateLists) == 1
     regStateList = data.registerStateLists[0]
     assert isinstance(regStateList, RegisterStateList)
+    # assert that the correct number of randomizations (15) were performed
     assert len(regStateList.beforeStates) == 1 * 14 + 1
     assert len(regStateList.afterStates) == 1 * 14 + 1
     print(regStateList.beforeStates[0])
+    # assert that the AND instruction executed properly (the RAX register should be 0 after execution)
     assert regStateList.beforeStates[0].get("RAX") != 0
     assert regStateList.afterStates[0].get("RAX") == 0
 
 
 def testRunTwoMipsInstructions():
+    """
+    This test uses the run_instruction module to gather data on two mips instructions in sequence
+
+    Asserts that the run_instruction module will properly switch between instructions, that the information
+    gathered for each instruction is of the correct length, and the correct information was gathere for each instruction
+    """
     panda = initializePanda("mips")
     instruction = "andi $t0, $t1, 0"
     instruction2 = "andi $t5, $t6, 0"
@@ -89,15 +112,16 @@ def testRunTwoMipsInstructions():
     ADDRESS = 0x0000
     encoding, count = ks.asm(CODE, ADDRESS)
     encoding2, count = ks.asm(CODE2, ADDRESS)
-#        data: StateData = None
     data, model, _ = runInstruction.runInstructions(
         panda, [encoding, encoding2], 1)
+    # assert the correct number of instructions (2) were collected
     assert len(data.registerStateLists) == 2
     # determine the first regStateList contains data for the first instruction and not the second
     states = data.registerStateLists[0]
     assert isinstance(states, RegisterStateList)
     assert len(states.beforeStates) == 1 * 24 + 1
     assert len(states.afterStates) == 1 * 24 + 1
+    # assert that for each randomization, the And instruction executed properly
     for i in range(len(states.beforeStates)):
         assert states.beforeStates[i].get("T0") != 0
         assert states.afterStates[i].get(
@@ -109,16 +133,23 @@ def testRunTwoMipsInstructions():
     assert isinstance(states, RegisterStateList)
     assert len(states.beforeStates) == 1 * 24 + 1
     assert len(states.afterStates) == 1 * 24 + 1
+    # assert that for each randomization, the correct instruction was executed
     for i in range(len(states.beforeStates)):
         assert states.beforeStates[i].get("T5") != 0
         assert states.beforeStates[i].get(
             "T0") == states.afterStates[i].get("T0")
         assert states.afterStates[i].get("T5") == 0
-
+    # assert that the panda model gathered for each instruction are not identical
     assert model[0] != model[1], "model 0 and model 1 are identical"
 
 
 def testRunTwoX86Instructions():
+    """
+    This test uses the run_instruction module to gather data on two x86_64 instructions in sequence
+
+    Asserts that the run_instruction module will properly switch between instructions, that the information
+    gathered for each instruction is of the correct length, and the correct information was gathere for each instruction
+    """
     panda = initializePanda("x86_64")
     instruction = "INC RAX"
     instruction2 = "INC RBX"
@@ -132,12 +163,14 @@ def testRunTwoX86Instructions():
     data: StateData = None
     data, model, _ = runInstruction.runInstructions(
         panda, [encoding, encoding2], 1)
-    # assert len(data.registerStateLists), 2)
+    assert len(data.registerStateLists) == 2
     # determine the first regStateList contains data for the first instruction and not the second
     states = data.registerStateLists[0]
     assert isinstance(states, RegisterStateList)
+    # assert that the correct number of randomizations were performed for instruction 1
     assert len(states.beforeStates) == 1 * 14 + 1
     assert len(states.afterStates) == 1 * 14 + 1
+    # assert that, for each randomization, RAX was incremented and RBX was not
     for i in range(len(states.beforeStates)):
         assert states.afterStates[i].get(
             "RAX") == states.beforeStates[i].get("RAX") + 1
@@ -147,16 +180,24 @@ def testRunTwoX86Instructions():
     # determine the second regStateList contains data for the second instruction and not the first
     states = data.registerStateLists[1]
     assert isinstance(states, RegisterStateList)
+    # assert that the correct number of randomizations were performed for the second instruction
     assert len(states.beforeStates) == 1 * 14 + 1
     assert len(states.afterStates) == 1 * 14 + 1
+    # assert that, for each randomization, RBX was incremented and RAX was not
     for i in range(len(states.beforeStates)):
         assert states.beforeStates[i].get("RBX") == states.afterStates[i].get("RBX") - 1
         assert states.afterStates[i].get("RAX") == states.beforeStates[i].get("RAX")
-
+    #assert that the Panda model gathered for each instruction are note equivalent
     assert model[0] != model[1], "model 0 and model 1 are identical"
 
 
 def testRunInstructionsMips():
+    """
+    This test checks whether the generation and execution of 10 random instructions works for mips
+
+    Asserts that the run_instruction module will properly switch between instructions, that the information
+    gathered for each instruction is of the correct length and type
+    """
     panda = initializePanda("mips")
     print("num_regs: " + str(len(panda.arch.registers)))
     instructions = []
@@ -174,14 +215,18 @@ def testRunInstructionsMips():
     data: StateData = None
     data, model, _ = runInstruction.runInstructions(
         panda, instructions, n)
+    # assert that the correct number of instructions were collected
     assert len(data.registerStateLists) == inst
     for regStateList in data.registerStateLists:
         if regStateList is None:
             continue
+        # assert that the correct number of randomizations were performed
         assert len(regStateList.bitmasks) == n*24 + 1
         assert len(regStateList.afterStates) == n*24 + 1
         assert len(regStateList.beforeStates) == n*24 + 1
+        # assert that the first execution of each instruction was with an initial state
         assert regStateList.bitmasks[0], b'\x00\x00\x00\x00'
+        # assert that each register state contains the correct datatypes
         for i in range(len(regStateList.bitmasks)):
             assert isinstance(regStateList.bitmasks[i], bytes)
             assert isinstance(regStateList.beforeStates[i], dict)
@@ -230,6 +275,12 @@ def testRunInstructionsX86():
 
 
 def testRunInstructionsMemoryMips():
+    """
+    Tests that memory instructions can be run in mips
+
+    asserts that the correct number of instructions is run, that the memory accesses were recorded properly,
+    and that each memory transaction is of the correct type
+    """
     panda = initializePanda("mips")
     instruction = "lw $t2, 0($t4)"
     instruction2 = "sw $t2, 0($t4)"

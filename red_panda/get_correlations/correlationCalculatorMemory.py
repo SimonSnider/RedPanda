@@ -45,7 +45,7 @@ def setArch(archType, testV=0):
         n = testV
 
 
-def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5, pValue: bool = True, verbose=False):
+def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float = 0.5, verbose=False):
 
     """ Initializes the correlation calculator with the data from running an instruction multiple times
 
@@ -60,8 +60,6 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
     thresh = threshold
     # printComment("length of afterStates: " +str(len(data.afterStates[0])))
     n = len(data.afterStates[0])
-    if pValue:
-        thresh = computeThreshold(threshold)
     
     iterPerRegister = iterPerReg
     I = len(data.bitmasks)-1
@@ -137,28 +135,27 @@ def initialize(data: RegisterStateList, iterPerReg: int = 100, threshold: float 
         lengthen(ls, maxLengthWrites)
     for ls in memReadVals.inputs:
         lengthen(ls, maxLengthReads)
-
+"""
 def binSum(q, c):
-    """
-    q -- 1-p, where p is the p-value chosen by the user
-    c -- a correlation coefficient
-    This function computes the probability that two variables are correlated given a
-    correlation coefficient and a desired probability
-    """
+    #q -- 1-p, where p is the p-value chosen by the user
+    #c -- a correlation coefficient
+    #This function computes the probability that two variables are correlated given a
+    #correlation coefficient and a desired probability
+    
     sum = 0.0
     n = iterPerRegister
     for x in range(math.floor(n*c), n):
         sum += math.comb(n, x)*((1-q)**x)*(q**(n-x))
     return sum
+"""
 
-
-
+"""
 def computeThreshold(q):
-    """
+   
     p -- desired p-value
     This function interpolates the minimum threshold for a correlation
     coefficient given a desired p-value
-    """
+   
     if q <= 0:
         return 0.0
     p = 1 - q
@@ -178,7 +175,7 @@ def computeThreshold(q):
     if sum < q:
         c = math.ceil(c*n) / n
     return c
-
+"""
 
 
 

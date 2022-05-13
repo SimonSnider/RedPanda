@@ -28,9 +28,19 @@ class TestScript(unittest.TestCase):
     The tests in this file create and run instances of panda. Because of this multiple tests cannot be run at a time
     without starting up separate environments. To account for this during manual testing, only one test will be
     uncommented at a time. A solution for automated testing is needed.
+
+    Each test in this file is testing a different function of the run_instruction module, the module where Panda is started
+    and information on the instructions is gathered through repeated execution.
     """
 
     def testRunMipsInstructionOnce(self):
+        """
+        This test runs a single mips instruction with one randomization per register.
+        
+        Asserts that using the run_instruction module on a mips instruction returns the correct
+        number of outputs, that the instruction information is of the correct type and length,
+        and that the instruction executed properly
+        """
         #initialize an instance of panda with the mips32 architecture
         panda = initializePanda("mips")
         #create the instruction we want to run
@@ -53,12 +63,19 @@ class TestScript(unittest.TestCase):
         # check that the correct number of randomized bitmasks were executed
         self.assertEqual(len(regStateList.beforeStates), 1 * 24 + 1)
         self.assertEqual(len(regStateList.afterStates), 1 * 24 + 1)
-        # Check that the 'and' instruction executed properly.
+        # Check that the 'andi' instruction executed properly.
         self.assertNotEqual(regStateList.beforeStates[0].get("T0"), 0)
         self.assertEqual(regStateList.afterStates[0].get("T0"), 0)
 
 
     # def testRunX86InstructionOnce(self):
+        # """
+        # This test runs a single x86_64 instruction with one randomization per register.
+        
+        # Asserts that using the run_instruction module on an x86_64 instruction returns the correct
+        # number of outputs, that the instruction information is of the correct type and length,
+        # and that the instruction executed properly
+        # """
     #     panda = initializePanda("x86_64")
     #     instruction = "AND RAX, 0"
     #     print(instruction)

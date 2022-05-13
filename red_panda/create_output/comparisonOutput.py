@@ -2,7 +2,6 @@ from red_panda.models.correlations import *
 from red_panda.compare_to_taint.taintComparer import *
 
 def printAllCorrelations(corrDict, writeFile, registerNames):
-    print("length of register names", len(registerNames))
     for reg in corrDict.keys():
         tainted = corrDict[reg]
         if(reg>=len(registerNames)):
@@ -14,7 +13,6 @@ def printAllCorrelations(corrDict, writeFile, registerNames):
                 writeFile.write(f"Register {registerNames[reg]} does not affect anything.\n")
             else:
                 for reg2 in tainted:
-                    print(reg, reg2)
                     writeFile.write(f"Register {registerNames[reg]} affects register {registerNames[reg2]}.\n")
 
 def generateOutput(instructionNames, data, filename, registerNames):
